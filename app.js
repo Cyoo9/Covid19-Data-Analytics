@@ -6,7 +6,7 @@ var multer  = require('multer');
 
 
 app.get("/", function(req, res) {
-  res.sendFile(__dirname + "/index.html");
+  res.sendFile(__dirname + "/covidData.html");
 });
 
 app.post("/", function(req, res) {
