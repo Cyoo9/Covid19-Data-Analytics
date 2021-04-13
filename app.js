@@ -6,48 +6,34 @@ const server = 5000;
 var bodyParser = require("body-parser");
 var multer  = require('multer');
 var csvFileName = "time_series_covid_19_confirmed_US.csv"; //just testing the function
+var csv = fs.readFileSync(csvFileName); 
 var List = require("collections/list"); //used for csv after array
 var list = new List([])
 
-function csvParser(csvFileName) {
-  var csv = fs.readFileSync(csvFileName);
-  var array = csv.toString().split("\r");
+function csvParser(csv){
 
-  let result = [];
-  let headers = array[0].split(", ");
+  var lines=csv.toString().split("\n");
 
-  for (let i = 1; i < array.length - 1; i++) {
-    let obj = {}
-    let str = array[i]
-    let s = ''
-    let flag = 0
+  var result = [];
 
-    for (let ch of str) {
-      if (ch === '"' && flag === 0) {
-        flag = 1
-      }
-      else if (ch === '"' && flag == 1) flag = 0
-      if (ch === ', ' && flag === 0) ch = '|'
-      if (ch !== '"') s += ch
-    }
-  
-    let properties = s.split("|")
+  var headers=lines[0].split(",");
 
-    for (let j in headers) {
-      if (properties[j].includes(", ")) {
-        obj[headers[j]] = properties[j]
-          .split(", ").map(item => item.trim())
-      }
-      else obj[headers[j]] = properties[j]
-    }
-    result.push(obj);
+  for(var i=1;i<lines.length;i++){
+
+	  var obj = {};
+	  var currentline = lines[i].split(",");
+
+	  for(var j=0;j<headers.length;j++){
+		  obj[headers[j]] = currentline[j];
+	  }
+	  result.push(obj);
   }
-
-  let json = JSON.stringify(result);
-  fs.writeFileSync('output.json', json);
+  
+  let json = JSON.stringify(result); //JSON
+  fs.writeFileSync('output.json', json); 
 }
 
-csvParser(csvFileName);
+csvParser(csv);
 
 /* app.use(express.urlencoded({
   extended: true
