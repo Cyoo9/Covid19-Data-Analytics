@@ -5,7 +5,7 @@ const server = 5000;
 
 var bodyParser = require("body-parser");
 var multer  = require('multer');
-var csvFileName = "time_series_covid_19_confirmed_US.csv"; //just testing the function
+var csvFileName = "covid_19_data.csv"; //just testing the function
 var csv = fs.readFileSync(csvFileName); 
 var List = require("collections/list"); //used for csv after array
 var list = new List([])
@@ -31,8 +31,8 @@ function csvParser(csv){
   
   let json = JSON.stringify(result); //JSON
   let js = JSON.parse(json);
-  console.log(getObjects(js, 'UID', '84001133')); //specific search 
-  fs.writeFileSync('output.json', json); 
+  let jsonOutput = JSON.stringify(getObjects(js, 'Province/State', 'Anhui'));
+  fs.writeFileSync('output.json', jsonOutput); 
 }
 
 function getObjects(obj, key, val) {
