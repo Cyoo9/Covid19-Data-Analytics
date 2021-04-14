@@ -12,7 +12,7 @@ var list = new List([])
 
 function csvParser(csv){
 
-  var lines=csv.toString().split("\n");
+  var lines=csv.toString().split("\r\n");
 
   var result = [];
 
@@ -28,11 +28,27 @@ function csvParser(csv){
 	  }
 	  result.push(obj);
   }
+  console.log(result[0]);
+  var search = [];
+  var searchIndex = 0;
+  for(var i = 0; i < result.length; i++) {
+
+      if(result[i]['Country/Region'] == 'Mainland China') {
+          if(result[i]['Province/State'] == 'Anhui') {
+            search[searchIndex] = result[i];
+            searchIndex = searchIndex + 1;
+          }
+      }
+  }
+  let json = JSON.stringify(search);
+  //let js = JSON.parse(json);
+  fs.writeFileSync('output.json', js);
   
-  let json = JSON.stringify(result); //JSON
+ /* let json = JSON.stringify(result); //JSON
   let js = JSON.parse(json);
-  let jsonOutput = JSON.stringify(getObjects(js, 'Province/State', 'Anhui'));
-  fs.writeFileSync('output.json', jsonOutput); 
+  js = JSON.stringify(getObjects(js, 'Province/State', 'Anhui'));
+  console.log(js);
+  fs.writeFileSync('output.json', js); */
 }
 
 function getObjects(obj, key, val) {
@@ -57,7 +73,7 @@ function getObjects(obj, key, val) {
 
 csvParser(csv); //test it
  
-/* app.use(express.urlencoded({
+/*app.use(express.urlencoded({
   extended: true
 }))
 
