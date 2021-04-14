@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/ucr-cs180-spring21/CSAST#readme",
   "dependencies": {
+    "csv-parser": "^3.0.0",
     "express": "^4.17.1",
     "multer": "^1.4.2"
   },
