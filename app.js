@@ -5,53 +5,56 @@ const server = 5000;
 
 var bodyParser = require("body-parser");
 var multer  = require('multer');
-var csvFileName = "covid_19_data.csv"; //just testing the function
-var csv = fs.readFileSync(csvFileName); 
-var List = require("collections/list"); //used for csv after array
-var list = new List([])
+var csvFileName = "covid_19_data.csv"; //just testing the functions
+var csv = fs.readFileSync(csvFileName); //reads in a cvs file
 
+//parses a cvs file into an array
 function csvParser(csv){
 
-  var lines=csv.toString().split("\r\n");
+  var lines=csv.toString().split("\r\n"); //split cvs file into readable lines of data by endlines
+  var result = []; //create the array
+  var headers=lines[0].split(","); //split the first line into object variable names
 
-  var result = [];
-
-  var headers=lines[0].split(",");
-
+  //goes through every line but the header line
   for(var i=1;i<lines.length;i++){
 
-	  var obj = {};
-	  var currentline = lines[i].split(",");
+	  var obj = {}; //create new object to be added to the array
+	  var currentline = lines[i].split(","); //split the current line into object variable values
 
+    //for each variable name in header, assign the value from that line
 	  for(var j=0;j<headers.length;j++){
 		  obj[headers[j]] = currentline[j];
 	  }
-	  result.push(obj);
-  }
-  console.log(result[0]);
-  var search = [];
-  var searchIndex = 0;
-  for(var i = 0; i < result.length; i++) {
 
-      if(result[i]['Country/Region'] == 'Mainland China') {
-          if(result[i]['Province/State'] == 'Anhui') {
-            search[searchIndex] = result[i];
-            searchIndex = searchIndex + 1;
-          }
-      }
+	  result.push(obj); //push newly created object on to array
   }
-  let json = JSON.stringify(search);
-  //let js = JSON.parse(json);
-  fs.writeFileSync('output.json', js);
-  
- /* let json = JSON.stringify(result); //JSON
-  let js = JSON.parse(json);
-  js = JSON.stringify(getObjects(js, 'Province/State', 'Anhui'));
-  console.log(js);
-  fs.writeFileSync('output.json', js); */
+
+  return result;
 }
 
-function getObjects(obj, key, val) {
+//searchs an array for specific object values
+function search(result) {
+
+  //console.log(result[0]);
+  var search = []; //create array that will hold the objects with the correct search values
+
+  //loops through all the arrays objects
+  for(var i = 0; i < result.length; i++) {
+    //stub
+    if(result[i]['Country/Region'] == 'Mainland China') {
+      if(result[i]['ObservationDate'] == '01/23/2020') {
+        search.push(result[i]);
+      }
+    }
+  }
+
+  let json = JSON.stringify(search); //stringify the search array
+  fs.writeFileSync('output.json', json); //store the string in a json file to be sent to front-end
+}
+
+//We might not need getObjects anymore caleb
+
+/*function getObjects(obj, key, val) {
     var objects = [];
     for (var i in obj) {
         if (!obj.hasOwnProperty(i)) continue;
@@ -69,9 +72,11 @@ function getObjects(obj, key, val) {
         }
     }
     return objects;
-}
+} */
 
-csvParser(csv); //test it
+//test parser and stub search
+var result = csvParser(csv);
+search(result);
  
 /*app.use(express.urlencoded({
   extended: true
