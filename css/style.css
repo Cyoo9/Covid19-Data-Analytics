@@ -4,3 +4,13 @@ body{
     font-family: Arial, Helvetica, sans-serif;
 }
 .tab { margin-left: 40px; }
+
+
+.hidden {
+    display: none;
+}
+
+.red-color {
+    color: red;
+}
+
