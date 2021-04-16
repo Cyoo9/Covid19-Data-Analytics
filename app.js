@@ -7,12 +7,12 @@ var bodyParser = require("body-parser");
 var multer  = require('multer');
 var csvFileName = "covid_19_data.csv"; //just testing the functions
 var csv = fs.readFileSync(csvFileName); //reads in a cvs file
+var result = [];
 
 //parses a cvs file into an array
 function csvParser(csv){
 
   var lines=csv.toString().split("\r\n"); //split cvs file into readable lines of data by endlines
-  var result = []; //create the array
   var headers=lines[0].split(","); //split the first line into object variable names
 
   //goes through every line but the header line
@@ -28,68 +28,50 @@ function csvParser(csv){
 
 	  result.push(obj); //push newly created object on to array
   }
-
-  return result;
 }
 
-//searchs an array for specific object values
-function search(result) {
+csvParser(csv);
 
-  //console.log(result[0]);
+//searchs an array for specific object values
+function search(req, res, next) {
+ 
   var search = []; //create array that will hold the objects with the correct search values
 
+  console.log(req.body.confirmedCases);
+  console.log(req.body.deaths);
+  console.log(req.body.recoveries);
+  
   //loops through all the arrays objects
   for(var i = 0; i < result.length; i++) {
-    //stub
-    if(result[i]['Country/Region'] == 'Mainland China') {
-      if(result[i]['ObservationDate'] == '01/23/2020') {
-        search.push(result[i]);
+    //checks if country, state, and date match, accepts all if one or more is left blank
+    if(result[i]['Country/Region'] == req.body.country || req.body.country == '') {
+      if(result[i]['Province/State'] == req.body.state || req.body.state == '') {
+        if(result[i]['ObservationDate'] == req.body.date || req.body.date == '') {
+          search.push(result[i]);
+        }
       }
     }
   }
 
   let json = JSON.stringify(search); //stringify the search array
   fs.writeFileSync('output.json', json); //store the string in a json file to be sent to front-end
+  next();
 }
-
-//We might not need getObjects anymore caleb
-
-/*function getObjects(obj, key, val) {
-    var objects = [];
-    for (var i in obj) {
-        if (!obj.hasOwnProperty(i)) continue;
-        if (typeof obj[i] == 'object') {
-            objects = objects.concat(getObjects(obj[i], key, val));    
-        } else 
-        //if key matches and value matches or if key matches and value is not passed (eliminating the case where key matches but passed value does not)
-        if (i == key && obj[i] == val || i == key && val == '') { //
-            objects.push(obj);
-        } else if (obj[i] == val && key == ''){
-            //only add if the object is not already in the array
-            if (objects.lastIndexOf(obj) == -1){
-                objects.push(obj);
-            }
-        }
-    }
-    return objects;
-} */
-
-//test parser and stub search
-var result = csvParser(csv);
-search(result);
  
-/*app.use(express.urlencoded({
+app.get("/", function(req, res) {
+  res.sendFile(__dirname + "/covidForm.html");
+});
+
+app.use(express.urlencoded({
   extended: true
 }))
 
-app.get("/", function(req, res) {
-  res.sendFile(__dirname + "/covidData.html");
-});
+app.use(search); //middleware
 
-app.post("/", function(req, res) {
-
+app.post('/', search, (req, res) => {
+  res.sendFile(__dirname + "/output.json");
 });
 
 app.listen(server, function() {
     console.log(`Server is running on port: ${server}`);
-}) */
+})
