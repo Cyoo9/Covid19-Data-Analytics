@@ -12,26 +12,26 @@
         <h2>What would you like to know?</h2>
         <h5> Please specify location and date: </h5>
         <div class="tab">
-            <form>
+            <form action="" method="POST">
                 <label for="country">Country:</label><br>
                 <input type="text" id="country" name="country"><br>
+                <label for="state">State/Province:</label><br>
+                <input type="text" id="state" name="state"><br>
                 <label for="date">Date (MM/DD/YYYY)</label><br>
                 <input type="text" id="date" name="date">
-            </form>
         </div>
         <h5> Select at least one statistic: </h5>
         <div class="tab">
-            <form>
-                <input type="checkbox" id="confirmedCases" name="confirmedCases" value="False">
+                <input type="checkbox" id="confirmedCases" name="confirmedCases" value="True">
                 <label for="confirmedCases"> Confirmed Cases</label><br>
-                <input type="checkbox" id="deaths" name="deaths" value="False">
+                <input type="checkbox" id="deaths" name="deaths" value="True">
                 <label for="deaths"> Deaths</label><br>
-                <input type="checkbox" id="recoveries" name="recoveries" value="False">
+                <input type="checkbox" id="recoveries" name="recoveries" value="True">
                 <label for="recoveries"> Recoveries</label>
+                </div>
+                <br>
+                <button type ="submit">Search</button>
             </form>
-        </div>
-        <br>
-        <input type="button"  value="Search" method="POST">
         <h5> Results: </h5>
     </body>
 </html>
