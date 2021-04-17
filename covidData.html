@@ -18,7 +18,7 @@
 
           
             <div class="tab">
-                <form name ="main-form" onsubmit="validate(event)"> 
+                <form name ="main-form" onsubmit="validate(event)" method="POST"> 
 
                     <h5> Please specify location and date: </h5>
                     <label for="country">Country:</label><br>
@@ -266,7 +266,7 @@
                     <br>
 
                     <label for="date">Date</label><br>
-                    <input type="date" required>
+                    <input type="date" id="date" name="date" required>
                     
     
                     <h5> Select at least one statistic: </h5>
