@@ -83,7 +83,9 @@ app.use(express.urlencoded({
 
 app.use(search); //middleware
 
-app.post('/', search, (req, res) => {
+app.post('/covidData.html', search, (req, res) => {
+  console.log( "XDXDXDXD: " + __dirname + "/output.json");
+  //res.send("<h1>hey buddy</h1>")
   res.sendFile(__dirname + "/output.json");
 });
 
