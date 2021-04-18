@@ -2,6 +2,8 @@ const express = require('express');
 const app = express();
 const fs = require('fs');
 const server = 5000;
+const path = require ('path');
+
 
 var bodyParser = require("body-parser");
 var multer  = require('multer');
@@ -40,6 +42,7 @@ function search(req, res, next) {
   console.log(req.body.confirmedCases);
   console.log(req.body.deaths);
   console.log(req.body.recoveries);
+  console.log("APP.JS LINE 43");
   
   //loops through all the arrays objects
   for(var i = 0; i < result.length; i++) {
@@ -57,10 +60,22 @@ function search(req, res, next) {
   fs.writeFileSync('output.json', json); //store the string in a json file to be sent to front-end
   next();
 }
- 
-app.get("/", function(req, res) {
-  res.sendFile(__dirname + "/covidForm.html");
+
+
+
+
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.get('/', function(req, res) {
+  res.redirect("/covidData.html");
+  //res.send("<h1>XDDDDDDDDDDDDDDDDDDDDDD</h1>");
 });
+
+app.get('/covidData.html', function(req, res) {
+  console.log("XD");
+  res.sendFile(path.join(__dirname, "../public" , "covidData.html"));
+});
+
 
 app.use(express.urlencoded({
   extended: true

@@ -820,6 +820,9 @@ function update(value){
 }
 
 
+
+
+
 /*function OnCountrySelection() {
 
     const country_dropdown = document.getElementById("country");
