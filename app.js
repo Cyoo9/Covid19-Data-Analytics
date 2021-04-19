@@ -23,6 +23,17 @@ function csvParser(csv){
 	  var obj = {}; //create new object to be added to the array
 	  var currentline = lines[i].split(","); //split the current line into object variable values
 
+    if(headers.length < currentline.length) {
+      var combinedLines = currentline[2] + ',' + currentline[3];
+      var removeQuotes = combinedLines.split("\"");
+      currentline[2] = removeQuotes[1];
+      currentline[3] = currentline[4];
+      currentline[4] = currentline[5];
+      currentline[5] = currentline[6];
+      currentline[6] = currentline[7];
+      currentline[7] = currentline[8];
+    }
+
     //for each variable name in header, assign the value from that line
 	  for(var j=0;j<headers.length;j++){
 		  obj[headers[j]] = currentline[j];
@@ -47,14 +58,8 @@ function ReformatDate(old_date) {
 
 //searchs an array for specific object values
 function search(req, res, next) {
-
-
   
   searched_results = []; //reset array to empty
-
-  console.log(req.body.Confirmed);
-  console.log(req.body.Deaths);
-  console.log(req.body.Recovered);
   
   //loops through all the arrays objects
   for(var i = 0; i < result.length; i++) {
