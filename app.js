@@ -55,9 +55,14 @@ function search(req, res, next) {
     //checks if country, state, and date match, accepts all if one or more is left blank
     if(result[i]['Country/Region'] == req.body.country || req.body.country == '') {
       if(result[i]['Province/State'] == req.body.state || req.body.state == '') {
-        const reformatted_date = ReformatDate(result[i]['ObservationDate']); //use reformatted date
-        if(reformatted_date == req.body.date || req.body.date == '') {
-          searched_results.push(result[i]);
+        if(req.body.date == '' || ReformatDate(result[i]['ObservationDate']) == req.body.date) {
+          if(result[i]['Confirmed'] >= req.body.confirmed) {
+            if(result[i]['Deaths'] >= req.body.confirmed) {
+              if(result[i]['Recovered'] >= req.body.confirmed) {
+                searched_results.push(result[i]);
+              }
+            }
+          }
         }
       }
     }
