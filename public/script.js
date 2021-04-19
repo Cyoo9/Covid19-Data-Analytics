@@ -1,5 +1,6 @@
 
 
+
 function validate(event) {
     const inputs = document.getElementsByTagName("input");
     let at_least_one_checked = false;
@@ -17,14 +18,98 @@ function validate(event) {
 
         event.preventDefault(); //Stops the onsubmit event. Prevents the form from submitting.
         
+        
     }
 
-    return at_least_one_checked; 
+        return at_least_one_checked;
+    // var xhttp = new XMLHttpRequest();
+    // xhttp.load = function() {
+    //     if (this.readyState == 4 && this.status == 200) {
+    //         document.getElementById("hehexd").innerHTML =
+    //         this.responseText;
+    //    }
+    // };
+    // xhttp.open("GET", "output.json", true);
+    // xhttp.send();
+
+  
+
+
+    //https://www.encodedna.com/javascript/how-to-read-data-from-external-json-file-in-javascript.htm
+    // var oXHR = new XMLHttpRequest();
+    
+
+    // oXHR.onreadystatechange = reportStatus;
+    // oXHR.open('GET', '../public/output.json', true);  // get json file **FIXME** : Doesn't connect to file!
+    // oXHR.onload = function(){
+    //     console.log(oXHR.responseText);
+    // };
+    // oXHR.send();
+
+    // function reportStatus() {
+    //     if (oXHR.readyState == 4) {		// Check if request is complete.
+
+    //         // Create an HTML table using response from server.
+    //         createTableFromJSON(this.responseText);
+    //     }
+    // }
+
+    // // Create an HTML table using the JSON data.
+    // function createTableFromJSON(jsonData) {
+    //     var arrBirds = [];
+    //     arrBirds = JSON.parse(jsonData); 	// Convert JSON to array.
+
+    //     var col = [];
+    //     for (var i = 0; i < arrBirds.length; i++) {
+    //         for (var key in arrBirds[i]) {
+    //             if (col.indexOf(key) === -1) {
+    //                 col.push(key);
+    //             }
+    //         }
+    //     }
+
+    //     // Create a dynamic table.
+    //     var table = document.createElement("table"); // Create table header.
+
+    //     var tr = table.insertRow(-1);                   // Table row.
+
+    //     for (var i = 0; i < col.length; i++) {
+    //         var th = document.createElement("th");      // Table header.
+    //         th.innerHTML = col[i];
+    //         tr.appendChild(th);
+    //     }
+
+    //     // Add JSON to the table rows.
+    //     for (var i = 0; i < arrBirds.length; i++) {
+
+    //         tr = table.insertRow(-1);
+
+    //         for (var j = 0; j < col.length; j++) {
+    //             var tabCell = tr.insertCell(-1);
+    //             tabCell.innerHTML = arrBirds[i][col[j]];
+    //         }
+    //     }
+
+    //     // Finally, add the dynamic table to a container.
+    //     var divContainer = document.getElementById("showTable");
+    //     divContainer.innerHTML = "";
+    //     divContainer.appendChild(table);
+    // };
+
 }
 
-
 var provincesbyCountry = {
-    Australia : ["Australian Capital Territory"
+    "('St. Martin',)" : [""],
+    Afghanistan : [""],
+    Albania : [""],
+    Algeria : [""],
+    Andorra : [""],
+    Angola : [""],
+    "Antigua and Barbuda" : [""],
+    Argentina : [""],
+    Armenia : [""],
+    Aruba : [""],
+    Australia : ["","Australian Capital Territory"
     ,"Diamond Princess cruise ship"
     ,"External territories"
     ,"From Diamond Princess"
@@ -37,7 +122,15 @@ var provincesbyCountry = {
     ,"Victoria"
     ,"Western Australia"
     ],
-    Belgium : ["Antwerp"
+    Austria : [""],
+    Azerbaijan : [""],
+    Bahamas : [""],
+    "Bahamas, The" : [""],
+    Bahrain : [""],
+    Bangladesh : [""],
+    Barbados : [""],
+    Belarus : [""],
+    Belgium : ["","Antwerp"
     ,"Brussels"
     ,"East Flanders"
     ,"Flemish Brabant"
@@ -50,7 +143,13 @@ var provincesbyCountry = {
     ,"Walloon Brabant"
     ,"West Flanders"
     ],
-    Brazil : [ "Acre"
+    Belize : [""],
+    Benin : [""],
+    Bhutan : [""],
+    Bolivia : [""],
+    "Bosnia and Herzegovina" : [""],
+    Botswana : [""],
+    Brazil : ["", "Acre"
     ,"Alagoas"
     ,"Amapa"
     ,"Amazonas"
@@ -79,8 +178,15 @@ var provincesbyCountry = {
     ,"Tocantins"
     ,"Unknown"
     ],
-
-    Canada : [" Montreal, QC"
+    Brunei : [""],
+    Bulgaria : [""],
+    "Burkina Faso" : [""],
+    Burma : [""],
+    Burundi : [""],
+    "Cabo Verde" : [""],
+    Cambodia : [""],
+    Cameroon : [""],
+    Canada : ["", " Montreal, QC"
     ,"Alberta"
     ,"British Columbia"
     ,"Calgary, Alberta"
@@ -103,7 +209,12 @@ var provincesbyCountry = {
     ,"Toronto, ON"
     ,"Yukon"
     ],
-    Chile : ["Antofagasta"
+    "Cape Verde" : [""],
+    "Cayman Islands" : [""],
+    "Central African Republic" : [""],
+    Chad : [""],
+    "Channel Islands" : [""],
+    Chile : ["","Antofagasta"
     ,"Araucania"
     ,"Arica y Parinacota"
     ,"Atacama"
@@ -121,7 +232,7 @@ var provincesbyCountry = {
     ,"Unknown"
     ,"Valparaiso"
     ],
-    Columbia : ["Amazonas"
+    Columbia : ["","Amazonas"
     ,"Antioquia"
     ,"Arauca"
     ,"Atlantico"
@@ -156,8 +267,33 @@ var provincesbyCountry = {
     ,"Vaupes"
     ,"Vichada"
     ],
-    Denmark :["Denmark", "Faroe Islands", "Greenland" ],
-    France :["Fench Guiana"
+    "Comoros" : [""],
+    "Congo (Brazzaville)" : [""],
+    "Congo (Kinshasa)" : [""],
+    "Costa Rica" : [""],
+    Croatia : [""],
+    Cuba : [""],
+    Curacao : [""],
+    Cyprus : [""],
+    "Czech Republic" : [""],
+    Denmark :["","Denmark", "Faroe Islands", "Greenland" ],
+    "Diamond Princess" : [""],
+    Djibouti : [""],
+    Dominica : [""],
+    "Dominican Republic" : [""],
+    "East Timor" : [""],
+    Ecuador : [""],
+    Egypt : [""],
+    "El Salvador" : [""],
+    "Equatorial Guinea" : [""],
+    Eritrea : [""],
+    Estonia :[""],
+    Eswatini :[""],
+    Ethiopia : [""],
+    "Faroe Islands" : [""],
+    Fiji : [""],
+    Finland : [""],
+    France :["", "Fench Guiana"
     ,"France"
     ,"French Guiana"
     ,"French Polynesia"
@@ -171,7 +307,12 @@ var provincesbyCountry = {
     ,"St Martin"
     ,"Wallis and Futuna"
     ],
-    Germany: ["Baden-Wurttemberg"
+    "French Guiana" :  [""],
+    Gabon :  [""],
+    Gambia :  [""],
+    "Gambia, The" : [""],
+    Georgia :  [""],
+    Germany: ["","Baden-Wurttemberg"
     ,"Bavaria"
     ,"Bayern"
     ,"Berlin"
@@ -190,7 +331,25 @@ var provincesbyCountry = {
     ,"Thuringen"
     ,"Unknown"
     ],
-    India: ["Andaman and Nicobar Islands"
+    Ghana : [""],
+    Gibraltar : [""],
+    Greece : [""],
+    Greenland : [""],
+    Grenada : [""],
+    Guadeloupe : [""],
+    Guam : [""],
+    Guatemala : [""],
+    Guernsey : [""],
+    Guinea : [""],
+    "Guinea-Bissau" : [""],
+    Guyana : [""],
+    Haiti : [""],
+    "Holy See" : [""], 
+    Honduras : [""], 
+    "Hong Kong" : [""], 
+    Hungary : [""], 
+    Iceland : [""], 
+    India: ["","Andaman and Nicobar Islands"
     ,"Andhra Pradesh"
     ,"Arunachal Pradesh"
     ,"Assam"
@@ -229,9 +388,12 @@ var provincesbyCountry = {
     ,"Uttarakhand"
     ,"West Bengal"
     ],
-    Iraq : ["None"],
-    Israel: ["From Diamond Princess"],
-    Italy : ["Abruzzo"
+    Indonesia : [""], 
+    Iran : [""], 
+    Iraq : ["","None"],
+    Ireland : [""], 
+    Israel : ["","From Diamond Princess"],
+    Italy : ["","Abruzzo"
     ,"Basilicata"
     ,"Calabria"
     ,"Campania"
@@ -253,7 +415,9 @@ var provincesbyCountry = {
     ,"Valle d'Aosta"
     ,"Veneto"
     ],
-    Japan: ["Aichi"
+    "Ivory Coast" : [""],
+    Jamaica : [""],
+    Japan: ["","Aichi"
     ,"Akita"
     ,"Aomori"
     ,"Chiba"
@@ -303,9 +467,25 @@ var provincesbyCountry = {
     ,"Yamaguchi"
     ,"Yamanashi"
     ],
-    Lebanon : ["None"],
-    Macau : ["Macau"],
-    "Mainland China": ["Anhui"
+    Jersey : [""],
+    Jordan : [""],
+    Kazakhstan : [""],
+    Kenya : [""],
+    Kosovo : [""],
+    Kuwait : [""],
+    Kyrgyzstan : [""],
+    Laos : [""],
+    Latvia : [""],
+    Lebanon : ["","None"],
+    Lesotho : [""],
+    Liberia : [""],
+    Libya : [""],
+    Liechtenstein : [""],
+    Lithuania : [""],
+    Luxembourg : [""],
+    Macau : ["","Macau"],
+    Madagascar : [""],
+    "Mainland China": ["","Anhui"
     ,"Beijing"
     ,"Chongqing"
     ,"Fujian"
@@ -338,7 +518,17 @@ var provincesbyCountry = {
     ,"Yunnan"
     ,"Zhejiang"
     ],
-    Mexico : ["Aguascalientes"
+    Malawi : [""],
+    Malaysia : [""],
+    Maldives : [""],
+    Mali : [""],
+    Malta : [""],
+    "Marshall Islands" : [""],
+    Martinique : [""],
+    Mauritania : [""],
+    Mauritius : [""],
+    Mayotte : [""],
+    Mexico : ["","Aguascalientes"
     ,"Baja California"
     ,"Baja California Sur"
     ,"Campeche"
@@ -372,7 +562,17 @@ var provincesbyCountry = {
     ,"Yucatan"
     ,"Zacatecas"
     ],
-    Netherlands : ["Aruba"
+    Micronesia : [""],
+    Moldova : [""],
+    Monaco : [""],
+    Mongolia : [""],
+    Montenegro : [""],
+    Morocco : [""],
+    Mozambique : [""],
+    "MS Zaandam" : [""],
+    Namibia : [""],
+    Nepal : [""],
+    Netherlands : ["","Aruba"
     ,"Bonaire, Sint Eustatius and Saba"
     ,"Curacao"
     ,"Drenthe"
@@ -391,8 +591,17 @@ var provincesbyCountry = {
     ,"Zeeland"
     ,"Zuid-Holland"
     ],
-    Others : ["Cruise Ship", "Diamond Princess cruise ship"],
-    Pakistan : ["Azad Jammu and Kashmir"
+    "New Zealand" : [""],
+    Nicaragua : [""],
+    Niger : [""],
+    Nigeria : [""],
+    "North Ireland" : [""],
+    "North Macedonia" : [""],
+    Norway : [""],
+    "occupied Palestinian territory" : [""],
+    Oman : [""],
+    Others : ["","Cruise Ship", "Diamond Princess cruise ship"],
+    Pakistan : ["","Azad Jammu and Kashmir"
     ,"Balochistan"
     ,"Gilgit-Baltistan"
     ,"Islamabad"
@@ -400,7 +609,11 @@ var provincesbyCountry = {
     ,"Punjab"
     ,"Sindh"
     ],
-    Peru : ["Amazonas"
+    Palestine : [""],
+    Panama : [""],
+    "Papua New Guinea" : [""],
+    Paraguay : [""],
+    Peru : ["","Amazonas"
     ,"Ancash"
     ,"Apurimac"
     ,"Arequipa"
@@ -427,7 +640,16 @@ var provincesbyCountry = {
     ,"Ucayali"
     ,"Unknown"
     ],
-    Russia : ["Adygea Republic"
+    Philippines : [""],
+    Poland : [""],
+    Portugal : [""],
+    "Puerto Rico" : [""],
+    Qatar : [""],
+    "Republic of Ireland" : [""],
+    "Republic of the Congo" : [""],
+    Reunion : [""],
+    Romania : [""],
+    Russia : ["","Adygea Republic"
     ,"Altai Krai"
     ,"Altai Republic"
     ,"Amur Oblast"
@@ -511,7 +733,28 @@ var provincesbyCountry = {
     ,"Yaroslavl Oblast"
     ,"Zabaykalsky Krai"
     ],
-    Spain : ["Andalusia"
+    Rwanda : [""],
+    "Saint Barthelemy" : [""],
+    "Saint Kitts and Nevis" : [""],
+    "Saint Lucia" : [""],
+    "Saint Vincent and the Grenadines" : [""],
+    Samoa : [""],
+    "San Marino" : [""],
+    "Sao Tome and Principe" : [""],
+    "Saudi Arabia" : [""],
+    Senegal : [""],
+    Serbia : [""],
+    Seychelles : [""],
+    "Sierra Leone" : [""],
+    Singapore : [""],
+    Slovakia : [""],
+    Slovenia : [""],
+    "Solomon Islands" : [""],
+    Somalia : [""],
+    "South Africa" : [""],
+    "South Korea" : [""],
+    "South Sudan" : [""],
+    Spain : ["","Andalusia"
     ,"Aragon"
     ,"Asturias"
     ,"Baleares"
@@ -532,7 +775,11 @@ var provincesbyCountry = {
     ,"Pais Vasco"
     ,"Unknown"
     ],
-    Sweden : ["Blekinge"
+    "Sri Lanka" : [""],
+    "St. Martin" : [""],
+    Sudan : [""],
+    Suriname : [""],
+    Sweden : ["","Blekinge"
     ,"Dalarna"
     ,"Gavleborg"
     ,"Gotland"
@@ -554,8 +801,21 @@ var provincesbyCountry = {
     ,"Vastmanland"
     ,"Vastra Gotaland"
     ],
-    Taiwan : ["Taiwan"],
-    UK : [,"Anguilla"
+    Switzerland : [""],
+    Syria : [""],
+    Taiwan : ["","Taiwan"],
+    Tajikistan : [""],
+    Tanzania : [""],
+    Thailand : [""],
+    "The Bahamas" : [""],
+    "The Gambia" : [""],
+    "Timor-Leste" : [""],
+    Togo : [""],
+    "Trinidad and Tobago" : [""],
+    Tunisia : [""],
+    Turkey : [""],
+    Uganda : [""],
+    UK : ["","Anguilla"
     ,"Bermuda"
     ,"British Virgin Islands"
     ,"Cayman Islands"
@@ -575,7 +835,8 @@ var provincesbyCountry = {
     ,"Unknown"
     ,"Wales"
     ],
-    Ukraine : ["Cherkasy Oblast"
+    "United Arab Emirates" : [""],
+    Ukraine : ["","Cherkasy Oblast"
     ,"Chernihiv Oblast"
     ,"Chernivtsi Oblast"
     ,"Crimea Republic*"
@@ -603,7 +864,7 @@ var provincesbyCountry = {
     ,"Zaporizhia Oblast"
     ,"Zhytomyr Oblast"
     ],
-    US : [" Norfolk County, MA"
+    US : [""," Norfolk County, MA"
     ,"Alabama"
     ,"Alameda County, CA"
     ,"Alaska"
@@ -803,9 +1064,16 @@ var provincesbyCountry = {
     ,"Wyoming"
     ,"Yolo County, CA"
     ],
-
+    Uzbekistan : [""],
+    Vanuatu : [""],
+    "Vatican City" : [""],
+    Venezuela : [""],
+    Vietnam : [""],
+    "West Bank and Gaza" : [""],
+    Yemen : [""],
+    Zambia : [""],
+    Zimbabwe : [""],
 }
-
 
 function update(value){
     if (value.length ==0) document.getElementById("state").innerHTML = 
