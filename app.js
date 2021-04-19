@@ -47,18 +47,25 @@ function ReformatDate(old_date) {
 
 //searchs an array for specific object values
 function search(req, res, next) {
+
+
   
   searched_results = []; //reset array to empty
 
+  console.log(req.body.Confirmed);
+  console.log(req.body.Deaths);
+  console.log(req.body.Recovered);
+  
   //loops through all the arrays objects
   for(var i = 0; i < result.length; i++) {
+
     //checks if country, state, and date match, accepts all if one or more is left blank
     if(result[i]['Country/Region'] == req.body.country || req.body.country == '') {
       if(result[i]['Province/State'] == req.body.state || req.body.state == '') {
         if(req.body.date == '' || ReformatDate(result[i]['ObservationDate']) == req.body.date) {
-          if(result[i]['Confirmed'] >= req.body.confirmed) {
-            if(result[i]['Deaths'] >= req.body.confirmed) {
-              if(result[i]['Recovered'] >= req.body.confirmed) {
+          if(parseInt(result[i]['Confirmed']) >= parseInt(req.body.Confirmed)) {
+            if(parseInt(result[i]['Deaths']) >= parseInt(req.body.Deaths)) {
+              if(parseInt(result[i]['Recovered']) >= parseInt(req.body.Recovered)) {
                 searched_results.push(result[i]);
               }
             }
