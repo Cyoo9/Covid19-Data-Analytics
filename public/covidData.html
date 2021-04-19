@@ -281,7 +281,19 @@
                     
                     <br>
                     <br>
-    
+
+                    <h5> Or, search by minimum statistic </h5>
+                       
+                            <input type = "number" id="confirmed" name="confirmed" value="0" min="0">
+                            <label for="Confirmed" > Minimum confirmed cases </label><br>
+                            <input type = "number" id="died" name="died" value="0" min="0">
+                            <label for="Deaths" > Minimum deaths </label><br>
+                            <input type = "number" id="recovered" name="recovered" value="0" min="0">
+                            <label for="Recovered" > Minimum recoveries </label>
+  
+                    <br>
+                    <br>
+
                     <!--input type="button" value="Search" method="POST"-->
                     <!-- <button type ="submit" formmethod="POST">Search</button> -->
                     <button id = "loadMore">Search</button>
@@ -339,18 +351,24 @@
                 const country = document.getElementById('country').value;
                 const state = document.getElementById('state').value;
                 const date = document.getElementById('date').value;
+                const numCases = document.getElementsByName("confirmed")[0].value;
+                const numDeaths = document.getElementsByName("died")[0].value;
+                const numRecovered = document.getElementsByName("recovered")[0].value;
 
+                
                 console.log(country);
                 console.log(state);
                 console.log(date);
+                console.log(numCases);
+                console.log(numDeaths);
+                console.log(numRecovered);
                 var http = new XMLHttpRequest();
-                var params = `country=${country}&state=${state}&date=${date}`;
+                var params = `country=${country}&state=${state}&date=${date}&Confirmed=${numCases}&Deaths=${numDeaths}&Recovered=${numRecovered}`;
                 http.open('POST', '/', true);
                 http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
                 http.onreadystatechange = function() {//Call a function when the state changes.
                     if(http.readyState == 4 && http.status == 200) {
                         console.log(http.responseText);
-                        console.log("breh");
 
                         // for (let i = 0; i < http.ResponseText.length; ++i) {
                         //     const new_tr = document.createElement("tr");
@@ -364,6 +382,8 @@
                     }
                     
                 }   
+
+                //console.log(params);
                 http.send(params);
 
                 return true;
