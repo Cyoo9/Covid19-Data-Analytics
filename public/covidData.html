@@ -13,7 +13,7 @@
         <h1>Covid-19 Information</h1>
         <h2>What would you like to know?</h2>
 
-        <div class="hidden red-color">
+        <div id='error' class="hidden red-color">
             <h5>*You must select at least one statistic*</h5> 
         </div>
 
@@ -311,6 +311,31 @@
 
                 event.preventDefault();
 
+                const inputs = document.getElementsByTagName("input");
+                let at_least_one_checked = false;
+
+                for (let i = 0; i < inputs.length; ++i) {
+                    at_least_one_checked |= inputs[i].type == "checkbox" && inputs[i].checked;
+                }
+
+                if (!at_least_one_checked) {
+                    const hidden_elems = document.getElementsByClassName("hidden");
+                    
+                    for (let i = 0; i < hidden_elems.length; ++i) {
+                        hidden_elems[i].classList.remove("hidden");
+                    }
+                    
+                    
+                }
+
+                if (!at_least_one_checked) {
+                    return false;
+                }
+                else {
+                    const error_elem = document.getElementById('error');
+                    error_elem.setAttribute('class', 'hidden');
+                }
+
                 const country = document.getElementById('country').value;
                 const state = document.getElementById('state').value;
                 const date = document.getElementById('date').value;
@@ -341,7 +366,7 @@
                 }   
                 http.send(params);
 
-                
+                return true;
         }
 
             </script>
