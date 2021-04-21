@@ -118,3 +118,80 @@ app.post('/', search,  (req, res) => {
 app.listen(server, function() {
     console.log(`Server is running on port: ${server}`);
 })
+
+
+
+
+
+function InUpDel(req, res, next) {
+
+  var currentdate = new Date(); 
+  var datetime = "Last Sync: " + currentdate.getDate() + "/"
+                  + (currentdate.getMonth()+1)  + "/" 
+                  + currentdate.getFullYear() + " @ "  
+                  + currentdate.getHours() + ":"  
+                  + currentdate.getMinutes() + ":" 
+                  + currentdate.getSeconds();
+  
+  if(req.body.sno == '') {
+    var obj = {
+      SNo: result[result.length-1]['SNo']+1,
+      ObservationDate: req.body.obdt,
+      'Province/State': req.body.pvst,
+      'Country/Region': req.body.corg,
+      'Last Update': datetime,
+      Confirmed: req.body.con,
+      Deaths: req.body.ded,
+      Recovered: req.body.rev
+    };
+    result.push(obj);
+  }
+  else {
+    var index = -1;
+    for(var i = 0; i < result.length; i++) {
+      if(result[i]['SNo'] == req.body.sno) {
+        index = i;
+      }
+    }
+    let json = JSON.stringify(results[i]);
+    fs.writeFileSync('./public/output.json', json);
+    res.sendFile(path.join(__dirname, "/public" , "output.json"));
+    if(DELETE) {
+      result.splice(index, 1); //removes from array?
+    }
+    if(UPDATE) {
+      if(req.body.obdt != '') {
+        result[index]['ObservationDate'] = req.body.obdt;
+      }
+      if(req.body.pvst != '') {
+        result[index]['Province/State'] = req.body.pvst;
+      }
+      if(req.body.corg != '') {
+        result[index]['Country/Region'] = req.body.corg;
+      }
+      if(req.body.con != '') {
+        result[index]['Confirmed'] = req.body.con;
+      }
+      if(req.body.ded != '') {
+        result[index]['Deaths'] = req.body.ded;
+      }
+      if(req.body.rev != '') {
+        result[index]['Recovered'] = req.body.rev;
+      }
+      result[index]['Last Update'] = datetime;
+    }
+  }
+
+  var obj = {
+    SNo: '',
+    ObservationDate: '',
+    'Province/State': '',
+    'Country/Region': '',
+    'Last Update': '',
+    Confirmed: '',
+    Deaths: '',
+    Recovered: ''
+  };
+  res.send("Changes confirmed");
+  next();
+}
