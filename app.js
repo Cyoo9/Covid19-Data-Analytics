@@ -108,7 +108,7 @@ app.post('/', search,  (req, res) => {
   for (let i = 0; i < searched_results.length; ++i) {
     console.log(`${i}: ${JSON.stringify(searched_results[i])}`);
   } */
-  
+  csv = fs.readFileSync(path.resolve(__dirname, './CSV Files/covid_19_data.csv'));
   let json = JSON.stringify(searched_results); //stringify the search array
   fs.writeFileSync('./public/output.json', json); //store the string in a json file to be sent to front-end
 
@@ -116,10 +116,14 @@ app.post('/', search,  (req, res) => {
   //res.end();
 });
 
-app.post('/update', (req, res) => {
-  let csvContent = ConvertToCSV(result); 
-  fs.writeFileSync(path.resolve(__dirname, './CSV Files/covid_19_data.csv'), csvContent)
-  req.send(csvContent);
+app.post('/update', InUpDel, search, (req, res) => {
+  let csvContent = ConvertToCSV(result); //result will already update here after InUpDel middleware function
+  fs.writeFileSync('./CSV Files/covid_19_data_updated.csv', csvContent);
+  csv = fs.readFileSync(path.resolve(__dirname, './CSV Files/covid_19_data_updated.csv'));
+  
+  let json = JSON.stringify(searched_results); //stringify the search array
+  fs.writeFileSync('./public/output.json', json); //store the string in a json file to be sent to front-end
+  res.sendFile(path.join(__dirname, "/public" , "output.json"));
 })
 
 app.listen(server, function() {
