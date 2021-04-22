@@ -89,12 +89,6 @@ app.get('/', function(req, res) {
   res.sendFile(path.join(__dirname, "/public" , "covidData.html"));
 });
 
-app.get('/output.json', (req, res) => {
-  console.log('xd');  //??
-  res.send("XDDDDD");  //??
-  //res.sendFile(path.join(__dirname, "/public" , "output.json"));
-});
-
 app.use(express.urlencoded({
   extended: true
 }))
@@ -102,18 +96,11 @@ app.use(express.urlencoded({
 //calls the middlewear function "search" after the client posts a request
 app.post('/', search,  (req, res) => {
 
-  /*console.log(req.body);
-
-  console.log(searched_results.length);
-  for (let i = 0; i < searched_results.length; ++i) {
-    console.log(`${i}: ${JSON.stringify(searched_results[i])}`);
-  } */
   csv = fs.readFileSync(path.resolve(__dirname, './CSV Files/covid_19_data.csv'));
   let json = JSON.stringify(searched_results); //stringify the search array
   fs.writeFileSync('./public/output.json', json); //store the string in a json file to be sent to front-end
 
   res.sendFile(path.join(__dirname, "/public" , "output.json"));
-  //res.end();
 });
 
 app.post('/update', InUpDel, search, (req, res) => {
@@ -220,11 +207,4 @@ function ConvertToCSV(objArray) {
 
   return str;
 }
-
-
-/*var downloadLink = document.createElement("a"); //frontend
-var blob = new Blob(["\ufeff", csv]);
-var url = URL.createObjectURL(blob);
-downloadLink.href = url;
-downloadLink.download = "covid_19_data_updated.csv";*/
 
