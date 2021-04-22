@@ -96,7 +96,7 @@ app.use(express.urlencoded({
 //calls the middlewear function "search" after the client posts a request
 app.post('/', search,  (req, res) => {
 
-  csv = fs.readFileSync(path.resolve(__dirname, './CSV Files/covid_19_data.csv'));
+  //csv = fs.readFileSync(path.resolve(__dirname, './CSV Files/covid_19_data.csv'));
   let json = JSON.stringify(searched_results); //stringify the search array
   fs.writeFileSync('./public/output.json', json); //store the string in a json file to be sent to front-end
 
