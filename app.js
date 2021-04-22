@@ -45,6 +45,7 @@ function csvParser(csv){
 
 csvParser(csv);
 
+
 //Reformats dates from something like 12/19/2020 to 2020-12-19
 function ReformatDate(old_date) {
 
@@ -115,13 +116,14 @@ app.post('/', search,  (req, res) => {
   //res.end();
 });
 
+app.post('/update', (req, res) => {
+  let csvContent = ConvertToCSV(result); 
+  req.send(csvContent);
+})
+
 app.listen(server, function() {
     console.log(`Server is running on port: ${server}`);
 })
-
-
-
-
 
 function InUpDel(req, res, next) {
 
@@ -195,3 +197,28 @@ function InUpDel(req, res, next) {
   res.send("Changes confirmed");
   next();
 }
+
+function ConvertToCSV(objArray) {
+  var array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray;
+  var str = '';
+
+  for (var i = 0; i < array.length; i++) {
+    var line = '';
+      for (var index in array[i]) {
+          if (line != '') {
+            line += ','
+          }
+          line += array[i][index];
+      }
+      str += line + '\r\n';
+  }
+
+  return str;
+}
+
+/*var downloadLink = document.createElement("a"); //frontend
+var blob = new Blob(["\ufeff", csv]);
+var url = URL.createObjectURL(blob);
+downloadLink.href = url;
+downloadLink.download = "covid_19_data_updated.csv";*/
+
