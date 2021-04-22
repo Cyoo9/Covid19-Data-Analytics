@@ -118,6 +118,7 @@ app.post('/', search,  (req, res) => {
 
 app.post('/update', (req, res) => {
   let csvContent = ConvertToCSV(result); 
+  fs.writeFileSync(path.resolve(__dirname, './CSV Files/covid_19_data.csv'), csvContent)
   req.send(csvContent);
 })
 
@@ -215,6 +216,7 @@ function ConvertToCSV(objArray) {
 
   return str;
 }
+
 
 /*var downloadLink = document.createElement("a"); //frontend
 var blob = new Blob(["\ufeff", csv]);
