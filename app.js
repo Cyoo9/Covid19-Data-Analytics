@@ -99,11 +99,11 @@ app.post('/', search,  (req, res) => {
   //csv = fs.readFileSync(path.resolve(__dirname, './CSV Files/covid_19_data.csv'));
   let json = JSON.stringify(searched_results); //stringify the search array
   fs.writeFileSync('./public/output.json', json); //store the string in a json file to be sent to front-end
-
+  fs.writeFileSync('./CSV Files/covid_19_data_updated.csv', ConvertToCSV(searched_results)); 
   res.sendFile(path.join(__dirname, "/public" , "output.json"));
 });
 
-app.post('/update', InUpDel, search, (req, res) => {
+/*app.post('/update', InUpDel, search, (req, res) => {
   let csvContent = ConvertToCSV(result); //result will already update here after InUpDel middleware function
   fs.writeFileSync('./CSV Files/covid_19_data_updated.csv', csvContent);
   csv = fs.readFileSync(path.resolve(__dirname, './CSV Files/covid_19_data_updated.csv'));
@@ -111,7 +111,7 @@ app.post('/update', InUpDel, search, (req, res) => {
   let json = JSON.stringify(searched_results); //stringify the search array
   fs.writeFileSync('./public/output.json', json); //store the string in a json file to be sent to front-end
   res.sendFile(path.join(__dirname, "/public" , "output.json"));
-})
+})*/
 
 app.listen(server, function() {
     console.log(`Server is running on port: ${server}`);
@@ -190,19 +190,26 @@ function InUpDel(req, res, next) {
   next();
 }
 
-function ConvertToCSV(objArray) {
+function ConvertToCSV(objArray) { //NEED TO ADD COMMA BETWEEN COUNTY AND STATE (revert). Column names (i.e. Sno, County, etc) NOT SHOWING
   var array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray;
-  var str = '';
+  var str = 'SNo,ObservationDate,Province/State,Country/Region,Last Update,Confirmed,Deaths,Recovered\r\n';
 
   for (var i = 0; i < array.length; i++) {
-    var line = '';
+      var line = '';
       for (var index in array[i]) {
-          if (line != '') {
-            line += ','
+        if(index != 'Recovered') {
+          if(array[i][index].includes(',')) {
+            line += '\"' + array[i][index] + '\"' + ',';
           }
+          else {
+            line += array[i][index] + ',';
+          }
+        }
+        else {
           line += array[i][index];
+        }
       }
-      str += line + '\r\n';
+     str += line + '\r\n';
   }
 
   return str;
