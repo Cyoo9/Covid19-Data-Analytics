@@ -89,6 +89,10 @@ app.get('/', function(req, res) {
   res.sendFile(path.join(__dirname, "/public" , "covidData.html"));
 });
 
+app.get('/update', function(req, res) {
+  res.sendFile(path.join(__dirname, "/public" , "covidDataUpdate.html"));
+});
+
 app.use(express.urlencoded({
   extended: true
 }))
