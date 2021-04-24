@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang = "en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name = "viewport" content="width=device-width, initial-scale=1.0"/>
+        <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+        <link rel="stylesheet" href="style.css"/>
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+        <title>Covid-19 Update</title>
+        <script src="script.js"></script>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+        <!--script type="text/javascript" src="app.js"></script-->
+    </head>
+    <body>
+        <!--header-->
+        <div class = "header-wrapper"> 
+            <nav class="navbar fixed-top navbar-expand-sm bg-dark py-0">
+            
+            <div class=" navbar-collapse w-100 order-1 order-md-0" id="navbarContents"> <!--removed collapse-->
+                <div class="navbar-nav mr-auto navbar-fix">
+                    <a class="nav-item nav-link" href="#">Team CSASTS</a>
+                </div>
+            </div>
+    
+            <!--div class=" navbar-collapse w-100 order-0" id="navbarContentsCenter">
+                <div class="mx-auto order-0">
+                <i class = "fab fa-twitter center" style="color: #1491e3;"> </i>
+                </div>
+            </div-->
+            
+            <div class=" navbar-collapse w-100 order-3" id="navbarContentsRight">
+                <div class="navbar ml-auto">
+                <div class="navbar-nav">
+                    <a class="nav-item nav-link nav" href="/public/covidData.html"> SEARCH </a>
+                    <a class="nav-item nav-link" href="/public/covidDataUpdate.html"> UPDATE DATASET </a>
+                    </div>
+                </div>
+                </div>
+           
+            
+            </nav>
+        </div>
+
+        <br>
+
+        <div class = "content-wrapper" >
+            <h1 id="Title">Covid-19 Information</h1>
+            <br>
+
+            <!-- <div id="error" class="hidden red-color">
+                <h5>*You must select at least one statistic*</h5> 
+            </div> -->
+            
+                <div class="tab">
+                    <form name ="main-form"> 
+
+                        <h5> What would you like to do? </h5>
+                        <label for="option">Choose an option:</label><br>
+                        <select id="updateOption" name="updateOption" required>
+                            <option value ="">Select </option>
+                            <option value ="Insert">Insert </option>
+                            <option value="Update">Update</option>
+                            <option value ="Delete">Delete</option>    
+                            <option value="Backup">Backup</option>
+                            <option value="Import">Import</option>    
+                        </select>
+                        <br>
+                        <br>
+                        
+                        <div id = "insert-wrapper" >
+                            <h4 class="optTitle"> INSERT </h4>
+                            <form>
+                                <label for="insertCountry">Country:</label><br>
+                                <input type="text" id="insertCountry" name="insertCountry"><br>
+                                <label for="insertState">Province/State:</label><br>
+                                <input type="text" id="insertState" name="insertState"> <br>
+                                <label for="insertDate">Date</label><br>
+                                <input type="date" id="insertDate" name="insertDate" required><br>
+
+                                <br>
+                                <br>
+                                <h5> Enter data for at least one field:</h5>
+                                <label for="newCases">Confirmed Cases:</label><br>
+                                <input type="text" id="newCases" name="newCases"><br>
+                                <label for="newDeaths">Deaths: </label><br>
+                                <input type="text" id="newDeaths" name="newDeaths"> <br>
+                                <label for="newRecoveries">Recovered:</label><br>
+                                <input type="text" id="newRecoveries" name="newRecoveries"> <br>
+                            </form>
+                        </div>
+                        
+                        <div id = "delete-wrapper">
+                            <h4 class="optTitle"> DELETE </h4>
+                            <form>
+                                <label for="deleteSno">Serial Number (Sno): </label><br>
+                                <input type="number" id="deleteSno" name="deleteSno"><br>
+                                <!--h5>Are you sure you would like to delete this data? </h5-->
+
+                            </form>
+                        </div>
+                        
+                        <div id = "update-wrapper">
+                            <h4 class="optTitle"> UPDATE </h4>
+                            <form>
+                                <label for="updateSno">Serial Number (Sno): </label><br>
+                                <input type="number" id="updateSno" name="updateSno"><br>
+                                <!--h5>Are you sure you would like to delete this data? </h5-->
+
+                                <h5>Update information: </h5> <!-- UPDATE INFO FOR ____ (Insert SNO of country! )-->
+                                <label for="updateCountry">Country:</label><br>
+                                <input type="text" id="updateCountry" name="updateCountry"><br>
+                                <label for="updateState">Province/State:</label><br>
+                                <input type="text" id="updateState" name="updateState"> <br>
+                                <label for="updateDate">Date</label><br>
+                                <input type="date" id="updateDate" name="updateDate" required><br>
+
+                                <br>
+                                <br>
+                                <label for="updateCases">Confirmed Cases:</label><br>
+                                <input type="text" id="updateCases" name="updateCases"><br>
+                                <label for="updateDeaths">Deaths: </label><br>
+                                <input type="text" id="updateDeaths" name="updateDeaths"> <br>
+                                <label for="updateRecoveries">Recovered:</label><br>
+                                <input type="text" id="updateRecoveries" name="updateRecoveries"> <br>
+                            </form>
+                        </div>
+
+                        <div id = "backup-wrapper" >
+                            <h4 class="optTitle"> Click Below to Backup </h4>
+                            <button type = "button" class = "btn btn-info">Backup</button>
+                            
+                        </div>
+
+                        <div id = "import-wrapper" >
+                            <h4 class="optTitle"> IMPORT </h4>
+                            <input type="file" id="importFile" name="importFile"> <br>
+                        </div>
+                        
+                
+                    </form>
+
+                </div>
+            
+                <script>
+                    $(document).ready(function() {
+                        $('#updateOption').on('change', function () {
+                            if (this.value == ""){
+                                $("#insert-wrapper").hide();
+                                $("#delete-wrapper").hide();
+                                $("#backup-wrapper").hide();
+                                $("#import-wrapper").hide();
+                                $("#update-wrapper").hide();
+                            }
+                            else if (this.value === "Insert") {
+                                $("#insert-wrapper").show();
+                                $("#delete-wrapper").hide();
+                                $("#backup-wrapper").hide();
+                                $("#import-wrapper").hide();
+                                $("#update-wrapper").hide();
+                            }
+                            else if (this.value === "Delete") {
+                                $("#delete-wrapper").show();
+                                $("#insert-wrapper").hide();
+                                $("#backup-wrapper").hide();
+                                $("#import-wrapper").hide();
+                                $("#update-wrapper").hide();
+                            }
+                            else if (this.value === "Update") {
+                                $("#update-wrapper").show();
+                                $("#insert-wrapper").hide();
+                                $("#delete-wrapper").hide();
+                                $("#backup-wrapper").hide();
+                                $("#import-wrapper").hide();
+                            }
+                            else if (this.value === "Backup"){
+                                $("#backup-wrapper").show();
+                                $("#insert-wrapper").hide();
+                                $("#delete-wrapper").hide();
+                                $("#import-wrapper").hide();
+                                $("#update-wrapper").hide();
+                            }
+                            else if (this.value === "Import"){
+                                $("#import-wrapper").show();
+                                $("#insert-wrapper").hide();
+                                $("#delete-wrapper").hide();
+                                $("#backup-wrapper").hide();
+                                $("#update-wrapper").hide();
+                            }
+                        });
+                    });                
+                </script>
+
+
+
+
+                     
+
+                
+                <!-- <script> //this script is to keep html on click
+                document.getElementById("loadMore").onclick = function() {
+
+                    event.preventDefault();
+
+                    const inputs = document.getElementsByTagName("input");
+                    let at_least_one_checked = false;
+
+                    for (let i = 0; i < inputs.length; ++i) {
+                        at_least_one_checked |= inputs[i].type == "checkbox" && inputs[i].checked;
+                    }
+
+                    if (!at_least_one_checked) {
+                        const hidden_elems = document.getElementsByClassName("hidden");
+                        
+                        for (let i = 0; i < hidden_elems.length; ++i) {
+                            hidden_elems[i].classList.remove("hidden");
+                        }
+                        
+                        
+                    }
+
+                    if (!at_least_one_checked) {
+                        return false;
+                    }
+                    else {
+                        const error_elem = document.getElementById('error');
+                        error_elem.setAttribute('class', 'hidden');
+                    }
+
+                    const country = document.getElementById('country').value;
+                    const state = document.getElementById('state').value;
+                    const date = document.getElementById('date').value;
+                    const numCases = document.getElementsByName("confirmed")[0].value;
+                    const numDeaths = document.getElementsByName("died")[0].value;
+                    const numRecovered = document.getElementsByName("recovered")[0].value;
+
+                    
+                    console.log(country);
+                    console.log(state);
+                    console.log(date);
+                    console.log(numCases);
+                    console.log(numDeaths);
+                    console.log(numRecovered);
+                    var http = new XMLHttpRequest();
+                    var params = `country=${country}&state=${state}&date=${date}&Confirmed=${numCases}&Deaths=${numDeaths}&Recovered=${numRecovered}`;
+                    http.open('POST', '/', true);
+                    http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+                    http.onreadystatechange = function() {//Call a function when the state changes.
+                        if(http.readyState == 4 && http.status == 200) {
+                            console.log(http.responseText);
+
+                            // for (let i = 0; i < http.ResponseText.length; ++i) {
+                            //     const new_tr = document.createElement("tr");
+
+                            //     for (let j = 0; j < 6; ++j) {
+                            //         const new_td = document.createElement("td");
+                            //     }
+
+                            // }
+                            createTableFromJSON(http.responseText);
+                        }
+                        
+                    }   
+
+                    //console.log(params);
+                    http.send(params);
+
+                    return true;
+            }
+
+                </script> -->
+                <h1 id="hehexd"></h1>
+
+            <br>
+
+            <h5> Results: </h5>
+            <!-- temporary; shows test results, needs to display output.txt, needs to align with checkboxes-->
+            <!--h3>
+                Data extracted from External JSON file and converted to an HTML table
+            </h3-->
+            <div id="showTable"></div>
+        </div>
+
+        
+    </body>
+
+
+
+
+    <script>
+        // Create XMLHttpRequest object.
+        // var oXHR = new XMLHttpRequest();
+    
+        // // Initiate request.
+        // oXHR.onreadystatechange = reportStatus;
+        // oXHR.open("GET", "../../library/sample.json", true);  // get json file.
+        // oXHR.send();
+    
+        // function reportStatus() {
+        //     if (oXHR.readyState == 4) {		// Check if request is complete.
+    
+        //         // Create an HTML table using response from server.
+        //         createTableFromJSON(this.responseText);
+        //     }
+        // }
+    
+        // Create an HTML table using the JSON data.
+        function createTableFromJSON(jsonData) {
+            var arrBirds = [];
+            arrBirds = JSON.parse(jsonData); 	// Convert JSON to array.
+
+
+            console.log("XDXD:");
+            console.log(arrBirds);
+
+            const want_confirmed_cases = document.getElementsByName('confirmedCases')[0].checked;
+            const want_deaths = document.getElementsByName('deaths')[0].checked;
+            const want_recoveries = document.getElementsByName('recoveries')[0].checked;
+
+
+    
+            var col = [];
+            for (var i = 0; i < arrBirds.length; i++) {
+                for (var key in arrBirds[i]) {
+                    if (col.indexOf(key) === -1) {
+                        if (key === "Confirmed" && !want_confirmed_cases) {
+                            continue;
+                        }
+                        if (key === "Deaths" && !want_deaths) {
+                            continue;
+                        }
+                        if (key === "Recovered" && !want_recoveries) {
+                            continue;
+                        }
+
+                        col.push(key);
+                    }
+                }
+            }
+    
+            // Create a dynamic table.
+            var table = document.createElement("table")// Create table header.
+    
+            var tr = table.insertRow(-1);                   // Table row.
+    
+            for (var i = 0; i < col.length; i++) {
+                var th = document.createElement("th");      // Table header.
+                th.innerHTML = col[i];
+                tr.appendChild(th);
+            }
+
+
+    
+            // Add JSON to the table rows.
+            console.log(arrBirds.length);
+            console.log(col.length);
+            for (var i = 0; i < arrBirds.length; i++) {
+    
+                tr = table.insertRow(-1);
+    
+                for (var j = 0; j < col.length; j++) {
+                    var tabCell = tr.insertCell(-1);
+
+                        if (col[j] === 'Confirmed' && !want_confirmed_cases) {
+                            tabCell.innerHTML = "";
+                            continue;
+                        }
+                        if (col[j] === 'Deaths'  && !want_deaths) {
+                            tabCell.innerHTML = "";
+                            continue;
+                        }
+                        if (col[j] === 'Recoveries' && !want_recoveries) {
+                            tabCell.innerHTML = "";
+                            continue;
+                        }
+
+                        tabCell.innerHTML = arrBirds[i][col[j]];
+                        console.log( tabCell.innerHTML);
+                }
+            }
+    
+            // Finally, add the dynamic table to a container.
+            var divContainer = document.getElementById("showTable");
+            divContainer.innerHTML = "";
+            divContainer.appendChild(table);
+        };
+    </script>
+    
+</html>
