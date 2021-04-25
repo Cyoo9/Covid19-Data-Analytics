@@ -33,7 +33,7 @@
                 <div class="navbar ml-auto">
                 <div class="navbar-nav">
                     <a class="nav-item nav-link nav" href="/"> SEARCH </a>
-                    <a class="nav-item nav-link" href="/update_page"> UPDATE DATASET </a>
+                    <a class="nav-item nav-link" href="/update_page"> UPDATE/IMPORT DATASET </a>
                     </div>
                 </div>
                 </div>
@@ -89,6 +89,9 @@
                                 <input type="text" id="newRecoveries" name="newRecoveries"> <br>
                                 <br>
                                 <button id="insert-btn" type = "button" class = "btn btn-info">Insert</button>
+                                <br>
+                                <br>
+                                <h2 id=""></h2>
                             </form>
                         </div>
                         
@@ -333,7 +336,8 @@
                         console.log(http.status);
                         if(http.readyState == 4 && http.status == 200) {
                             console.log(http.responseText);
-                            createTableFromJSON(http.responseText);
+
+                            
                         }
                         
                     }   
@@ -382,7 +386,6 @@
                         console.log(http.status);
                         if(http.readyState == 4 && http.status == 200) {
                             console.log(http.responseText);
-                            createTableFromJSON(http.responseText);
                         }
                         
                     }   
@@ -412,7 +415,6 @@
                         console.log(http.status);
                         if(http.readyState == 4 && http.status == 200) {
                             console.log(http.responseText);
-                            createTableFromJSON(http.responseText);
                         }
                         
                     }   
@@ -438,7 +440,6 @@
                 console.log(http.status);
                 if(http.readyState == 4 && http.status == 200) {
                     console.log(http.responseText);
-                    createTableFromJSON(http.responseText);
                 }
                 
             }   
