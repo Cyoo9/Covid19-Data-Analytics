@@ -12,7 +12,6 @@ var csv = fs.readFileSync(path.resolve(__dirname, './CSV Files/covid_19_data.csv
 var result = [];
 var searched_results = [];
 var reqType = "";
-let indexDecrementer = 1;
 
 //parses a cvs file into an array
 function csvParser(csv){
@@ -162,13 +161,7 @@ function InUpDel(req, res) {
   else {
     if(reqType == "delete") { 
         result.splice(result.findIndex(x => x.SNo === req.body.deleteSno), 1); //removes from array
-        indexDecrementer++; 
-        /*let index = -1;
-        for(let i = 0; i < result.length; i++) {
-          if(result[i]['SNo'] == req.body.deleteSno) {
-            index = i;
-          }
-        } */
+        
     }
     if(reqType == "update") {
       if(req.body.updateDate != '') {
