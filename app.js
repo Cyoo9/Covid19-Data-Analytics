@@ -70,7 +70,7 @@ function search(req, res, next) {
       if(result[i]['Province/State'] == req.body.state || req.body.state == '') {
         if(req.body.date == '' || ReformatDate(result[i]['ObservationDate']) == req.body.date) {
           if(parseInt(result[i]['Confirmed']) >= parseInt(req.body.Confirmed)) {
-            if(parseInt(result[i]['Deaths']) >= parseInt(req.body.Deaths)) {
+            if(parseInt(result[i]['Deaths']) >= parseInt(req.body.Deaths)) {   
               if(parseInt(result[i]['Recovered']) >= parseInt(req.body.Recovered)) {
                 searched_results.push(result[i]);
               }
@@ -134,13 +134,13 @@ function InUpDel(req, res, next) {
   if(req.body.sno == '') {
     var obj = {
       SNo: result[result.length-1]['SNo']+1,
-      ObservationDate: req.body.obdt,
-      'Province/State': req.body.pvst,
-      'Country/Region': req.body.corg,
+      ObservationDate: req.body.insertDate,
+      'Province/State': req.body.insertState,
+      'Country/Region': req.body.insertCountry,
       'Last Update': datetime,
-      Confirmed: req.body.con,
-      Deaths: req.body.ded,
-      Recovered: req.body.rev
+      Confirmed: req.body.newCases,
+      Deaths: req.body.newDeaths,
+      Recovered: req.body.newRecoveries
     };
     result.push(obj);
   }
@@ -154,29 +154,32 @@ function InUpDel(req, res, next) {
     let json = JSON.stringify(results[i]);
     fs.writeFileSync('./public/output.json', json);
     res.sendFile(path.join(__dirname, "/public" , "output.json"));
-    if(DELETE) {
+    if(DELETE) { //they have deleteSno and updateSno
       result.splice(index, 1); //removes from array?
     }
     if(UPDATE) {
-      if(req.body.obdt != '') {
-        result[index]['ObservationDate'] = req.body.obdt;
+      if(req.body.updateSno != '') {
+        result[index]['SNo'] = req.body.updateSno;
       }
-      if(req.body.pvst != '') {
-        result[index]['Province/State'] = req.body.pvst;
+      if(req.body.updateDate != '') {
+        result[index]['ObservationDate'] = req.body.updateDate;
       }
-      if(req.body.corg != '') {
-        result[index]['Country/Region'] = req.body.corg;
+      if(req.body.updateState != '') {
+        result[index]['Province/State'] = req.body.updateState;
       }
-      if(req.body.con != '') {
-        result[index]['Confirmed'] = req.body.con;
+      if(req.body.updateCoutry != '') {
+        result[index]['Country/Region'] = req.body.updateCountry;
       }
-      if(req.body.ded != '') {
-        result[index]['Deaths'] = req.body.ded;
+      if(req.body.updateCases != '') {
+        result[index]['Confirmed'] = req.body.updateCases;
       }
-      if(req.body.rev != '') {
-        result[index]['Recovered'] = req.body.rev;
+      if(req.body.updateDeaths != '') {
+        result[index]['Deaths'] = req.body.updateDeaths;
       }
-      result[index]['Last Update'] = datetime;
+      if(req.body.updateRecoveries != '') {
+        result[index]['Recovered'] = req.body.updateRecoveries;
+      }
+      result[index]['Last Update'] = datetime; //??
     }
   }
 
