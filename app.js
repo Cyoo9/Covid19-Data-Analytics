@@ -125,6 +125,12 @@ app.post('/import', (req, res) => {
 app.post('/insert', (req, res) => {
   reqType = "insert";
   InUpDel(req, res);
+
+  let json = {
+    "message" : "COVID-19 information inserted"
+  }
+
+  res.send(json);
   
 })
 
@@ -169,16 +175,17 @@ function InUpDel(req, res) {
     if(reqType == "delete") { 
       if(result.findIndex(x => x.SNo === req.body.deleteSno) != -1) {
         result.splice(result.findIndex(x => x.SNo === req.body.deleteSno), 1); //removes from array
-        var index = result.findIndex(x => x.SNo === "" + (parseInt(req.body.deleteSno) + 1));
+        /*var index = result.findIndex(x => x.SNo === "" + (parseInt(req.body.deleteSno) + 1));
         if(index != -1) {
           for(var i = index; i < result.length; i++) {
             result[i]['SNo'] = "" + (parseInt(result[i]['SNo']) - 1);
           }
-        }
+        }*/
+        res.send("Delete Complete");
       }
     }
     if(reqType == "update") {
-      if(result.findIndex(x => x.SNo === req.body.updateSno != -1)) {
+      if(result.findIndex(x => x.SNo === req.body.updateSno) != -1) {
         result[result.findIndex(x => x.SNo === req.body.updateSno)]['ObservationDate'] = req.body.updateDate;
         result[result.findIndex(x => x.SNo === req.body.updateSno)]['Province/State'] = req.body.updateState;
         result[result.findIndex(x => x.SNo === req.body.updateSno)]['Country/Region'] = req.body.updateCountry;
@@ -186,6 +193,9 @@ function InUpDel(req, res) {
         result[result.findIndex(x => x.SNo === req.body.updateSno)]['Deaths'] = req.body.updateDeaths;
         result[result.findIndex(x => x.SNo === req.body.updateSno)]['Recovered'] = req.body.updateRecoveries;
         result[result.findIndex(x => x.SNo === req.body.updateSno)]['Last Update'] = datetime;
+        res.send("Update Complete");
+      } else {
+        res.send("SNo doesn't exist");
       }
     }
   }
