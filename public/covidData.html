@@ -53,14 +53,14 @@
                 <div class="tab">
                     <form name ="main-form"> 
 
-                        <h5> Please specify location and date: </h5>
+                        <h5> Please input search parameters: </h5>
                         <label for="country">
                             Country: <p class="inline error-color invisible">*</p>
                         </label>
                         <br>
-                        <select id="country" name="country" onchange="update(this.value)" required>
+                        <input list="countries" name="country" id="country" onchange="update(this.value)" required>
+                        <datalist id="countries">
                             <option value ="">Select</option>
-                            <option value ="('St. Martin',)">('St. Martin',)</option>
                             <option value ="Afghanistan">Afghanistan</option>
                             <option value ="Albania">Albania</option>
                             <option value ="Algeria">Algeria</option>
@@ -286,29 +286,25 @@
                             <option value ="Yemen">Yemen</option>
                             <option value ="Zambia">Zambia</option>
                             <option value ="Zimbabwe">Zimbabwe</option>
-
-                        </select>
-        
+                        </datalist>
                         <br>
                         <br>
                         <label for="Province/State">
                             Province/State: 
-                        </label><br>
+                        </label>
+                        <br>
+                        <input type="text" id="state" name="state">
+                        <br>
+                        <br>
+
                         
-                        <select id="state" name="state">
-                            <option value ="">Select</option>
-
-                        </select>
-                        <br>
-                        <br>
-
-                        <h5> If new country by user entry, please type below: </h5>
+                        <!-- <h5> If new country by user entry, please type below: </h5>
 
                         <label for="country">
                             Country: <p class="inline error-color invisible">*</p>
                         </label>
 
-                        <input type="text" id = "country-user-inputted">
+                        <input type="text" id = "country-user-inputted" name="country-user-inputted">
 
                         <br>
                         <br>    
@@ -321,10 +317,10 @@
                             Province/State: <p class="inline error-color invisible">*</p>
                         </label>
 
-                        <input type="text" id = "state-user-inputted">
+                        <input type="text" id = "state-user-inputted" name="state-user-inputted">
 
                         <br>
-                        <br>  
+                        <br>  -->
 
 
                         <label for="date">
@@ -355,7 +351,7 @@
                         <br>
                         <br>
 
-                        <h5> Or, search by minimum statistic </h5>
+                        <h5> You may also search by minimum statistic </h5>
                         
                                 <input type = "number" id="confirmed" name="confirmed" value="0" min="0">
                                 <label for="Confirmed" >
@@ -429,8 +425,8 @@
                     const numDeaths = document.getElementsByName("died")[0].value;
                     const numRecovered = document.getElementsByName("recovered")[0].value;
              
-                    const country_user_inputted = document.getElementById("country-user-inputted").value;
-                    const state_user_inputted = document.getElementById("state-user-inputted").value;
+                    // const country_user_inputted = document.getElementById("country-user-inputted").value;
+                    // const state_user_inputted = document.getElementById("state-user-inputted").value;
 
                     console.log(country);
                     console.log(state);
@@ -510,8 +506,8 @@
                     params += `&Confirmed=${numCases}`;
                     params += `&Deaths=${numDeaths}`;
                     params += `&Recovered=${numRecovered}`;
-                    params += `&countryUserInputted=${country_user_inputted}`;
-                    params += `&stateUserInputted=${state_user_inputted}`;
+                    // params += `&countryUserInputted=${country_user_inputted}`;
+                    // params += `&stateUserInputted=${state_user_inputted}`;
 
                     http.open('POST', '/search', true);
                     http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');

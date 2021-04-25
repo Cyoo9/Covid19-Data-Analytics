@@ -16,6 +16,8 @@ var reqType = "";
 //parses a cvs file into an array
 function csvParser(csv){
 
+  result = []; //clear array
+
   var lines=csv.toString().split("\r\n"); //split cvs file into readable lines of data by endlines
   var headers=lines[0].split(","); //split the first line into object variable names
 
@@ -51,7 +53,15 @@ csvParser(csv);
 function ReformatDate(old_date) {
 
   if (old_date.length == 10) {
-    return `${old_date.substr(6, 4)}-${old_date.substr(0, 2)}-${old_date.substr(3, 2)}`;
+    if(old_date[2] == '/') {
+      return `${old_date.substr(6, 4)}-${old_date.substr(0, 2)}-${old_date.substr(3, 2)}`;
+    }
+    else if(old_date[4] == '-') {
+      return old_date;
+    }
+    else {
+      return "Unknown Date";
+    }
   }   
   else {
     return "Unknown Date";
@@ -62,12 +72,13 @@ function ReformatDate(old_date) {
 //searchs an array for specific object values
 function search(req, res, next) {
   searched_results = []; //reset array to empty
+
   //loops through all the arrays objects
   for(var i = 0; i < result.length; i++) {
 
     //checks if country, state, and date match, accepts all if one or more is left blank
-    if(result[i]['Country/Region'] == req.body.country || result[i]['Country/Region'] == req.body.country_user_inputted || req.body.country == '') {
-      if(result[i]['Province/State'] == req.body.state || result[i]['Province/State'] == req.body.state_user_inputted ||req.body.state == '') {
+    if(result[i]['Country/Region'] == req.body.country || req.body.country == '') {
+      if(result[i]['Province/State'] == req.body.state ||req.body.state == '') {
         if(req.body.date == '' || ReformatDate(result[i]['ObservationDate']) == req.body.date) {
           if(parseInt(result[i]['Confirmed']) >= parseInt(req.body.Confirmed)) {
             if(parseInt(result[i]['Deaths']) >= parseInt(req.body.Deaths)) {   
@@ -80,7 +91,7 @@ function search(req, res, next) {
       }
     }
   }
-  return next;
+  next();
 }
 
 app.use(express.static(path.join(__dirname, 'public')));
@@ -99,14 +110,13 @@ app.use(express.urlencoded({
 
 //calls the middlewear function "search" after the client posts a request
 app.post('/search', search, (req, res) => {
-
   let json = JSON.stringify(searched_results); //stringify the search array
   fs.writeFileSync('./public/output.json', json); //store the string in a json file to be sent to front-end
   res.sendFile(path.join(__dirname, "/public" , "output.json"));
 })
 
 app.post('/import', (req, res) => {
-  csv = "covid_19_data_updated.csv";
+  csv = fs.readFileSync(path.resolve(__dirname, './CSV Files/covid_19_data_updated.csv'));
   csvParser(csv); //reparse with updated csv file
   res.send("Import complete. Search now on updated database");
 })
@@ -139,7 +149,8 @@ function InUpDel(req, res) {
                   + currentdate.getDate() + "/"
                   + currentdate.getFullYear() + " "  
                   + currentdate.getHours() + ":"  
-                  + currentdate.getMinutes(); 
+                  + currentdate.getMinutes() + ":"
+                  + currentdate.getSeconds();
   
   if(reqType == "insert") {;
     var obj = {
@@ -156,23 +167,32 @@ function InUpDel(req, res) {
   }
   else {
     if(reqType == "delete") { 
+      if(result.findIndex(x => x.SNo === req.body.deleteSno) != -1) {
         result.splice(result.findIndex(x => x.SNo === req.body.deleteSno), 1); //removes from array
-        
+        var index = result.findIndex(x => x.SNo === "" + (parseInt(req.body.deleteSno) + 1));
+        if(index != -1) {
+          for(var i = index; i < result.length; i++) {
+            result[i]['SNo'] = "" + (parseInt(result[i]['SNo']) - 1);
+          }
+        }
+      }
     }
     if(reqType == "update") {
-      result[result.findIndex(x => x.SNo === req.body.updateSno)]['ObservationDate'] = req.body.updateDate;
-      result[result.findIndex(x => x.SNo === req.body.updateSno)]['Province/State'] = req.body.updateState;
-      result[result.findIndex(x => x.SNo === req.body.updateSno)]['Country/Region'] = req.body.updateCountry;
-      result[result.findIndex(x => x.SNo === req.body.updateSno)]['Confirmed'] = req.body.updateCases;
-      result[result.findIndex(x => x.SNo === req.body.updateSno)]['Deaths'] = req.body.updateDeaths;
-      result[result.findIndex(x => x.SNo === req.body.updateSno)]['Recovered'] = req.body.updateRecoveries;
-      result[result.findIndex(x => x.SNo === req.body.updateSno)]['Last Update'] = datetime;
+      if(result.findIndex(x => x.SNo === req.body.updateSno != -1)) {
+        result[result.findIndex(x => x.SNo === req.body.updateSno)]['ObservationDate'] = req.body.updateDate;
+        result[result.findIndex(x => x.SNo === req.body.updateSno)]['Province/State'] = req.body.updateState;
+        result[result.findIndex(x => x.SNo === req.body.updateSno)]['Country/Region'] = req.body.updateCountry;
+        result[result.findIndex(x => x.SNo === req.body.updateSno)]['Confirmed'] = req.body.updateCases;
+        result[result.findIndex(x => x.SNo === req.body.updateSno)]['Deaths'] = req.body.updateDeaths;
+        result[result.findIndex(x => x.SNo === req.body.updateSno)]['Recovered'] = req.body.updateRecoveries;
+        result[result.findIndex(x => x.SNo === req.body.updateSno)]['Last Update'] = datetime;
+      }
     }
   }
 
   ConvertToCSV(result);
 
-  res.send("Changes confirmed");
+  console.log("Changes confirmed");
 } 
 
 function ConvertToCSV(objArray) { 
@@ -197,5 +217,4 @@ function ConvertToCSV(objArray) {
      str += line + '\r\n';
   }
   fs.writeFileSync('./CSV Files/covid_19_data_updated.csv', str);
-}  
-
+}
