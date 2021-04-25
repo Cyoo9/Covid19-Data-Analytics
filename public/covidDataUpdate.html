@@ -8,7 +8,7 @@
         <!-- Bootstrap CSS -->
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
         <title>Covid-19 Update</title>
-        <script src="script.js"></script>
+        
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
         <!--script type="text/javascript" src="app.js"></script-->
     </head>
@@ -33,7 +33,7 @@
                 <div class="navbar ml-auto">
                 <div class="navbar-nav">
                     <a class="nav-item nav-link nav" href="/"> SEARCH </a>
-                    <a class="nav-item nav-link" href="/update"> UPDATE DATASET </a>
+                    <a class="nav-item nav-link" href="/update_page"> UPDATE DATASET </a>
                     </div>
                 </div>
                 </div>
@@ -62,7 +62,7 @@
                             <option value ="Insert">Insert </option>
                             <option value="Update">Update</option>
                             <option value ="Delete">Delete</option>    
-                            <option value="Backup">Backup</option>
+                            <!-- <option value="Backup">Backup</option> -->
                             <option value="Import">Import</option>    
                         </select>
                         <br>
@@ -87,6 +87,8 @@
                                 <input type="text" id="newDeaths" name="newDeaths"> <br>
                                 <label for="newRecoveries">Recovered:</label><br>
                                 <input type="text" id="newRecoveries" name="newRecoveries"> <br>
+                                <br>
+                                <button id="insert-btn" type = "button" class = "btn btn-info">Insert</button>
                             </form>
                         </div>
                         
@@ -96,6 +98,10 @@
                                 <label for="deleteSno">Serial Number (Sno): </label><br>
                                 <input type="number" id="deleteSno" name="deleteSno"><br>
                                 <!--h5>Are you sure you would like to delete this data? </h5-->
+
+                                <br>
+                                <button id="delete-btn"  type = "button" class = "btn btn-info">Delete</button>
+                                
 
                             </form>
                         </div>
@@ -123,18 +129,23 @@
                                 <input type="text" id="updateDeaths" name="updateDeaths"> <br>
                                 <label for="updateRecoveries">Recovered:</label><br>
                                 <input type="text" id="updateRecoveries" name="updateRecoveries"> <br>
+
+                                <br>
+
+                                <button id="update-btn"  type = "button" class = "btn btn-info">Update</button>
                             </form>
                         </div>
 
-                        <div id = "backup-wrapper" >
+                        <!-- <div id = "backup-wrapper" >
                             <h4 class="optTitle"> Click Below to Backup </h4>
-                            <button type = "button" class = "btn btn-info">Backup</button>
+                            <button id="backup-btn"  type = "button" class = "btn btn-info">Backup</button>
                             
-                        </div>
+                        </div> -->
 
                         <div id = "import-wrapper" >
-                            <h4 class="optTitle"> IMPORT </h4>
-                            <input type="file" id="importFile" name="importFile"> <br>
+                            <h4 class="optTitle"> Click to Import Data </h4>
+                            <br>
+                            <button id="import-btn"  type = "button" class = "btn btn-info">Import</button>
                         </div>
                         
                 
@@ -173,13 +184,13 @@
                                 $("#backup-wrapper").hide();
                                 $("#import-wrapper").hide();
                             }
-                            else if (this.value === "Backup"){
-                                $("#backup-wrapper").show();
-                                $("#insert-wrapper").hide();
-                                $("#delete-wrapper").hide();
-                                $("#import-wrapper").hide();
-                                $("#update-wrapper").hide();
-                            }
+                            // else if (this.value === "Backup"){
+                            //     $("#backup-wrapper").show();
+                            //     $("#insert-wrapper").hide();
+                            //     $("#delete-wrapper").hide();
+                            //     $("#import-wrapper").hide();
+                            //     $("#update-wrapper").hide();
+                            // }
                             else if (this.value === "Import"){
                                 $("#import-wrapper").show();
                                 $("#insert-wrapper").hide();
@@ -285,24 +296,158 @@
     </body>
 
 
-
+    <script src="script.js"></script>
 
     <script>
-        // Create XMLHttpRequest object.
-        // var oXHR = new XMLHttpRequest();
-    
-        // // Initiate request.
-        // oXHR.onreadystatechange = reportStatus;
-        // oXHR.open("GET", "../../library/sample.json", true);  // get json file.
-        // oXHR.send();
-    
-        // function reportStatus() {
-        //     if (oXHR.readyState == 4) {		// Check if request is complete.
-    
-        //         // Create an HTML table using response from server.
-        //         createTableFromJSON(this.responseText);
-        //     }
-        // }
+
+        document.getElementById("insert-btn").onclick = () =>  {
+            console.log("Clicked on insert button")
+            const insert_country = document.getElementById("insertCountry").value;
+            const insert_state = document.getElementById("insertState").value;
+            const insert_date = document.getElementById("insertDate").value;
+
+            const new_cases = document.getElementById("newCases").value;
+            const new_deaths = document.getElementById("newDeaths").value;
+            const new_recoveries = document.getElementById("newRecoveries").value;
+
+            console.log(insert_country);
+            console.log(insert_state);
+            console.log(insert_date);
+
+            console.log(new_cases);
+            console.log(new_deaths);
+            console.log(new_recoveries);
+
+            var http = new XMLHttpRequest();
+                    var params = "";
+                    params += `insertCountry=${insert_country}`;
+                    params += `&insertState=${insert_state}`;
+                    params += `&insertDate=${insert_date}`;
+                    params += `&newCases=${new_cases}`;
+                    params += `&newDeaths=${new_deaths}`;
+                    params += `&newRecoveries=${new_recoveries}`;
+
+                    http.open('POST', '/insert', true);
+                    http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+                    http.onreadystatechange = function() {//Call a function when the state changes.
+                        console.log(http.status);
+                        if(http.readyState == 4 && http.status == 200) {
+                            console.log(http.responseText);
+                            createTableFromJSON(http.responseText);
+                        }
+                        
+                    }   
+
+                    //console.log(params);
+                    http.send(params);
+
+                    return true;
+
+            
+        };
+
+        document.getElementById("update-btn").onclick = () => {
+            console.log("Clicked on update button")
+
+            const update_sno = document.getElementById("updateSno").value;
+            const update_country = document.getElementById("updateCountry").value;
+            const update_state = document.getElementById("updateState").value;
+            const update_date = document.getElementById("updateDate").value;
+
+            const update_cases = document.getElementById("updateCases").value;
+            const update_deaths = document.getElementById("updateDeaths").value;
+            const update_recoveries = document.getElementById("updateRecoveries").value;
+
+            console.log(update_country);
+            console.log(update_state);
+            console.log(update_date);
+
+            console.log(update_cases);
+            console.log(update_deaths);
+            console.log(update_recoveries);
+
+            var http = new XMLHttpRequest();
+                    var params = "";
+                    params += `updateSno=${update_sno}`;
+                    params += `&updateCountry=${update_country}`;
+                    params += `&updateState=${update_state}`;
+                    params += `&updateDate=${update_date}`;
+                    params += `&updateCases=${update_cases}`;
+                    params += `&updateDeaths=${update_deaths}`;
+                    params += `&updateRecoveries=${update_recoveries}`;
+
+                    http.open('POST', '/update', true);
+                    http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+                    http.onreadystatechange = function() {//Call a function when the state changes.
+                        console.log(http.status);
+                        if(http.readyState == 4 && http.status == 200) {
+                            console.log(http.responseText);
+                            createTableFromJSON(http.responseText);
+                        }
+                        
+                    }   
+
+                    //console.log(params);
+                    http.send(params);
+
+                    return true;
+        };
+
+        document.getElementById("delete-btn").onclick = () =>  {
+            console.log("Clicked on delete button")
+
+
+            const delete_sno = document.getElementById("deleteSno").value;
+
+            console.log(delete_sno);
+ 
+
+            var http = new XMLHttpRequest();
+                    var params = "";
+                    params += `deleteSno=${delete_sno}`;
+
+                    http.open('POST', '/delete', true);
+                    http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+                    http.onreadystatechange = function() {//Call a function when the state changes.
+                        console.log(http.status);
+                        if(http.readyState == 4 && http.status == 200) {
+                            console.log(http.responseText);
+                            createTableFromJSON(http.responseText);
+                        }
+                        
+                    }   
+
+                    //console.log(params);
+                    http.send(params);
+
+                    return true;
+        };
+
+
+
+        document.getElementById("import-btn").onclick = () =>  {
+            console.log("Clicked on import button")
+
+            var http = new XMLHttpRequest();
+            var params = "";
+            params += `import-btn-clicked=true`;
+
+            http.open('POST', '/import', true);
+            http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+            http.onreadystatechange = function() {//Call a function when the state changes.
+                console.log(http.status);
+                if(http.readyState == 4 && http.status == 200) {
+                    console.log(http.responseText);
+                    createTableFromJSON(http.responseText);
+                }
+                
+            }   
+            //console.log(params);
+            http.send(params);
+
+            return true;
+        };
+
     
         // Create an HTML table using the JSON data.
         function createTableFromJSON(jsonData) {

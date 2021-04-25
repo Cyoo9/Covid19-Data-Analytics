@@ -7,6 +7,7 @@ let ejs = require('ejs');
 
 var bodyParser = require("body-parser");
 var multer  = require('multer');
+const { ap } = require('list');
 var csv = fs.readFileSync(path.resolve(__dirname, './CSV Files/covid_19_data.csv')); //reads in a cvs file
 var result = [];
 let searched_results = [];
@@ -89,7 +90,7 @@ app.get('/', function(req, res) {
   res.sendFile(path.join(__dirname, "/public" , "covidData.html"));
 });
 
-app.get('/update', function(req, res) {
+app.get('/update_page', function(req, res) {
   res.sendFile(path.join(__dirname, "/public" , "covidDataUpdate.html"));
 });
 
@@ -106,6 +107,7 @@ app.post('/search', search,  (req, res) => {
   fs.writeFileSync('./CSV Files/covid_19_data_updated.csv', ConvertToCSV(searched_results)); 
   res.sendFile(path.join(__dirname, "/public" , "output.json"));
 });
+
 
 /*app.post('/update', InUpDel, search, (req, res) => {
   let csvContent = ConvertToCSV(result); //result will already update here after InUpDel middleware function
@@ -221,4 +223,43 @@ function ConvertToCSV(objArray) { //NEED TO ADD COMMA BETWEEN COUNTY AND STATE (
 
   return str;
 }
+
+
+
+
+/*
+
+  Testing buttons in covidData.html 
+
+*/
+
+
+
+app.post('/insert', (req, res) => {
+  //When you click the insert button, the form data
+  //will show up on node console
+  console.log(" Recevied insert request ");
+  console.log(req.body);
+});
+
+app.post('/update', (req, res) => {
+  //When you click the update button, the form data
+  //will show up on node console
+  console.log(" Recevied update request ");
+  console.log(req.body);
+});
+
+app.post('/delete', (req, res) => {
+  //When you click the delete button, the form data
+  //will show up on node console
+  console.log(" Recevied delete request ");
+  console.log(req.body);
+});
+
+
+app.post('/import', (req, res) => {
+  console.log(" Recevied import request ");
+  console.log(req.body);
+
+});
 
