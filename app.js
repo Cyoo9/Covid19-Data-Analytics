@@ -60,6 +60,9 @@ function ReformatDate(old_date) {
 
 //searchs an array for specific object values
 function search(req, res, next) {
+
+  console.log(" Received search request" );
+  console.log(req.body);
   
   searched_results = []; //reset array to empty
   

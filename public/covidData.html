@@ -18,7 +18,7 @@
             
             <div class=" navbar-collapse w-100 order-1 order-md-0" id="navbarContents"> <!--removed collapse-->
                 <div class="navbar-nav mr-auto navbar-fix">
-                    <a class="nav-item nav-link" href="#">Team CSASTS</a>
+                    <a class="nav-item nav-link" href="/">Team CSASTS</a>
                 </div>
             </div>
     
@@ -291,7 +291,6 @@
         
                         <br>
                         <br>
-
                         <label for="Province/State">
                             Province/State: 
                         </label><br>
@@ -300,9 +299,33 @@
                             <option value ="">Select</option>
 
                         </select>
+                        <br>
+                        <br>
+
+                        <h5> If new country by user entry, please type below: </h5>
+
+                        <label for="country">
+                            Country: <p class="inline error-color invisible">*</p>
+                        </label>
+
+                        <input type="text" id = "country-user-inputted">
 
                         <br>
+                        <br>    
+
+
+
+                        <h5> If new province/state by user entry, please type below: </h5>
+
+                        <label for="state">
+                            Province/State: <p class="inline error-color invisible">*</p>
+                        </label>
+
+                        <input type="text" id = "state-user-inputted">
+
                         <br>
+                        <br>  
+
 
                         <label for="date">
                             Date: 
@@ -405,6 +428,9 @@
                     const numCases = document.getElementsByName("confirmed")[0].value;
                     const numDeaths = document.getElementsByName("died")[0].value;
                     const numRecovered = document.getElementsByName("recovered")[0].value;
+             
+                    const country_user_inputted = document.getElementById("country-user-inputted").value;
+                    const state_user_inputted = document.getElementById("state-user-inputted").value;
 
                     console.log(country);
                     console.log(state);
@@ -415,77 +441,78 @@
 
 
                     //removes previous error messages
-                    const error_elem = document.getElementsByClassName('error-output');
-                    while (error_elem.length != 0) {
-                        error_elem[0].remove();
-                    }
+                    // const error_elem = document.getElementsByClassName('error-output');
+                    // while (error_elem.length != 0) {
+                    //     error_elem[0].remove();
+                    // }
 
                     //1 = OK, no errors
                     //0 = Bad/missing input from the form
-                    let status = 1; 
+                    // let status = 1; 
 
-                    const error_container_elem = document.getElementById('error-block');
+                    // const error_container_elem = document.getElementById('error-block');
 
-                    if (country == "") {
-                        const elem = document.createElement('p');
-                        const text = document.createTextNode('You must select a country');
+                    // if (country == "") {
+                    //     const elem = document.createElement('p');
+                    //     const text = document.createTextNode('You must select a country');
 
 
-                        elem.appendChild(text);
-                        elem.setAttribute('class', 'error-color error-output');
+                    //     elem.appendChild(text);
+                    //     elem.setAttribute('class', 'error-color error-output');
                         
-                        error_container_elem.appendChild(elem);
+                    //     error_container_elem.appendChild(elem);
 
-                        status = 0;
-                    }
+                    //     status = 0;
+                    // }
 
-                    //Some countries don't have a state/province to specify. Only check for empty state/province if country is also empty
-                    if (country == "" && state == "") {
-                        const elem = document.createElement('p');
-                        const text = document.createTextNode('You must select a state/province');
-
-
-
-                        elem.appendChild(text);
-                        elem.setAttribute('class', 'error-color error-output');
-                        error_container_elem.appendChild(elem);
-                    }
-
-                    if (date == "") {
-                        const elem = document.createElement('p');
-                        const text = document.createTextNode('Your date is incomplete');
+                    // //Some countries don't have a state/province to specify. Only check for empty state/province if country is also empty
+                    // if (country == "" && state == "") {
+                    //     const elem = document.createElement('p');
+                    //     const text = document.createTextNode('You must select a state/province');
 
 
-                        elem.appendChild(text);
-                        elem.setAttribute('class', 'error-color error-output');
-                        error_container_elem.appendChild(elem);
-                        status = 0;
-                    }
 
-                    if (!at_least_one_checked) {
-                        const elem = document.createElement('p');
-                        const text = document.createTextNode('You must select at least one statistic');
+                    //     elem.appendChild(text);
+                    //     elem.setAttribute('class', 'error-color error-output');
+                    //     error_container_elem.appendChild(elem);
+                    // }
 
-                        elem.appendChild(text);
-                        elem.setAttribute('class', 'error-color error-output');
-                        error_container_elem.appendChild(elem);
-                        status = 0;
-                    }
+                    // if (date == "") {
+                    //     const elem = document.createElement('p');
+                    //     const text = document.createTextNode('Your date is incomplete');
 
-                    if (!status) {
-                        return false;
-                    }
+
+                    //     elem.appendChild(text);
+                    //     elem.setAttribute('class', 'error-color error-output');
+                    //     error_container_elem.appendChild(elem);
+                    //     status = 0;
+                    // }
+
+                    // if (!at_least_one_checked) {
+                    //     const elem = document.createElement('p');
+                    //     const text = document.createTextNode('You must select at least one statistic');
+
+                    //     elem.appendChild(text);
+                    //     elem.setAttribute('class', 'error-color error-output');
+                    //     error_container_elem.appendChild(elem);
+                    //     status = 0;
+                    // }
+
+                    // if (!status) {
+                    //     return false;
+                    // }
         
-
-
-                    
-
-
-
-
-
                     var http = new XMLHttpRequest();
-                    var params = `country=${country}&state=${state}&date=${date}&Confirmed=${numCases}&Deaths=${numDeaths}&Recovered=${numRecovered}`;
+                    var params = "";
+                    params += `country=${country}`;
+                    params += `&state=${state}`;
+                    params += `&date=${date}`;
+                    params += `&Confirmed=${numCases}`;
+                    params += `&Deaths=${numDeaths}`;
+                    params += `&Recovered=${numRecovered}`;
+                    params += `&countryUserInputted=${country_user_inputted}`;
+                    params += `&stateUserInputted=${state_user_inputted}`;
+
                     http.open('POST', '/search', true);
                     http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
                     http.onreadystatechange = function() {//Call a function when the state changes.
