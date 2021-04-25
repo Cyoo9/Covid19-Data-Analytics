@@ -11,6 +11,7 @@ const { ap } = require('list');
 var csv = fs.readFileSync(path.resolve(__dirname, './CSV Files/covid_19_data.csv')); //reads in a cvs file
 var result = [];
 let searched_results = [];
+var reqType = "";
 
 //parses a cvs file into an array
 function csvParser(csv){
@@ -19,7 +20,7 @@ function csvParser(csv){
   var headers=lines[0].split(","); //split the first line into object variable names
 
   //goes through every line but the header line
-  for(var i=1;i<lines.length;i++){
+  for(var i=1;i<lines.length - 1;i++){ //last line is empty. dont put that in the array
 
 	  var obj = {}; //create new object to be added to the array
 	  var currentline = lines[i].split(","); //split the current line into object variable values
@@ -44,23 +45,23 @@ function csvParser(csv){
   }
 }
 
-csvParser(csv);
-
+csvParser(csv); 
 
 //Reformats dates from something like 12/19/2020 to 2020-12-19
 function ReformatDate(old_date) {
 
   if (old_date.length == 10) {
     return `${old_date.substr(6, 4)}-${old_date.substr(0, 2)}-${old_date.substr(3, 2)}`;
-  }
+  }   
   else {
     return "Unknown Date";
   }
 }
 
+
 //searchs an array for specific object values
 function search(req, res, next) {
-  
+
   searched_results = []; //reset array to empty
   
   //loops through all the arrays objects
@@ -81,7 +82,7 @@ function search(req, res, next) {
       }
     }
   }
-  next();
+  return next;
 }
 
 app.use(express.static(path.join(__dirname, 'public')));
@@ -99,32 +100,44 @@ app.use(express.urlencoded({
 }))
 
 //calls the middlewear function "search" after the client posts a request
-app.post('/search', search,  (req, res) => {
+app.post('/search', search, (req, res) => {
 
   //csv = fs.readFileSync(path.resolve(__dirname, './CSV Files/covid_19_data.csv'));
   let json = JSON.stringify(searched_results); //stringify the search array
   fs.writeFileSync('./public/output.json', json); //store the string in a json file to be sent to front-end
-  fs.writeFileSync('./CSV Files/covid_19_data_updated.csv', ConvertToCSV(searched_results)); 
   res.sendFile(path.join(__dirname, "/public" , "output.json"));
 });
 
+app.post('/import', (req, res) => {
+  csv = "covid_19_data_updated.csv";
+  csvParser(csv); //reparse with updated csv file
+  res.send("Import complete. Search now on updated database");
+})
 
-/*app.post('/update', InUpDel, search, (req, res) => {
-  let csvContent = ConvertToCSV(result); //result will already update here after InUpDel middleware function
-  fs.writeFileSync('./CSV Files/covid_19_data_updated.csv', csvContent);
-  csv = fs.readFileSync(path.resolve(__dirname, './CSV Files/covid_19_data_updated.csv'));
+
+app.post('/insert', (req, res) => {
+  reqType = "insert";
+  InUpDel(req, res);
   
-  let json = JSON.stringify(searched_results); //stringify the search array
-  fs.writeFileSync('./public/output.json', json); //store the string in a json file to be sent to front-end
-  res.sendFile(path.join(__dirname, "/public" , "output.json"));
-})*/
+})
+
+app.post('/update', (req, res) => {
+  reqType = "update";
+  InUpDel(req, res);
+})
+
+app.post('/delete', (req, res) => {
+  reqType = "delete";
+  InUpDel(req, res);
+})
 
 app.listen(server, function() {
     console.log(`Server is running on port: ${server}`);
 })
 
-function InUpDel(req, res, next) {
+function InUpDel(req, res) {
 
+  csvParser(csv);
   var currentdate = new Date(); 
   var datetime = "Last Sync: " + currentdate.getDate() + "/"
                   + (currentdate.getMonth()+1)  + "/" 
@@ -133,9 +146,9 @@ function InUpDel(req, res, next) {
                   + currentdate.getMinutes() + ":" 
                   + currentdate.getSeconds();
   
-  if(req.body.sno == '') {
+  if(reqType == "insert") {;
     var obj = {
-      SNo: result[result.length-1]['SNo']+1,
+      SNo: (parseInt(result[result.length-1]['SNo']) + 1) + "",
       ObservationDate: req.body.insertDate,
       'Province/State': req.body.insertState,
       'Country/Region': req.body.insertCountry,
@@ -144,48 +157,49 @@ function InUpDel(req, res, next) {
       Deaths: req.body.newDeaths,
       Recovered: req.body.newRecoveries
     };
-    result.push(obj);
+    result.push(obj); 
   }
   else {
-    var index = -1;
-    for(var i = 0; i < result.length; i++) {
-      if(result[i]['SNo'] == req.body.sno) {
-        index = i;
-      }
+    if(reqType == "delete") { 
+        let json = JSON.stringify(result[req.body.deleteSno - 1]); //index that is being deleted. put it into output.json
+        result.splice(req.body.deleteSno - 1, 1); //removes from array
+        fs.writeFileSync('./public/output.json', json);
+        res.sendFile(path.join(__dirname, "/public" , "output.json")); 
+        /*for(let i = 0; i < result.length; i++) { //shift all except the first sno by 1. 
+          if(result[i]['SNo'] != 1) { 
+            result[i]['Sno'] -= 1;
+          }
+        }*/
     }
-    let json = JSON.stringify(results[i]);
-    fs.writeFileSync('./public/output.json', json);
-    res.sendFile(path.join(__dirname, "/public" , "output.json"));
-    if(DELETE) { //they have deleteSno and updateSno
-      result.splice(index, 1); //removes from array?
-    }
-    if(UPDATE) {
-      if(req.body.updateSno != '') {
-        result[index]['SNo'] = req.body.updateSno;
-      }
+    if(reqType == "update") {
       if(req.body.updateDate != '') {
-        result[index]['ObservationDate'] = req.body.updateDate;
+        result[req.body.updateSno - 1]['ObservationDate'] = req.body.updateDate;
       }
       if(req.body.updateState != '') {
-        result[index]['Province/State'] = req.body.updateState;
+        result[req.body.updateSno - 1]['Province/State'] = req.body.updateState;
       }
       if(req.body.updateCoutry != '') {
-        result[index]['Country/Region'] = req.body.updateCountry;
+        result[req.body.updateSno - 1]['Country/Region'] = req.body.updateCountry;
       }
       if(req.body.updateCases != '') {
-        result[index]['Confirmed'] = req.body.updateCases;
+        result[req.body.updateSno - 1]['Confirmed'] = req.body.updateCases;
       }
       if(req.body.updateDeaths != '') {
-        result[index]['Deaths'] = req.body.updateDeaths;
+        result[req.body.updateSno - 1]['Deaths'] = req.body.updateDeaths;
       }
       if(req.body.updateRecoveries != '') {
-        result[index]['Recovered'] = req.body.updateRecoveries;
+        result[req.body.updateSno - 1]['Recovered'] = req.body.updateRecoveries;
       }
-      result[index]['Last Update'] = datetime; //??
+      result[req.body.updateSno - 1]['Last Update'] = datetime; //???
+      let json = JSON.stringify(result[req.body.updateSno - 1]); 
+      fs.writeFileSync('./public/output.json', json); 
+
     }
   }
 
-  var obj = {
+  ConvertToCSV(result);
+
+  /*var obj = {
     SNo: '',
     ObservationDate: '',
     'Province/State': '',
@@ -194,20 +208,25 @@ function InUpDel(req, res, next) {
     Confirmed: '',
     Deaths: '',
     Recovered: ''
-  };
+  };*/
+
+  //console.log("Changes confirmed");
   res.send("Changes confirmed");
-  next();
 }
 
-function ConvertToCSV(objArray) { //NEED TO ADD COMMA BETWEEN COUNTY AND STATE (revert). Column names (i.e. Sno, County, etc) NOT SHOWING
+function ConvertToCSV(objArray) { 
   var array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray;
   var str = 'SNo,ObservationDate,Province/State,Country/Region,Last Update,Confirmed,Deaths,Recovered\r\n';
+
+  console.log(array[2]); //test Sno 3 deletion. Should log Sno 4 (works) 
+  console.log(array[array.length - 1]) //test insert (works)
+  console.log(array[0]); //should be updated (works)
 
   for (var i = 0; i < array.length; i++) {
       var line = '';
       for (var index in array[i]) {
         if(index != 'Recovered') {
-          if(array[i][index].includes(',')) {
+          if(array[i][index].includes(',')) { 
             line += '\"' + array[i][index] + '\"' + ',';
           }
           else {
@@ -220,46 +239,7 @@ function ConvertToCSV(objArray) { //NEED TO ADD COMMA BETWEEN COUNTY AND STATE (
       }
      str += line + '\r\n';
   }
-
-  return str;
+  fs.writeFileSync('./CSV Files/covid_19_data_updated.csv', str);
 }
 
-
-
-
-/*
-
-  Testing buttons in covidData.html 
-
-*/
-
-
-
-app.post('/insert', (req, res) => {
-  //When you click the insert button, the form data
-  //will show up on node console
-  console.log(" Recevied insert request ");
-  console.log(req.body);
-});
-
-app.post('/update', (req, res) => {
-  //When you click the update button, the form data
-  //will show up on node console
-  console.log(" Recevied update request ");
-  console.log(req.body);
-});
-
-app.post('/delete', (req, res) => {
-  //When you click the delete button, the form data
-  //will show up on node console
-  console.log(" Recevied delete request ");
-  console.log(req.body);
-});
-
-
-app.post('/import', (req, res) => {
-  console.log(" Recevied import request ");
-  console.log(req.body);
-
-});
 
