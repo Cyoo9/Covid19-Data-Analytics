@@ -10,8 +10,9 @@ var multer  = require('multer');
 const { ap } = require('list');
 var csv = fs.readFileSync(path.resolve(__dirname, './CSV Files/covid_19_data.csv')); //reads in a cvs file
 var result = [];
-let searched_results = [];
+var searched_results = [];
 var reqType = "";
+let indexDecrementer = 1;
 
 //parses a cvs file into an array
 function csvParser(csv){
@@ -139,12 +140,11 @@ function InUpDel(req, res) {
 
   csvParser(csv);
   var currentdate = new Date(); 
-  var datetime = "Last Sync: " + currentdate.getDate() + "/"
-                  + (currentdate.getMonth()+1)  + "/" 
-                  + currentdate.getFullYear() + " @ "  
+  var datetime =  currentdate.getMonth()+1  + "/" 
+                  + currentdate.getDate() + "/"
+                  + currentdate.getFullYear() + " "  
                   + currentdate.getHours() + ":"  
-                  + currentdate.getMinutes() + ":" 
-                  + currentdate.getSeconds();
+                  + currentdate.getMinutes(); 
   
   if(reqType == "insert") {;
     var obj = {
@@ -161,39 +161,35 @@ function InUpDel(req, res) {
   }
   else {
     if(reqType == "delete") { 
-        let json = JSON.stringify(result[req.body.deleteSno - 1]); //index that is being deleted. put it into output.json
-        result.splice(req.body.deleteSno - 1, 1); //removes from array
-        fs.writeFileSync('./public/output.json', json);
-        res.sendFile(path.join(__dirname, "/public" , "output.json")); 
-        /*for(let i = 0; i < result.length; i++) { //shift all except the first sno by 1. 
-          if(result[i]['SNo'] != 1) { 
-            result[i]['Sno'] -= 1;
+        result.splice(result.findIndex(x => x.SNo === req.body.deleteSno), 1); //removes from array
+        indexDecrementer++; 
+        /*let index = -1;
+        for(let i = 0; i < result.length; i++) {
+          if(result[i]['SNo'] == req.body.deleteSno) {
+            index = i;
           }
-        }*/
+        } */
     }
     if(reqType == "update") {
       if(req.body.updateDate != '') {
-        result[req.body.updateSno - 1]['ObservationDate'] = req.body.updateDate;
+        result[result.findIndex(x => x.SNo === req.body.updateSno)]['ObservationDate'] = req.body.updateDate;
       }
       if(req.body.updateState != '') {
-        result[req.body.updateSno - 1]['Province/State'] = req.body.updateState;
+        result[result.findIndex(x => x.SNo === req.body.updateSno)]['Province/State'] = req.body.updateState;
       }
       if(req.body.updateCoutry != '') {
-        result[req.body.updateSno - 1]['Country/Region'] = req.body.updateCountry;
+        result[result.findIndex(x => x.SNo === req.body.updateSno)]['Country/Region'] = req.body.updateCountry;
       }
       if(req.body.updateCases != '') {
-        result[req.body.updateSno - 1]['Confirmed'] = req.body.updateCases;
+        result[result.findIndex(x => x.SNo === req.body.updateSno)]['Confirmed'] = req.body.updateCases;
       }
       if(req.body.updateDeaths != '') {
-        result[req.body.updateSno - 1]['Deaths'] = req.body.updateDeaths;
+        result[result.findIndex(x => x.SNo === req.body.updateSno)]['Deaths'] = req.body.updateDeaths;
       }
       if(req.body.updateRecoveries != '') {
-        result[req.body.updateSno - 1]['Recovered'] = req.body.updateRecoveries;
+        result[result.findIndex(x => x.SNo === req.body.updateSno)]['Recovered'] = req.body.updateRecoveries;
       }
-      result[req.body.updateSno - 1]['Last Update'] = datetime; //???
-      let json = JSON.stringify(result[req.body.updateSno - 1]); 
-      fs.writeFileSync('./public/output.json', json); 
-
+      result[result.findIndex(x => x.SNo === req.body.updateSno)]['Last Update'] = datetime;
     }
   }
 
@@ -220,7 +216,7 @@ function ConvertToCSV(objArray) {
 
   console.log(array[2]); //test Sno 3 deletion. Should log Sno 4 (works) 
   console.log(array[array.length - 1]) //test insert (works)
-  console.log(array[0]); //should be updated (works)
+  console.log(array[0]); //update Sno 1 and test (works)
 
   for (var i = 0; i < array.length; i++) {
       var line = '';
