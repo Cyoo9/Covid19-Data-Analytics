@@ -992,7 +992,12 @@ function update(value){
 }
 
 
+// var myInsert = document.getElementById('insert-btn');
 
+// myInsert.onclick = function() {
+
+//     alert("HIIIIIIIIIIIIII");
+// }
 
 
 /*function OnCountrySelection() {

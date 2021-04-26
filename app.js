@@ -126,27 +126,46 @@ app.post('/insert', (req, res) => {
   reqType = "insert";
   InUpDel(req, res);
 
-  let json = {
-    "message" : "COVID-19 information inserted"
-  }
-
-  res.send(json);
+  res.send("COVID-19 data inserted successfully");
   
 })
 
 app.post('/update', (req, res) => {
   reqType = "update";
   InUpDel(req, res);
+
+  res.send("COVID-19 data updated successfully");
 })
 
 app.post('/delete', (req, res) => {
   reqType = "delete";
   InUpDel(req, res);
+
+  res.send("COVID-19 data deleted successfully");
 })
 
 app.listen(server, function() {
     console.log(`Server is running on port: ${server}`);
 })
+
+
+
+
+// function buttonAlert(button){
+//     if (button.id == "insert-btn") {
+//       confirm("You just inserted");
+//     }
+//     else if (button.id == "delete-btn") {
+//       confirm("Are you sure you want to delete ?");
+//     }
+//     else {
+//       confirm ("Are you sure you want to update?");
+//     }
+  
+//   }
+
+
+
 
 function InUpDel(req, res) {
 

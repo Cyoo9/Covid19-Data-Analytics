@@ -8,7 +8,7 @@
         <!-- Bootstrap CSS -->
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
         <title>Covid-19 Update</title>
-        
+        <script src="script.js"></script>
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
         <!--script type="text/javascript" src="app.js"></script-->
     </head>
@@ -19,21 +19,17 @@
             
             <div class=" navbar-collapse w-100 order-1 order-md-0" id="navbarContents"> <!--removed collapse-->
                 <div class="navbar-nav mr-auto navbar-fix">
-                    <a class="nav-item nav-link" href="#">Team CSASTS</a>
+                    <a class="nav-brand nav-link" href="./covidData.html">Team CSASTS</a>
                 </div>
             </div>
     
-            <!--div class=" navbar-collapse w-100 order-0" id="navbarContentsCenter">
-                <div class="mx-auto order-0">
-                <i class = "fab fa-twitter center" style="color: #1491e3;"> </i>
-                </div>
-            </div-->
             
             <div class=" navbar-collapse w-100 order-3" id="navbarContentsRight">
                 <div class="navbar ml-auto">
                 <div class="navbar-nav">
-                    <a class="nav-item nav-link nav" href="/"> SEARCH </a>
-                    <a class="nav-item nav-link" href="/update_page"> UPDATE/IMPORT DATASET </a>
+                    <a class="nav-item nav-link nav" href="./covidData.html"> SEARCH </a>
+                    <a class="nav-item nav-link" href="./covidDataUpdate.html"> UPDATE </a>
+                    <button class = "btn btn-dark" id="import-btn" type="button">IMPORT</button>
                     </div>
                 </div>
                 </div>
@@ -63,7 +59,7 @@
                             <option value="Update">Update</option>
                             <option value ="Delete">Delete</option>    
                             <!-- <option value="Backup">Backup</option> -->
-                            <option value="Import">Import</option>    
+                            <!-- <option value="Import">Import</option>     -->
                         </select>
                         <br>
                         <br>
@@ -88,10 +84,18 @@
                                 <label for="newRecoveries">Recovered:</label><br>
                                 <input type="text" id="newRecoveries" name="newRecoveries"> <br>
                                 <br>
-                                <button id="insert-btn" type = "button" class = "btn btn-info">Insert</button>
+                                <script>
+                                function insertAlert() {
+                                    console.log("HIIIIIIIIIIIIIIIIIIII");
+                                  }
+                                
+                                </script>
+                                <button id="insert-btn" type = "button" class = "btn btn-info" onclick="insertAlert()">Insert</button>
+                         
                                 <br>
                                 <br>
-                                <h2 id=""></h2>
+
+                                <div id = "insert-message"></div>
                             </form>
                         </div>
                         
@@ -103,7 +107,11 @@
                                 <!--h5>Are you sure you would like to delete this data? </h5-->
 
                                 <br>
-                                <button id="delete-btn"  type = "button" class = "btn btn-info">Delete</button>
+                                <button id="delete-btn"  type = "button" class = "btn btn-info" onclick="buttonAlert(this.id)">Delete</button>
+
+                                <br>
+                                <br>
+                                <div id = "delete-message"></div>
                                 
 
                             </form>
@@ -134,8 +142,11 @@
                                 <input type="text" id="updateRecoveries" name="updateRecoveries"> <br>
 
                                 <br>
+                                <button id="update-btn"  type = "button" class = "btn btn-info" onclick="buttonAlert(this.id)">Update</button>
 
-                                <button id="update-btn"  type = "button" class = "btn btn-info">Update</button>
+                                <br>
+                                <br>
+                                <div id = "update-message"></div>
                             </form>
                         </div>
 
@@ -145,12 +156,12 @@
                             
                         </div> -->
 
-                        <div id = "import-wrapper" >
+                        <!-- <div id = "import-wrapper" >
                             <h4 class="optTitle"> Click to Import Data </h4>
                             <br>
                             <button id="import-btn"  type = "button" class = "btn btn-info">Import</button>
                         </div>
-                        
+                         -->
                 
                     </form>
 
@@ -163,21 +174,21 @@
                                 $("#insert-wrapper").hide();
                                 $("#delete-wrapper").hide();
                                 $("#backup-wrapper").hide();
-                                $("#import-wrapper").hide();
+                                // $("#import-wrapper").hide();
                                 $("#update-wrapper").hide();
                             }
                             else if (this.value === "Insert") {
                                 $("#insert-wrapper").show();
                                 $("#delete-wrapper").hide();
                                 $("#backup-wrapper").hide();
-                                $("#import-wrapper").hide();
+                               //$("#import-wrapper").hide();
                                 $("#update-wrapper").hide();
                             }
                             else if (this.value === "Delete") {
                                 $("#delete-wrapper").show();
                                 $("#insert-wrapper").hide();
                                 $("#backup-wrapper").hide();
-                                $("#import-wrapper").hide();
+                              //  $("#import-wrapper").hide();
                                 $("#update-wrapper").hide();
                             }
                             else if (this.value === "Update") {
@@ -185,7 +196,7 @@
                                 $("#insert-wrapper").hide();
                                 $("#delete-wrapper").hide();
                                 $("#backup-wrapper").hide();
-                                $("#import-wrapper").hide();
+                             //   $("#import-wrapper").hide();
                             }
                             // else if (this.value === "Backup"){
                             //     $("#backup-wrapper").show();
@@ -194,13 +205,13 @@
                             //     $("#import-wrapper").hide();
                             //     $("#update-wrapper").hide();
                             // }
-                            else if (this.value === "Import"){
-                                $("#import-wrapper").show();
-                                $("#insert-wrapper").hide();
-                                $("#delete-wrapper").hide();
-                                $("#backup-wrapper").hide();
-                                $("#update-wrapper").hide();
-                            }
+                            // else if (this.value === "Import"){
+                            //     $("#import-wrapper").show();
+                            //     $("#insert-wrapper").hide();
+                            //     $("#delete-wrapper").hide();
+                            //     $("#backup-wrapper").hide();
+                            //     $("#update-wrapper").hide();
+                            // }
                         });
                     });                
                 </script>
@@ -336,6 +347,20 @@
                         console.log(http.status);
                         if(http.readyState == 4 && http.status == 200) {
                             console.log(http.responseText);
+                            console.log(typeof http.responseText);
+
+                            const h2 = document.createElement("h2");
+                            const h2_text = document.createTextNode(http.responseText);
+                            const msg_container = document.getElementById("insert-message");
+
+
+                            console.log(h2);
+                            console.log(h2_text);
+                            console.log(msg_container);
+
+                            h2.appendChild(h2_text);
+                            msg_container.appendChild(h2);
+
 
                             
                         }
@@ -386,6 +411,19 @@
                         console.log(http.status);
                         if(http.readyState == 4 && http.status == 200) {
                             console.log(http.responseText);
+                            console.log(typeof http.responseText);
+
+                            const h2 = document.createElement("h2");
+                            const h2_text = document.createTextNode(http.responseText);
+                            const msg_container = document.getElementById("update-message");
+
+
+                            console.log(h2);
+                            console.log(h2_text);
+                            console.log(msg_container);
+
+                            h2.appendChild(h2_text);
+                            msg_container.appendChild(h2);
                         }
                         
                     }   
@@ -415,6 +453,19 @@
                         console.log(http.status);
                         if(http.readyState == 4 && http.status == 200) {
                             console.log(http.responseText);
+                            console.log(typeof http.responseText);
+
+                            const h2 = document.createElement("h2");
+                            const h2_text = document.createTextNode(http.responseText);
+                            const msg_container = document.getElementById("delete-message");
+
+
+                            console.log(h2);
+                            console.log(h2_text);
+                            console.log(msg_container);
+
+                            h2.appendChild(h2_text);
+                            msg_container.appendChild(h2);
                         }
                         
                     }   
