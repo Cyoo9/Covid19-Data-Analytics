@@ -11,7 +11,57 @@ const { ap } = require('list');
 var csv = fs.readFileSync(path.resolve(__dirname, './CSV Files/covid_19_data.csv')); //reads in a cvs file
 var result = [];
 var searched_results = [];
-var reqType = "";
+
+csvParser(csv); //Call csvParser on original data by default
+
+app.use(express.static(path.join(__dirname, 'public')));
+
+//send html form for search page (also default page when loading site)
+app.get('/', function(req, res) {
+  res.sendFile(path.join(__dirname, "/public" , "covidData.html"));
+})
+
+//send html form for update page
+app.get('/update_page', function(req, res) {
+  res.sendFile(path.join(__dirname, "/public" , "covidDataUpdate.html"));
+})
+
+app.use(express.urlencoded({
+  extended: true
+}))
+
+//calls the middlewear function "search" after the client posts a request
+app.post('/search', search, (req, res) => {
+  let json = JSON.stringify(searched_results); //stringify the search array
+  fs.writeFileSync('./public/output.json', json); //store the string in a json file to be sent to front-end
+  res.sendFile(path.join(__dirname, "/public" , "output.json")); //send json
+})
+
+//called when import button is selected
+app.post('/import', (req, res) => {
+  csv = fs.readFileSync(path.resolve(__dirname, './CSV Files/covid_19_data_updated.csv')); //change filepath to updated csv
+  csvParser(csv); //reparse with updated csv file
+  res.send("Import complete. Search now on updated database");
+})
+
+//called in insert wrapper, uses middlewear to insert data into result array
+app.post('/insert', insertData, (req, res) => {
+  ConvertToCSV(result); //automatically backsup array for importing later
+})
+
+//called in update wrapper, uses middlewear to update data in result array
+app.post('/update', updateData, (req, res) => {
+  ConvertToCSV(result); //automatically backsup array for importing later
+})
+
+//called in delete wrapper, uses middlewear to delete data in result array
+app.post('/delete', deleteData, (req, res) => {
+  ConvertToCSV(result); //automatically backsup array for importing later
+})
+
+app.listen(server, function() {
+    console.log(`Server is running on port: ${server}`);
+})
 
 //parses a cvs file into an array
 function csvParser(csv){
@@ -27,6 +77,7 @@ function csvParser(csv){
 	  var obj = {}; //create new object to be added to the array
 	  var currentline = lines[i].split(","); //split the current line into object variable values
 
+    //hotfix for provinces with commas in the name
     if(headers.length < currentline.length) {
       var combinedLines = currentline[2] + ',' + currentline[3];
       var removeQuotes = combinedLines.split("\"");
@@ -47,7 +98,118 @@ function csvParser(csv){
   }
 }
 
-csvParser(csv); 
+//searchs an array for specific object values
+function search(req, res, next) {
+  searched_results = []; //reset array to empty
+
+  //loops through all the arrays objects
+  for(var i = 0; i < result.length; i++) {
+
+    //checks if country, state, and date match, accepts all if one or more is left blank
+    if(result[i]['Country/Region'] == req.body.country || req.body.country == '') {
+      if(result[i]['Province/State'] == req.body.state ||req.body.state == '') {
+        if(req.body.date == '' || ReformatDate(result[i]['ObservationDate']) == req.body.date) {
+          //checks if confirmed, deaths, and recovered are above minimum values
+          if(parseInt(result[i]['Confirmed']) >= parseInt(req.body.Confirmed)) {
+            if(parseInt(result[i]['Deaths']) >= parseInt(req.body.Deaths)) {   
+              if(parseInt(result[i]['Recovered']) >= parseInt(req.body.Recovered)) {
+                searched_results.push(result[i]);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  next();
+}
+
+//inserts data into result array
+function insertData(req, res, next) {
+  //gets current date and time for last update
+  var currentdate = new Date(); 
+  var datetime =  currentdate.getMonth()+1  + "/" 
+                  + currentdate.getDate() + "/"
+                  + currentdate.getFullYear() + " "  
+                  + currentdate.getHours() + ":"  
+                  + currentdate.getMinutes() + ":"
+                  + currentdate.getSeconds();
+  
+  //create new object with the insert data
+  var obj = {
+    SNo: (parseInt(result[result.length-1]['SNo']) + 1) + "", //sets serial number automatically
+    ObservationDate: req.body.insertDate,
+    'Province/State': req.body.insertState,
+    'Country/Region': req.body.insertCountry,
+    'Last Update': datetime,
+    Confirmed: req.body.newCases,
+    Deaths: req.body.newDeaths,
+    Recovered: req.body.newRecoveries
+  };
+  //pushes new insert
+  result.push(obj);
+  next();
+}
+
+//updates data in result array
+function updateData(req, res, next) {
+  //gets current date and time for last update
+  var currentdate = new Date(); 
+  var datetime =  currentdate.getMonth()+1  + "/" 
+                  + currentdate.getDate() + "/"
+                  + currentdate.getFullYear() + " "  
+                  + currentdate.getHours() + ":"  
+                  + currentdate.getMinutes() + ":"
+                  + currentdate.getSeconds();
+
+  //updates data at given SNo if the SNo exists
+  if(result.findIndex(x => x.SNo === req.body.updateSno) != -1) {
+    result[result.findIndex(x => x.SNo === req.body.updateSno)]['ObservationDate'] = req.body.updateDate;
+    result[result.findIndex(x => x.SNo === req.body.updateSno)]['Province/State'] = req.body.updateState;
+    result[result.findIndex(x => x.SNo === req.body.updateSno)]['Country/Region'] = req.body.updateCountry;
+    result[result.findIndex(x => x.SNo === req.body.updateSno)]['Confirmed'] = req.body.updateCases;
+    result[result.findIndex(x => x.SNo === req.body.updateSno)]['Deaths'] = req.body.updateDeaths;
+    result[result.findIndex(x => x.SNo === req.body.updateSno)]['Recovered'] = req.body.updateRecoveries;
+    result[result.findIndex(x => x.SNo === req.body.updateSno)]['Last Update'] = datetime;
+  }
+  next();
+}
+
+//deletes data in result array
+function deleteData(req, res, next) {
+  //deletes data at given SNo if SNo exists
+  if(result.findIndex(x => x.SNo === req.body.deleteSno) != -1) {
+    result.splice(result.findIndex(x => x.SNo === req.body.deleteSno), 1); //removes from array
+  }
+  next();
+}
+
+//converts an array to a csv file called covid_19_data_updated.csv
+function ConvertToCSV(objArray) {
+  var array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray; //gets array
+
+  var str = 'SNo,ObservationDate,Province/State,Country/Region,Last Update,Confirmed,Deaths,Recovered\r\n'; //harcode headers
+
+  //adds each value from each array object, sperated by commas
+  for (var i = 0; i < array.length; i++) {
+      var line = '';
+      for (var index in array[i]) {
+        if(index != 'Recovered') {
+          if(array[i][index].includes(',')) { 
+            line += '\"' + array[i][index] + '\"' + ',';
+          }
+          else {
+            line += array[i][index] + ',';
+          }
+        }
+        else {
+          line += array[i][index];
+        }
+      }
+     str += line + '\r\n';
+  }
+  fs.writeFileSync('./CSV Files/covid_19_data_updated.csv', str); //writes to file
+}
 
 //Reformats dates from something like 12/19/2020 to 2020-12-19
 function ReformatDate(old_date) {
@@ -66,169 +228,4 @@ function ReformatDate(old_date) {
   else {
     return "Unknown Date";
   }
-}
-
-
-//searchs an array for specific object values
-function search(req, res, next) {
-  searched_results = []; //reset array to empty
-
-  //loops through all the arrays objects
-  for(var i = 0; i < result.length; i++) {
-
-    //checks if country, state, and date match, accepts all if one or more is left blank
-    if(result[i]['Country/Region'] == req.body.country || req.body.country == '') {
-      if(result[i]['Province/State'] == req.body.state ||req.body.state == '') {
-        if(req.body.date == '' || ReformatDate(result[i]['ObservationDate']) == req.body.date) {
-          if(parseInt(result[i]['Confirmed']) >= parseInt(req.body.Confirmed)) {
-            if(parseInt(result[i]['Deaths']) >= parseInt(req.body.Deaths)) {   
-              if(parseInt(result[i]['Recovered']) >= parseInt(req.body.Recovered)) {
-                searched_results.push(result[i]);
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  next();
-}
-
-app.use(express.static(path.join(__dirname, 'public')));
-
-app.get('/', function(req, res) {
-  res.sendFile(path.join(__dirname, "/public" , "covidData.html"));
-})
-
-app.get('/update_page', function(req, res) {
-  res.sendFile(path.join(__dirname, "/public" , "covidDataUpdate.html"));
-})
-
-app.use(express.urlencoded({
-  extended: true
-}))
-
-//calls the middlewear function "search" after the client posts a request
-app.post('/search', search, (req, res) => {
-  let json = JSON.stringify(searched_results); //stringify the search array
-  fs.writeFileSync('./public/output.json', json); //store the string in a json file to be sent to front-end
-  res.sendFile(path.join(__dirname, "/public" , "output.json"));
-})
-
-app.post('/import', (req, res) => {
-  console.log("Hello");
-  csv = fs.readFileSync(path.resolve(__dirname, './CSV Files/covid_19_data_updated.csv'));
-  csvParser(csv); //reparse with updated csv file
-  res.send("Import complete. Search now on updated database");
-})
-
-
-app.post('/insert', (req, res) => {
-  reqType = "insert";
-  InUpDel(req, res);
-
-  let json = {
-    "message" : "COVID-19 information inserted"
-  }
-
-  res.send(json);
-  
-})
-
-app.post('/update', (req, res) => {
-  reqType = "update";
-  InUpDel(req, res);
-})
-
-app.post('/delete', (req, res) => {
-  reqType = "delete";
-  InUpDel(req, res);
-})
-
-app.listen(server, function() {
-    console.log(`Server is running on port: ${server}`);
-})
-
-function InUpDel(req, res) {
-
-  var currentdate = new Date(); 
-  var datetime =  currentdate.getMonth()+1  + "/" 
-                  + currentdate.getDate() + "/"
-                  + currentdate.getFullYear() + " "  
-                  + currentdate.getHours() + ":"  
-                  + currentdate.getMinutes() + ":"
-                  + currentdate.getSeconds();
-  
-  if(reqType == "insert") {;
-    var obj = {
-      SNo: (parseInt(result[result.length-1]['SNo']) + 1) + "",
-      ObservationDate: req.body.insertDate,
-      'Province/State': req.body.insertState,
-      'Country/Region': req.body.insertCountry,
-      'Last Update': datetime,
-      Confirmed: req.body.newCases,
-      Deaths: req.body.newDeaths,
-      Recovered: req.body.newRecoveries
-    };
-    res.send("Insert Complete");
-    result.push(obj); 
-  }
-  else {
-    if(reqType == "delete") { 
-      if(result.findIndex(x => x.SNo === req.body.deleteSno) != -1) {
-        result.splice(result.findIndex(x => x.SNo === req.body.deleteSno), 1); //removes from array
-        /*var index = result.findIndex(x => x.SNo === "" + (parseInt(req.body.deleteSno) + 1));
-        if(index != -1) {
-          for(var i = index; i < result.length; i++) {
-            result[i]['SNo'] = "" + (parseInt(result[i]['SNo']) - 1);
-          }
-        }*/
-        res.send("Delete Complete");
-      } else {
-        res.send("SNo doesn't exist");
-      }
-    }
-    if(reqType == "update") {
-      if(result.findIndex(x => x.SNo === req.body.updateSno) != -1) {
-        result[result.findIndex(x => x.SNo === req.body.updateSno)]['ObservationDate'] = req.body.updateDate;
-        result[result.findIndex(x => x.SNo === req.body.updateSno)]['Province/State'] = req.body.updateState;
-        result[result.findIndex(x => x.SNo === req.body.updateSno)]['Country/Region'] = req.body.updateCountry;
-        result[result.findIndex(x => x.SNo === req.body.updateSno)]['Confirmed'] = req.body.updateCases;
-        result[result.findIndex(x => x.SNo === req.body.updateSno)]['Deaths'] = req.body.updateDeaths;
-        result[result.findIndex(x => x.SNo === req.body.updateSno)]['Recovered'] = req.body.updateRecoveries;
-        result[result.findIndex(x => x.SNo === req.body.updateSno)]['Last Update'] = datetime;
-        res.send("Update Complete");
-      } else {
-        res.send("SNo doesn't exist");
-      }
-    }
-  }
-
-  ConvertToCSV(result);
-
-  console.log("Changes confirmed");
-} 
-
-function ConvertToCSV(objArray) { 
-  var array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray;
-  var str = 'SNo,ObservationDate,Province/State,Country/Region,Last Update,Confirmed,Deaths,Recovered\r\n';
-
-  for (var i = 0; i < array.length; i++) {
-      var line = '';
-      for (var index in array[i]) {
-        if(index != 'Recovered') {
-          if(array[i][index].includes(',')) { 
-            line += '\"' + array[i][index] + '\"' + ',';
-          }
-          else {
-            line += array[i][index] + ',';
-          }
-        }
-        else {
-          line += array[i][index];
-        }
-      }
-     str += line + '\r\n';
-  }
-  fs.writeFileSync('./CSV Files/covid_19_data_updated.csv', str);
 }
