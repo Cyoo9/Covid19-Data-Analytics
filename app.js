@@ -116,6 +116,7 @@ app.post('/search', search, (req, res) => {
 })
 
 app.post('/import', (req, res) => {
+  console.log("Hello");
   csv = fs.readFileSync(path.resolve(__dirname, './CSV Files/covid_19_data_updated.csv'));
   csvParser(csv); //reparse with updated csv file
   res.send("Import complete. Search now on updated database");
@@ -169,6 +170,7 @@ function InUpDel(req, res) {
       Deaths: req.body.newDeaths,
       Recovered: req.body.newRecoveries
     };
+    res.send("Insert Complete");
     result.push(obj); 
   }
   else {
@@ -182,6 +184,8 @@ function InUpDel(req, res) {
           }
         }*/
         res.send("Delete Complete");
+      } else {
+        res.send("SNo doesn't exist");
       }
     }
     if(reqType == "update") {
