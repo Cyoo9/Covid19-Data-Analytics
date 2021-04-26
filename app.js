@@ -26,6 +26,10 @@ app.get('/update_page', function(req, res) {
   res.sendFile(path.join(__dirname, "/public" , "covidDataUpdate.html"));
 })
 
+app.get('/analysis_page', function(req, res) {
+  res.sendFile(path.join(__dirname, "/public" , "dataAnalysis.html"));
+})
+
 app.use(express.urlencoded({
   extended: true
 }))
