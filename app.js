@@ -47,6 +47,7 @@ app.post('/import', (req, res) => {
 //called in insert wrapper, uses middlewear to insert data into result array
 app.post('/insert', insertData, (req, res) => {
   ConvertToCSV(result); //automatically backsup array for importing later
+  res.send("Successfully inserted data");
 })
 
 //called in update wrapper, uses middlewear to update data in result array
@@ -171,6 +172,10 @@ function updateData(req, res, next) {
     result[result.findIndex(x => x.SNo === req.body.updateSno)]['Deaths'] = req.body.updateDeaths;
     result[result.findIndex(x => x.SNo === req.body.updateSno)]['Recovered'] = req.body.updateRecoveries;
     result[result.findIndex(x => x.SNo === req.body.updateSno)]['Last Update'] = datetime;
+    res.send("Successfully updated data");
+  }
+  else {
+    res.send("Incorrect serial number. Try again.");
   }
   next();
 }
@@ -180,6 +185,10 @@ function deleteData(req, res, next) {
   //deletes data at given SNo if SNo exists
   if(result.findIndex(x => x.SNo === req.body.deleteSno) != -1) {
     result.splice(result.findIndex(x => x.SNo === req.body.deleteSno), 1); //removes from array
+    res.send("Successfully deleted data");
+  }
+  else {
+    res.send("Incorrect serial number. Try again.");
   }
   next();
 }
