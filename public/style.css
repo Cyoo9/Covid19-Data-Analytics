@@ -40,12 +40,6 @@ body{
 #update-wrapper{
     display:none;
 }
-#backup-wrapper{
-  display:none;
-}
-#import-wrapper{
-  display:none;
-}
 .tab { margin-left: 40px; }
 
 .invisible {
@@ -84,4 +78,3 @@ th {
     font-weight:bold;
     background-color: #f0eae2;
 }        
-

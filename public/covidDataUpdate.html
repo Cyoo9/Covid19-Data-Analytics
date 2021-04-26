@@ -27,9 +27,8 @@
             <div class=" navbar-collapse w-100 order-3" id="navbarContentsRight">
                 <div class="navbar ml-auto">
                 <div class="navbar-nav">
-                    <a class="nav-item nav-link nav" href="./covidData.html"> SEARCH </a>
-                    <a class="nav-item nav-link" href="./covidDataUpdate.html"> UPDATE </a>
-                    <button class = "btn btn-dark" id="import-btn" type="button">IMPORT</button>
+                    <a class="nav-item nav-link nav" href="/"> SEARCH </a>
+                    <a class="nav-item nav-link" href="/update_page"> UPDATE DATASET </a>
                     </div>
                 </div>
                 </div>
@@ -58,8 +57,6 @@
                             <option value ="Insert">Insert </option>
                             <option value="Update">Update</option>
                             <option value ="Delete">Delete</option>    
-                            <!-- <option value="Backup">Backup</option> -->
-                            <!-- <option value="Import">Import</option>     -->
                         </select>
                         <br>
                         <br>
@@ -149,20 +146,6 @@
                                 <div id = "update-message"></div>
                             </form>
                         </div>
-
-                        <!-- <div id = "backup-wrapper" >
-                            <h4 class="optTitle"> Click Below to Backup </h4>
-                            <button id="backup-btn"  type = "button" class = "btn btn-info">Backup</button>
-                            
-                        </div> -->
-
-                        <!-- <div id = "import-wrapper" >
-                            <h4 class="optTitle"> Click to Import Data </h4>
-                            <br>
-                            <button id="import-btn"  type = "button" class = "btn btn-info">Import</button>
-                        </div>
-                         -->
-                
                     </form>
 
                 </div>
@@ -174,44 +157,22 @@
                                 $("#insert-wrapper").hide();
                                 $("#delete-wrapper").hide();
                                 $("#backup-wrapper").hide();
-                                // $("#import-wrapper").hide();
-                                $("#update-wrapper").hide();
                             }
                             else if (this.value === "Insert") {
                                 $("#insert-wrapper").show();
                                 $("#delete-wrapper").hide();
                                 $("#backup-wrapper").hide();
-                               //$("#import-wrapper").hide();
-                                $("#update-wrapper").hide();
                             }
                             else if (this.value === "Delete") {
                                 $("#delete-wrapper").show();
                                 $("#insert-wrapper").hide();
                                 $("#backup-wrapper").hide();
-                              //  $("#import-wrapper").hide();
-                                $("#update-wrapper").hide();
                             }
                             else if (this.value === "Update") {
                                 $("#update-wrapper").show();
                                 $("#insert-wrapper").hide();
                                 $("#delete-wrapper").hide();
-                                $("#backup-wrapper").hide();
-                             //   $("#import-wrapper").hide();
                             }
-                            // else if (this.value === "Backup"){
-                            //     $("#backup-wrapper").show();
-                            //     $("#insert-wrapper").hide();
-                            //     $("#delete-wrapper").hide();
-                            //     $("#import-wrapper").hide();
-                            //     $("#update-wrapper").hide();
-                            // }
-                            // else if (this.value === "Import"){
-                            //     $("#import-wrapper").show();
-                            //     $("#insert-wrapper").hide();
-                            //     $("#delete-wrapper").hide();
-                            //     $("#backup-wrapper").hide();
-                            //     $("#update-wrapper").hide();
-                            // }
                         });
                     });                
                 </script>
@@ -476,32 +437,6 @@
                     return true;
         };
 
-
-
-        document.getElementById("import-btn").onclick = () =>  {
-            console.log("Clicked on import button")
-
-            var http = new XMLHttpRequest();
-            var params = "";
-            params += `import-btn-clicked=true`;
-
-            http.open('POST', '/import', true);
-            http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-            http.onreadystatechange = function() {//Call a function when the state changes.
-                console.log(http.status);
-                if(http.readyState == 4 && http.status == 200) {
-                    console.log(http.responseText);
-                }
-                
-            }   
-            //console.log(params);
-            http.send(params);
-
-            return true;
-        };
-
-
-    
         // Create an HTML table using the JSON data.
         function createTableFromJSON(jsonData) {
             var arrBirds = [];

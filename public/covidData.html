@@ -25,9 +25,8 @@
             <div class=" navbar-collapse w-100 order-3" id="navbarContentsRight">
                 <div class="navbar ml-auto">
                 <div class="navbar-nav">
-                    <a class="nav-item nav-link" href="./covidData.html"> SEARCH </a>
-                    <a class="nav-item nav-link" href="./covidDataUpdate.html"> UPDATE </a>
-                    <button class = "btn btn-dark" id="import-btn" type="button">IMPORT</button>
+                    <a class="nav-item nav-link" href="/"> SEARCH </a>
+                    <a class="nav-item nav-link" href="/update_page"> UPDATE DATASET </a>
                     </div>
                 </div>
                 
@@ -40,7 +39,32 @@
         
 
         <div class = "content-wrapper" >
+            <button id="import-btn" style="float:right">Import</button>
             <h1 id="Title">Covid-19 Information</h1>
+            <script>
+            document.getElementById("import-btn").onclick = () =>  {
+                console.log("Clicked on import button")
+    
+                var http = new XMLHttpRequest();
+                var params = "";
+                params += `import-btn-clicked=true`;
+    
+                http.open('POST', '/import', true);
+                http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+                http.onreadystatechange = function() {//Call a function when the state changes.
+                    console.log(http.status);
+                    if(http.readyState == 4 && http.status == 200) {
+                        console.log(http.responseText);
+                    }
+                    
+                }   
+                //console.log(params);
+                http.send(params);
+    
+                return true;
+            };
+            </script>
+
             <h2>What would you like to know?</h2>
 
             <div id="error-block"></div>
@@ -561,8 +585,6 @@
         function createTableFromJSON(jsonData) {
             var arrBirds = [];
             arrBirds = JSON.parse(jsonData); 	// Convert JSON to array.
-
-
 
             const want_confirmed_cases = document.getElementsByName('confirmedCases')[0].checked;
             const want_deaths = document.getElementsByName('deaths')[0].checked;
