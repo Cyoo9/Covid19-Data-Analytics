@@ -1,0 +1,224 @@
+SNo,Country,vaxName,vaxDate,lockdownDate,lockdownStrength
+1,Mainland China,Sinopharm,2020-12-15
+2,Hong Kong,Sinovac,2020-12-15
+3,Macau,Sinopharm,2021-02-08
+4,Taiwan,Oxford-AstraZeneca,2021-03-21
+5,US,Pfizer-BioNTech,2020-12-14
+6,Japan,Pfizer-BioNTech,2021-02-17
+7,Thailand,Sinovac,2021-03-01
+8,South Korea,Oxford-AstraZeneca,2021-02-26
+9,Singapore,Moderna,2021-01-08
+10,Philippines,Oxford-AstraZeneca,2021-03-01
+11,Malaysia,Pfizer-BioNTech,2021-02-24
+12,Vietnam,Oxford-AstraZeneca,2021-03-08
+13,Australia,Oxford-AstraZeneca,2021-02-21
+14,Mexico,Oxford-AstraZeneca,2020-12-24
+15,Brazil,Oxford-AstraZeneca,2021-01-18
+16,Colombia,Pfizer-BioNTech,2021-02-17
+17,France,Pfizer-BioNTech,2020-12-27
+18,Nepal,Sinopharm,2021-01-27
+19,Canada,Pfizer-BioNTech,2020-12-14
+20,Cambodia,Oxford-AstraZeneca,2021-02-10
+21,Sri Lanka,Oxford-AstraZeneca,2021-01-29
+22,Ivory Coast,Oxford-AstraZeneca,2021-03-01
+23,Germany,Moderna,2020-12-26
+24,Finland,Moderna,2020-12-27
+25,United Arab Emirates,Oxford-AstraZeneca,2020-12-14
+26,India,Oxford-AstraZeneca,2021-01-16
+27,Italy,Moderna,2020-12-27
+28,UK,Pfizer-BioNTech,2020-12-08
+29,Russia,Sputnik V,2020-12-05
+30,Sweden,Pfizer-BioNTech,2020-12-27
+31,Spain,Moderna,2020-12-27
+32,Belgium,Oxford-AstraZeneca,2020-12-28
+33,Others,,,
+34,Egypt,Oxford-AstraZeneca,2021-01-24
+35,Iran,Oxford-AstraZeneca,2021-02-09
+36,Israel,Pfizer-BioNTech,2020-12-19
+37,Lebanon,Pfizer-BioNTech,2021-02-14
+38,Iraq,Oxford-AstraZeneca,2021-03-02
+39,Oman,Oxford-AstraZeneca,2020-12-27
+40,Afghanistan,Oxford-AstraZeneca,2021-02-23
+41,Bahrain,Oxford-AstraZeneca,2020-12-17
+42,Kuwait,Pfizer-BioNTech,2020-12-24
+43,Austria,Pfizer-BioNTech,2020-12-27
+44,Algeria,Sputnik V,2021-01-30
+45,Croatia,Pfizer-BioNTech,2020-12-27
+46,Switzerland,Pfizer-BioNTech,2020-12-23
+47,Pakistan,Sinopharm,2021-01-02
+48,Georgia,Oxford-AstraZeneca,2021-03-15
+49,Greece,Moderna,2020-12-27
+50,North Macedonia,Pfizer-BioNTech,2021-02-17
+51,Norway,Oxford-AstraZeneca,2020-12-26
+52,Romania,Oxford-AstraZeneca,2020-12-27
+53,Denmark,Oxford-AstraZeneca,2020-12-27
+54,Estonia,Moderna,2020-12-27
+55,Netherlands,Pfizer-BioNTech,2021-01-06
+56,San Marino,Pfizer-BioNTech,2021-02-25
+57,Azerbaijan,Sinovac,2021-01-18
+58,Belarus,Sputnik V,2020-12-29
+59,Iceland,Pfizer-BioNTech,2020-12-29
+60,Lithuania,Moderna,2020-12-28
+61,New Zealand,Pfizer-BioNTech,2021-02-20
+62,Nigeria,Oxford-AstraZeneca,2021-03-05
+63,North Ireland,Pfizer-BioNTech,2020-12-29
+64,Ireland,Pfizer-BioNTech,2020-12-29
+65,Luxembourg,Pfizer-BioNTech,2020-12-28
+66,Monaco,Pfizer-BioNTech,2020-12-31
+67,Qatar,Pfizer-BioNTech,2020-12-23
+68,Ecuador,Oxford-AstraZeneca,2021-01-22
+69,Czech Republic,Moderna,2020-12-27
+70,Armenia,Sputnik V,2021-02-08
+71,Dominican Republic,Oxford-AstraZeneca,2021-02-16
+72,Indonesia,Oxford-AstraZeneca,2021-01-13
+73,Portugal,Moderna,2020-12-27
+74,Andorra,Pfizer-BioNTech,2021-01-20
+75,Latvia,Pfizer-BioNTech,2020-12-28
+76,Morocco,Sinopharm,2021-01-25
+77,Saudi Arabia,Pfizer-BioNTech,2020-12-17
+78,Senegal,Sinopharm,2021-02-23
+79,Argentina,Oxford-AstraZeneca,2020-12-29
+80,Chile,Pfizer-BioNTech,2020-12-24
+81,Jordan,Pfizer-BioNTech,2021-01-14
+82,Ukraine,Sinovac,2021-02-24
+83,Saint Barthelemy,,,
+84,Hungary,Moderna,2020-12-26
+85,Faroe Islands,Moderna,2020-12-30
+86,Gibraltar,Pfizer-BioNTech,2021-01-10
+87,Liechtenstein,Moderna,2021-01-18
+88,Poland,Pfizer-BioNTech,2020-12-27
+89,Tunisia,Pfizer-BioNTech,2021-03-13
+90,Palestine,Pfizer-BioNTech,2021-02-02
+91,Bosnia and Herzegovina,Sputnik V,2021-02-12
+92,Slovenia,Pfizer-BioNTech,2020-12-27
+93,South Africa,Janssen,2021-12-17
+94,Bhutan,Oxford-AstraZeneca,2021-03-27
+95,Cameroon,Sinopharm,2021-04-12
+96,Costa Rica,Pfizer-BioNTech,2020-12-24
+97,Peru,Pfizer-BioNTech,2021-02-07
+98,Serbia,Sputnik V,2020-12-24
+99,Slovakia,Pfizer-BioNTech,2020-12-26
+100,Togo,Oxford-AstraZeneca,2021-03-10
+101,Vatican City,,,
+102,French Guiana,,,
+103,Malta,Moderna,2020-12-27
+104,Martinique,,,
+105,Republic of Ireland,Pfizer-BioNTech,2020-12-29
+106,Bulgaria,Moderna,2020-12-27
+107,Maldives,Oxford-AstraZeneca,2021-02-01
+108,Bangladesh,Oxford-AstraZeneca,2021-01-28
+109,Moldova,Oxford-AstraZeneca,2021-03-02
+110,Paraguay,Sputnik V,2021-02-22
+111,Albania,Pfizer-BioNTech,2021-01-11
+112,Cyprus,Pfizer-BioNTech,2020-12-27
+113,St. Martin,,,
+114,Brunei,Oxford-AstraZeneca,2021-04-03
+115,occupied Palestinian territory,Pfizer-BioNTech,2021-02-02
+116,Burkina Faso,,,
+117,Channel Islands,,,
+118,Holy See,,,
+119,Mongolia,Oxford-AstraZeneca,2021-02-23
+120,Panama,Pfizer-BioNTech,2021-01-20
+121,Bolivia,Oxford-AstraZeneca,2021-01-29
+122,Honduras,Oxford-AstraZeneca,2021-03-01
+123,Congo (Kinshasa),Sinopharm,2021-03-25
+124,Jamaica,Oxford-AstraZeneca,2021-03-10
+125,Reunion,,,
+126,Turkey,Pfizer-BioNTech,2021-01-14
+127,Cuba,,,
+128,Guyana,Oxford-AstraZeneca,2021-02-11
+129,Kazakhstan,Sputnik V,2021-02-01
+130,Cayman Islands,Pfizer-BioNTech,2021-01-07
+131,Guadeloupe,,,
+132,Ethiopia,Oxford-AstraZeneca,2021-03-13
+133,Sudan,Oxford-AstraZeneca,2021-03-09
+134,Guinea,Sputnik V,2020-12-30
+135,Antigua and Barbuda,Oxford-AstraZeneca,2021-02-17
+136,Aruba,,,
+137,Kenya,Oxford-AstraZeneca,2021-03-05
+138,Uruguay,Pfizer-BioNTech,2021-03-01
+139,Ghana,Oxford-AstraZeneca,2021-03-01
+140,Jersey,,,
+141,Namibia,Oxford-AstraZeneca,2021-03-19
+142,Seychelles,Sinopharm,2021-01-10
+143,Trinidad and Tobago,Oxford-AstraZeneca,2021-02-17
+144,Venezuela,Sputnik V,2021-02-18
+145,Curacao,,,
+146,Eswatini,Oxford-AstraZeneca,2021-03-24
+147,Gabon,Sinopharm,2021-03-23
+148,Guatemala,Moderna,2021-02-25
+149,Guernsey,Oxford-AstraZeneca,2020-12-17
+150,Mauritania,Sinopharm,2021-03-26
+151,Rwanda,Moderna,2021-02-15
+152,Saint Lucia,Oxford-AstraZeneca,2021-02-17
+153,Saint Vincent and the Grenadines,Oxford-AstraZeneca,2021-02-14
+154,Suriname,Oxford-AstraZeneca,2021-02-23
+155,Kosovo,Oxford-AstraZeneca,2021-03-29
+156,Central African Republic,,,
+157,Congo (Brazzaville),Sinopharm,2021-03-25
+158,Equatorial Guinea,Sinopharm,2021-02-12
+159,Uzbekistan,Oxford-AstraZeneca,2021-04-01
+160,Guam,,,
+161,Puerto Rico,,,
+162,Benin,,,
+163,Greenland,Pfizer-BioNTech,2021-01-04
+164,Liberia,,,
+165,Mayotte,,,
+166,Republic of the Congo,Sinopharm,2021-03-25
+167,Somalia,Oxford-AstraZeneca,2021-03-16
+168,Tanzania,,,
+169,The Bahamas,Oxford-AstraZeneca,2021-03-14
+170,Barbados,Oxford-AstraZeneca,2021-02-11
+171,Montenegro,Sinopharm,2021-02-20
+172,The Gambia,Oxford-AstraZeneca,2021-03-10
+173,Kyrgyzstan,Sinopharm,2021-03-29
+174,Mauritius,Oxford-AstraZeneca,2021-01-26
+175,Zambia,Oxford-AstraZenec,2021-04-14
+176,Djibouti,Oxford-AstraZenec,2021-03-15
+177,Chad,,,
+178,El Salvador,Oxford-AstraZeneca,2021-02-17
+179,Fiji,Oxford-AstraZeneca,2021-03-10
+180,Nicaragua,Oxford-AstraZeneca,2021-04-05
+181,Madagascar,,,
+182,Haiti,,,
+183,Angola,Oxford-AstraZeneca,2021-03-02
+184,Cabo Verde,Oxford-AstraZeneca,2021-03-18
+185,Niger,Sinopharm,2021-03-29
+186,Papua New Guinea,Oxford-AstraZeneca,2021-03-30
+187,Zimbabwe,Sinopharm,2021-02-18
+188,Cape Verde,Oxford-AstraZeneca,2021-03-18
+189,East Timor,,,
+190,Eritrea,,,
+191,Uganda,Oxford-AstraZeneca,2021-03-10
+192,Bahamas,Oxford-AstraZeneca,2021-03-14
+193,Dominica,Oxford-AstraZeneca,2021-02-12
+194,Gambia,Oxford-AstraZeneca,2021-03-10
+195,Grenada,Oxford-AstraZeneca,2021-02-12
+196,Mozambique,Sinopharm,2021-03-08
+197,Samoa,,,
+198,Syria,Sputnik V,2021-03-01
+199,Timor-Leste,Oxford-AstraZeneca,2021-04-07
+200,Belize,Oxford-AstraZeneca,2021-03-01
+201,Laos,Sinopharm,2021-03-12
+202,Libya,Oxford-AstraZeneca,2021-04-17
+203,Diamond Princess,,,
+204,Guinea-Bissau,,,
+205,Mali,Oxford-AstraZenec,2021-03-31
+206,Saint Kitts and Nevis,Oxford-AstraZenec,2021-02-24
+207,West Bank and Gaza,,2020-12-19
+208,Burma,,,
+209,MS Zaandam,,,
+210,Botswana,Oxford-AstraZeneca,2021-03-26
+211,Burundi,,,
+212,Sierra Leone,Oxford-AstraZeneca,2021-03-15
+213,Malawi,Oxford-AstraZeneca,2021-03-11
+214,South Sudan,Oxford-AstraZeneca,2021-04-06
+215,Sao Tome and Principe,Oxford-AstraZeneca,2021-03-15
+216,Yemen,,,
+217,Comoros,,,
+218,Tajikistan,,,
+219,Lesotho,Oxford-AstraZeneca,2021-03-10
+220,Solomon Islands,Oxford-AstraZeneca,2021-03-24
+221,Marshall Islands,,,
+222,Vanuatu,,,
+223,Micronesia,,,
