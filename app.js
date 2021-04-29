@@ -8,11 +8,10 @@ let ejs = require('ejs');
 var bodyParser = require("body-parser");
 var multer  = require('multer');
 const { ap } = require('list');
+const { parse } = require('path');
 var result = [];
 var searched_results = [];
 var outside_data = [];
-let vaccineName = "";
-let vaccineDate = "";
 
 var csv = fs.readFileSync(path.resolve(__dirname, './CSV Files/covid_19_data.csv')); //reads in a cvs file
 result = csvParser(csv); //Call csvParser on original data by default
@@ -48,7 +47,7 @@ app.post('/search', search, (req, res) => {
 })
 
 //called when import button is selected
-app.post('/import', (req, res) => { 
+app.post('/import', analytics2, (req, res) => { 
   csv = fs.readFileSync(path.resolve(__dirname, './CSV Files/covid_19_data_updated.csv')); //change filepath to updated csv
   result = csvParser(csv); //reparse with updated csv file
   res.send("Import complete. Search now on updated database");
@@ -96,7 +95,6 @@ app.listen(server, function() {
 
 function analytics1(req, res, next) {
   search(req, res, next);
-
 }
 
 function analytics2(req, res, next) {
@@ -106,6 +104,8 @@ function analytics2(req, res, next) {
   let beforeVax = [];
   let afterVax = [];
   let afterIndex = -1;
+  let vaccineName = "";
+  let vaccineDate = "";
   
   for(let i = 0; i < outside_data.length; i++) {
     if(outside_data[i]['Country'] == country) {
@@ -135,28 +135,46 @@ function analytics2(req, res, next) {
   }
 
   let avgCasesBeforeVax = 0;
-  let beforeSum = parseInt(beforeVax[beforeVax.length-1]['Confirmed']) - parseInt(beforeVax[0]['Confirmed']);
-  avgCasesBeforeVax = beforeSum / beforeVax.length;
+  let sum = 0;
+  for(let i = 0; i < beforeVax.length; i++) {
+    sum += parseInt(beforeVax[i]['Confirmed']);
+  }
+  avgCasesBeforeVax = sum / beforeVax.length;
 
   let avgCasesAfterVax = 0;
-  let afterSum = parseInt(afterVax[afterVax.length-1]['Confirmed']) - parseInt(afterVax[0]['Confirmed']);
-  avgCasesAfterVax = afterSum / afterVax.length;
+  sum = 0;
+  for(let i = 0; i < afterVax.length; i++) {
+    sum += parseInt(afterVax[i]['Confirmed']);
+  }
+  avgCasesAfterVax = sum / afterVax.length;
 
   let avgDeathsBeforeVax = 0;
-  beforeSum = parseInt(beforeVax[beforeVax.length-1]['Deaths']) - parseInt(beforeVax[0]['Deaths']);
-  avgDeathsBeforeVax = beforeSum / beforeVax.length;
+  sum = 0;
+  for(let i = 0; i < beforeVax.length; i++) {
+    sum += parseInt(beforeVax[i]['Deaths']);
+  }
+  avgDeathsBeforeVax = sum / beforeVax.length;
 
   let avgDeathsAfterVax = 0;
-  afterSum = parseInt(afterVax[afterVax.length-1]['Deaths']) - parseInt(afterVax[0]['Deaths']);
-  avgDeathsVax = afterSum / afterVax.length;
+  sum = 0;
+  for(let i = 0; i < afterVax.length; i++) {
+    sum += parseInt(afterVax[i]['Deaths']);
+  }
+  avgDeathsAfterVax = sum / afterVax.length;
 
   let avgRecoveriesBeforeVax = 0;
-  beforeSum = parseInt(beforeVax[beforeVax.length-1]['Recovered']) - parseInt(beforeVax[0]['Recovered']);
-  avgRecoveriesBeforeVax = beforeSum / beforeVax.length;
+  sum = 0;
+  for(let i = 0; i < beforeVax.length; i++) {
+    sum += parseInt(beforeVax[i]['Recovered']);
+  }
+  avgRecoveriesBeforeVax = sum / beforeVax.length;
 
   let avgRecoveriesAfterVax = 0;
-  afterSum = parseInt(afterVax[afterVax.length-1]['Recovered']) - parseInt(afterVax[0]['Recovered']);
-  avgRecoveriesAfterVax = afterSum / afterVax.length;
+  sum = 0;
+  for(let i = 0; i < afterVax.length; i++) {
+    sum += parseInt(afterVax[i]['Recovered']);
+  }
+  avgRecoveriesAfterVax = sum / afterVax.length;
 
   let vaxObj = {'avgCasesBeforeVax' : avgCasesBeforeVax,
                 'avgCasesAfterVax' : avgCasesAfterVax, 
@@ -169,10 +187,9 @@ function analytics2(req, res, next) {
                 };
 
   array.push(vaxObj);
-  fs.writeFileSync('./public/output.json', JSON.stringify(array)); //store the string in a json file to be sent to front-end
-  //need to somehow combine with aftervax...
+  fs.writeFileSync('./public/output.json', JSON.stringify(array));
 
-  res.sendFile(path.join(__dirname, "/public" , "output.json")); //send jso
+  res.sendFile(path.join(__dirname, "/public" , "output.json")); //send json
   next();
 }
 
@@ -388,12 +405,67 @@ function ReformatDate(old_date) {
 
 function CountrySearch(arr, country) {
   
-  var search = [];
+  let search = [];
 
-  for(var i = 0; i < arr.length; i++) {
+  for(let i = 0; i < arr.length; i++) {
     if(arr[i]['Country/Region'] == country) {
       search.push(arr[i]);
+      if(arr[i]['Province/State'] == 'Recovered') {
+        search[search.length-2]['Recovered'] == arr[i]
+      }
     }
   }
-  return search;
+
+  let datesChecked = [];
+  let totalCon = 0;
+  let totalRec = 0;
+  let totalDed = 0;
+  let newObj = {};
+  let array = [];
+  let retArray = [];
+  let alreadyChecked = false;
+
+  for(let i = 0; i < search.length; i++) {
+    alreadyChecked = false;
+    for(var index in datesChecked) {
+      if(datesChecked[index].includes(search[i]['ObservationDate'])) {
+        alreadyChecked = true;
+      }
+    }
+    if(!alreadyChecked) {
+      totalCon = parseInt(search[i]['Confirmed']);
+      totalRec = parseInt(search[i]['Recovered']);
+      totalDed = parseInt(search[i]['Deaths']);
+      for(let j = i+1; j < search.length; j++) {
+        if(search[i]['ObservationDate'] == search[j]['ObservationDate']) {
+          totalCon += parseInt(search[j]['Confirmed']);
+          totalRec += parseInt(search[j]['Recovered']);
+          totalDed += parseInt(search[j]['Deaths']);
+        }
+      }
+      datesChecked.push(search[i]['ObservationDate']);
+      newObj = {'ObservationDate' : search[i]['ObservationDate'],
+                'Country' : country, 
+                'Confirmed' : totalCon, 
+                'Deaths' : totalDed, 
+                'Recovered' : totalRec
+                };
+      array.push(newObj);
+    }
+  }
+
+  retArray.push(array[0]);
+  for(let i = 1; i < array.length; i++) {
+    newObj = {'ObservationDate' : array[i]['ObservationDate'],
+              'Country' : country, 
+              'Confirmed' : parseInt(array[i]['Confirmed']) - parseInt(array[i-1]['Confirmed']), 
+              'Deaths' : parseInt(array[i]['Deaths']) - parseInt(array[i-1]['Deaths']), 
+              'Recovered' : parseInt(array[i]['Recovered']) - parseInt(array[i-1]['Recovered'])
+              };
+    retArray.push(newObj);
+  }
+
+  fs.writeFileSync('./public/output2.json', JSON.stringify(array));
+
+  return retArray;
 }
