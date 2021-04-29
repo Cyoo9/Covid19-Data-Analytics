@@ -12,7 +12,7 @@ var csv = fs.readFileSync(path.resolve(__dirname, './CSV Files/covid_19_data.csv
 var result = [];
 var searched_results = [];
 
-csvParser(csv); //Call csvParser on original data by default
+result = csvParser(csv); //Call csvParser on original data by default
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -44,7 +44,7 @@ app.post('/search', search, (req, res) => {
 //called when import button is selected
 app.post('/import', (req, res) => {
   csv = fs.readFileSync(path.resolve(__dirname, './CSV Files/covid_19_data_updated.csv')); //change filepath to updated csv
-  csvParser(csv); //reparse with updated csv file
+  result = csvParser(csv); //reparse with updated csv file
   res.send("Import complete. Search now on updated database");
 })
 
@@ -71,7 +71,7 @@ app.listen(server, function() {
 //parses a cvs file into an array
 function csvParser(csv){
 
-  result = []; //clear array
+  var parsed = []; //clear array
 
   var lines=csv.toString().split("\r\n"); //split cvs file into readable lines of data by endlines
   var headers=lines[0].split(","); //split the first line into object variable names
@@ -99,8 +99,9 @@ function csvParser(csv){
 		  obj[headers[j]] = currentline[j];
 	  }
 
-	  result.push(obj); //push newly created object on to array
+	  parsed.push(obj); //push newly created object on to array
   }
+  return parsed;
 }
 
 //searchs an array for specific object values
@@ -241,4 +242,18 @@ function ReformatDate(old_date) {
   else {
     return "Unknown Date";
   }
+}
+
+function CountrySearch(arr, country) {
+  var search = []; //reset array to empty
+
+  //loops through all the arrays objects
+  for(var i = 0; i < arr.length; i++) {
+
+    //checks if country, state, and date match, accepts all if one or more is left blank
+    if(arr[i]['Country/Region'] == country) {
+      search.push(arr[i]);
+    }
+  }
+  return search;
 }
