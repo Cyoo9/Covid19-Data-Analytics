@@ -32,6 +32,9 @@ app.get('/update_page', function(req, res) {
 
 app.get('/analysis_page', function(req, res) {
   res.sendFile(path.join(__dirname, "/public" , "dataAnalysis.html"));
+
+  csv = fs.readFileSync(path.resolve(__dirname, './CSV Files/outside_metrics.csv')); //change filepath to updated csv
+  result = csvParser(csv); //reparse with updated csv file
 })
 
 app.use(express.urlencoded({
@@ -68,9 +71,43 @@ app.post('/delete', deleteData, (req, res) => {
   ConvertToCSV(result); //automatically backsup array for importing later
 })
 
+app.post('/Q1', analytics1, (req, res) => {
+
+})
+
+app.post('/Q2', analytics2, (req, res) => {
+
+})
+
+app.post('/Q3', analytics3, (req, res) => {
+
+})
+
+app.post('/Q4', analytics4, (req, res) => {
+
+})
+
+
 app.listen(server, function() {
     console.log(`Server is running on port: ${server}`);
 })
+
+
+function analytics1(req, res, next) {
+  search(req, res, next);
+}
+
+function analytics2(req, res, next) {
+  search(req, res, next);
+}
+
+function analytics3(req, res, next) {
+    search(req, res, next);
+}
+
+function analytics4(req, res, next) {
+    search(req, res, next);
+}
 
 //parses a cvs file into an array
 function csvParser(csv){
