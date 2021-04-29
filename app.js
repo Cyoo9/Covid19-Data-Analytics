@@ -47,7 +47,7 @@ app.post('/search', search, (req, res) => {
 })
 
 //called when import button is selected
-app.post('/import', analytics2, (req, res) => { 
+app.post('/import', (req, res) => { 
   csv = fs.readFileSync(path.resolve(__dirname, './CSV Files/covid_19_data_updated.csv')); //change filepath to updated csv
   result = csvParser(csv); //reparse with updated csv file
   res.send("Import complete. Search now on updated database");
@@ -464,8 +464,6 @@ function CountrySearch(arr, country) {
               };
     retArray.push(newObj);
   }
-
-  fs.writeFileSync('./public/output2.json', JSON.stringify(array));
 
   return retArray;
 }
