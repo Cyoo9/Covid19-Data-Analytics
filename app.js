@@ -8,11 +8,15 @@ let ejs = require('ejs');
 var bodyParser = require("body-parser");
 var multer  = require('multer');
 const { ap } = require('list');
-var csv = fs.readFileSync(path.resolve(__dirname, './CSV Files/covid_19_data.csv')); //reads in a cvs file
 var result = [];
 var searched_results = [];
+var outside_data = [];
 
+var csv = fs.readFileSync(path.resolve(__dirname, './CSV Files/covid_19_data.csv')); //reads in a cvs file
 result = csvParser(csv); //Call csvParser on original data by default
+
+csv = fs.readFileSync(path.resolve(__dirname, './CSV Files/outside_metrics.csv'));
+outside_data = csvParser(csv);
 
 app.use(express.static(path.join(__dirname, 'public')));
 
