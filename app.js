@@ -11,6 +11,8 @@ const { ap } = require('list');
 var result = [];
 var searched_results = [];
 var outside_data = [];
+let vaccineName = "";
+let vaccineDate = "";
 
 var csv = fs.readFileSync(path.resolve(__dirname, './CSV Files/covid_19_data.csv')); //reads in a cvs file
 result = csvParser(csv); //Call csvParser on original data by default
@@ -46,7 +48,7 @@ app.post('/search', search, (req, res) => {
 })
 
 //called when import button is selected
-app.post('/import', (req, res) => {
+app.post('/import', (req, res) => { 
   csv = fs.readFileSync(path.resolve(__dirname, './CSV Files/covid_19_data_updated.csv')); //change filepath to updated csv
   result = csvParser(csv); //reparse with updated csv file
   res.send("Import complete. Search now on updated database");
@@ -68,9 +70,145 @@ app.post('/delete', deleteData, (req, res) => {
   ConvertToCSV(result); //automatically backsup array for importing later
 })
 
+app.post('/Q1', analytics1, (req, res) => {
+
+})
+
+app.post('/Q2', analytics2, (req, res) => {
+  //res.send("Vaccine Name: " + vaccineName + "\nVaccine Date: " + vaccineDate);
+})
+
+app.post('/Q3', analytics3, (req, res) => {
+
+})
+
+app.post('/Q4', search, (req, res) => {  //frontend visualizes deaths and cases next to each other (comparison)
+  let json = JSON.stringify(searched_results); //stringify the search array
+  fs.writeFileSync('./public/output.json', json); //store the string in a json file to be sent to front-end
+  res.sendFile(path.join(__dirname, "/public" , "output.json")); //send json
+})
+
+
 app.listen(server, function() {
     console.log(`Server is running on port: ${server}`);
 })
+
+
+function analytics1(req, res, next) {
+  search(req, res, next);
+
+}
+
+function analytics2(req, res, next) {
+  country = "US"; //testing
+  let array = CountrySearch(result, country)
+
+  let beforeVax = [];
+  let afterVax = [];
+  let afterIndex = -1;
+  
+  for(let i = 0; i < outside_data.length; i++) {
+    if(outside_data[i]['Country'] == country) {
+      vaccineName = outside_data[i]['vaxName'];
+      vaccineDate = outside_data[i]['vaxDate']; //use this for searching csv 
+    }
+  }
+
+  console.log(vaccineName);
+  console.log(vaccineDate);
+
+  for(let i = 0; i < array.length; i++) {
+    if(ReformatDate(array[i]['ObservationDate']) == vaccineDate) {
+      afterIndex = i; 
+    }
+  }
+  
+  console.log(afterIndex);
+  console.log(array[afterIndex]);
+
+  for(let i = afterIndex; i < array.length; i++) {
+    afterVax.push(array[i]);
+  }
+
+  for(let i = 0; i < afterIndex; i++) {
+    beforeVax.push(array[i]);
+  }
+
+  let avgCasesBeforeVax = 0;
+  let beforeSum = parseInt(beforeVax[beforeVax.length-1]['Confirmed']) - parseInt(beforeVax[0]['Confirmed']);
+  avgCasesBeforeVax = beforeSum / beforeVax.length;
+
+  let avgCasesAfterVax = 0;
+  let afterSum = parseInt(afterVax[afterVax.length-1]['Confirmed']) - parseInt(afterVax[0]['Confirmed']);
+  avgCasesAfterVax = afterSum / afterVax.length;
+
+  let avgDeathsBeforeVax = 0;
+  beforeSum = parseInt(beforeVax[beforeVax.length-1]['Deaths']) - parseInt(beforeVax[0]['Deaths']);
+  avgDeathsBeforeVax = beforeSum / beforeVax.length;
+
+  let avgDeathsAfterVax = 0;
+  afterSum = parseInt(afterVax[afterVax.length-1]['Deaths']) - parseInt(afterVax[0]['Deaths']);
+  avgDeathsVax = afterSum / afterVax.length;
+
+  let avgRecoveriesBeforeVax = 0;
+  beforeSum = parseInt(beforeVax[beforeVax.length-1]['Recovered']) - parseInt(beforeVax[0]['Recovered']);
+  avgRecoveriesBeforeVax = beforeSum / beforeVax.length;
+
+  let avgRecoveriesAfterVax = 0;
+  afterSum = parseInt(afterVax[afterVax.length-1]['Recovered']) - parseInt(afterVax[0]['Recovered']);
+  avgRecoveriesAfterVax = afterSum / afterVax.length;
+
+  let vaxObj = {'avgCasesBeforeVax' : avgCasesBeforeVax,
+                'avgCasesAfterVax' : avgCasesAfterVax, 
+                'avgDeathsBeforeVax' : avgDeathsBeforeVax, 
+                'avgDeathsAfterVax' : avgDeathsAfterVax, 
+                'avgRecoveriesBeforeVax' : avgRecoveriesBeforeVax,
+                'avgRecoveriesAfterVax' : avgRecoveriesAfterVax,
+                'VaccineName' : vaccineName,
+                'VaccineDate' : vaccineDate
+                };
+
+  array.push(vaxObj);
+  fs.writeFileSync('./public/output.json', JSON.stringify(array)); //store the string in a json file to be sent to front-end
+  //need to somehow combine with aftervax...
+
+  res.sendFile(path.join(__dirname, "/public" , "output.json")); //send jso
+  next();
+}
+
+function analytics3(req, res, next) {
+    search(req, res, next);
+}
+
+/*function sortByCases() { //fix algorithm to use it later
+  let obj = {};
+  let countryCases = [];
+
+  for(let i = 0; i < result.length; i++) { //sum up all cases for each country
+    if(!(countryCases.includes(result[i]['Country']))) {
+      obj[window[result[i]['Country']]] = parseInt(result[i]['Confirmed']);
+      countryCases.push(obj);
+    } else {
+      countryCases[countryCases.findIndex(x => x.theobj === obj)]['Country'] += parseInt(result[i]['Confirmed']); 
+    }
+  }
+
+  for(let i = 0; i < countryCases.length; i++) { //sort the summed cases
+    let min = i; 
+    for(let j = i + 1; j < countryCases.length; j++) {
+      if(countryCases[j]['Country'] < countryCases[min]) {
+        min = j;
+      }
+    }
+    if(min != i) {
+      let tmp = countryCases[i];
+      countryCases[i] = countryCases[min];
+      coutryCases[min] = tmp;
+    }
+  }
+
+  return countryCases;
+} */
 
 //parses a cvs file into an array
 function csvParser(csv){
@@ -249,6 +387,7 @@ function ReformatDate(old_date) {
 }
 
 function CountrySearch(arr, country) {
+  
   var search = [];
 
   for(var i = 0; i < arr.length; i++) {
