@@ -249,12 +249,9 @@ function ReformatDate(old_date) {
 }
 
 function CountrySearch(arr, country) {
-  var search = []; //reset array to empty
+  var search = [];
 
-  //loops through all the arrays objects
   for(var i = 0; i < arr.length; i++) {
-
-    //checks if country, state, and date match, accepts all if one or more is left blank
     if(arr[i]['Country/Region'] == country) {
       search.push(arr[i]);
     }
