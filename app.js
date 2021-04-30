@@ -81,10 +81,8 @@ app.post('/Q3', analytics3, (req, res) => {
 
 })
 
-app.post('/Q4', search, (req, res) => {  //frontend visualizes deaths and cases next to each other (comparison)
-  let json = JSON.stringify(searched_results); //stringify the search array
-  fs.writeFileSync('./public/output.json', json); //store the string in a json file to be sent to front-end
-  res.sendFile(path.join(__dirname, "/public" , "output.json")); //send json
+app.post('/Q4', analytics4, (req, res) => {  
+
 })
 
 
@@ -94,11 +92,12 @@ app.listen(server, function() {
 
 
 function analytics1(req, res, next) {
-  search(req, res, next);
+  country = "Afghanistan"; //testing
+  let array = CountrySearch(result, country);
 }
 
 function analytics2(req, res, next) {
-  country = "US"; //testing
+  country = "Afghanistan"; //testing
   let array = CountrySearch(result, country)
 
   let beforeVax = [];
@@ -194,7 +193,19 @@ function analytics2(req, res, next) {
 }
 
 function analytics3(req, res, next) {
-    search(req, res, next);
+  country = "Afghanistan"; //testing
+  let array = CountrySearch(result, country);
+}
+
+function analytics4(req, res, next) {
+  country = "Afghanistan"; //testing
+  let array = CountrySearch(result, country);
+  fs.writeFileSync('./public/output.json', JSON.stringify(array));
+
+  res.sendFile(path.join(__dirname, "/public" , "output.json")); //send json
+  next();
+  
+
 }
 
 /*function sortByCases() { //fix algorithm to use it later
