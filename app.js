@@ -47,7 +47,7 @@ app.post('/search', search, (req, res) => {
 })
 
 //called when import button is selected
-app.post('/import', analytics3, (req, res) => { 
+app.post('/import', analytics4, (req, res) => { 
   csv = fs.readFileSync(path.resolve(__dirname, './CSV Files/covid_19_data_updated.csv')); //change filepath to updated csv
   result = csvParser(csv); //reparse with updated csv file
   res.send("Import complete. Search now on updated database");
@@ -69,31 +69,65 @@ app.post('/delete', deleteData, (req, res) => {
   ConvertToCSV(result); //automatically backsup array for importing later
 })
 
-app.post('/Q1', analytics1, (req, res) => {
+app.post('/Q1', analytics1, (req, res) => {})
 
-})
+app.post('/Q2', analytics2, (req, res) => {})
 
-app.post('/Q2', analytics2, (req, res) => {
-  //res.send("Vaccine Name: " + vaccineName + "\nVaccine Date: " + vaccineDate);
-})
+app.post('/Q3', analytics3, (req, res) => {})
 
-app.post('/Q3', analytics3, (req, res) => {
-
-})
-
-app.post('/Q4', analytics4, (req, res) => {  
-
-})
+app.post('/Q4', analytics4, (req, res) => {})
 
 
 app.listen(server, function() {
     console.log(`Server is running on port: ${server}`);
 })
 
-
 function analytics1(req, res, next) {
-  let country = "Afghanistan"; //testing
-  let array = CountrySearch(result, country);
+  let countries = [];
+  let countryCount = 0;
+  for(let i = 0; i < result.length; i++) {
+    if(!(countries.includes(result[i]['Country/Region']))) {
+      countries.push(result[i]['Country/Region']);
+      countryCount++;
+    }
+  }
+
+  let allCountryData = []; 
+  let temp = [];
+  let retArray = [];
+
+  for(let i = 0; i < countries.length; i++) {
+    temp = CountrySearch(result, countries[i]);
+    allCountryData.push(temp);
+  }
+
+  let totalCases;
+  let totalDeaths;
+  let totalRecoveries;
+  let obj;
+  
+  for(let i = 0; i < allCountryData.length; i++) {
+    temp = allCountryData[i];
+    totalCases = 0;
+    totalDeaths = 0;
+    totalRecoveries = 0;
+    for(let j = 0; j < temp.length; j++) {
+      totalCases += parseInt(temp[j]['Confirmed']);
+      totalDeaths += parseInt(temp[j]['Deaths']);
+      totalRecoveries += parseInt(temp[j]['Recovered']);
+    }
+    obj = { 'Country' : temp[0]['Country'],
+            'avgCasesPerDay' : (totalCases/temp.length),
+            'avgDeathsPerDay' : (totalDeaths/temp.length),
+            'avgRecoveriesPerDay' : (totalRecoveries/temp.length)
+          };
+    retArray.push(obj);
+  }
+
+  fs.writeFileSync('./public/output.json', JSON.stringify(retArray));
+
+  res.sendFile(path.join(__dirname, "/public" , "output.json")); //send json
+  next();
 }
 
 function analytics2(req, res, next) {
@@ -205,49 +239,26 @@ function analytics3(req, res, next) {
 
   res.sendFile(path.join(__dirname, "/public" , "output.json")); //send json
   next();
-
 }
 
 function analytics4(req, res, next) {
   let country = "Afghanistan"; //testing
   let array = CountrySearch(result, country);
-  fs.writeFileSync('./public/output.json', JSON.stringify(array));
+  let obj = {};
+  let retArray = [];
+  for(let i = 0; i < array.length; i++) {
+    obj = { 'ObservationDate' : array[i]['ObservationDate'],
+            'Country' : array[i]['Country'],
+            'Confirmed' : array[i]['Confirmed'],
+            'Deaths' : array[i]['Deaths']
+          }
+    retArray.push(obj);
+  }
+  fs.writeFileSync('./public/output.json', JSON.stringify(retArray));
 
   res.sendFile(path.join(__dirname, "/public" , "output.json")); //send json
   next();
-  
-
 }
-
-/*function sortByCases() { //fix algorithm to use it later
-  let obj = {};
-  let countryCases = [];
-
-  for(let i = 0; i < result.length; i++) { //sum up all cases for each country
-    if(!(countryCases.includes(result[i]['Country']))) {
-      obj[window[result[i]['Country']]] = parseInt(result[i]['Confirmed']);
-      countryCases.push(obj);
-    } else {
-      countryCases[countryCases.findIndex(x => x.theobj === obj)]['Country'] += parseInt(result[i]['Confirmed']); 
-    }
-  }
-
-  for(let i = 0; i < countryCases.length; i++) { //sort the summed cases
-    let min = i; 
-    for(let j = i + 1; j < countryCases.length; j++) {
-      if(countryCases[j]['Country'] < countryCases[min]) {
-        min = j;
-      }
-    }
-    if(min != i) {
-      let tmp = countryCases[i];
-      countryCases[i] = countryCases[min];
-      coutryCases[min] = tmp;
-    }
-  }
-
-  return countryCases;
-} */
 
 //parses a cvs file into an array
 function csvParser(csv){
