@@ -1,4 +1,4 @@
-SNo,Country,vaxName,vaxDate,lockdownDate,lockdownStrength
+SNo,Country,vaxName,vaxDate
 1,Mainland China,Sinopharm,2020-12-15
 2,Hong Kong,Sinovac,2020-12-15
 3,Macau,Sinopharm,2021-02-08
