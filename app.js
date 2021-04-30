@@ -47,7 +47,7 @@ app.post('/search', search, (req, res) => {
 })
 
 //called when import button is selected
-app.post('/import', (req, res) => { 
+app.post('/import', analytics3, (req, res) => { 
   csv = fs.readFileSync(path.resolve(__dirname, './CSV Files/covid_19_data_updated.csv')); //change filepath to updated csv
   result = csvParser(csv); //reparse with updated csv file
   res.send("Import complete. Search now on updated database");
@@ -92,12 +92,12 @@ app.listen(server, function() {
 
 
 function analytics1(req, res, next) {
-  country = "Afghanistan"; //testing
+  let country = "Afghanistan"; //testing
   let array = CountrySearch(result, country);
 }
 
 function analytics2(req, res, next) {
-  country = "Afghanistan"; //testing
+  let country = "Afghanistan"; //testing
   let array = CountrySearch(result, country)
 
   let beforeVax = [];
@@ -193,12 +193,23 @@ function analytics2(req, res, next) {
 }
 
 function analytics3(req, res, next) {
-  country = "Afghanistan"; //testing
-  let array = CountrySearch(result, country);
+  let country1 = "Afghanistan"; //testing
+  let country2 ="US";
+  let array1 = CountrySearch(result, country1);
+  let array2 = CountrySearch(result, country2);
+
+  for(let i = 0; i < array2.length; i++) {
+    array1.push(array2[i]);
+  }
+  fs.writeFileSync('./public/output.json', JSON.stringify(array1));
+
+  res.sendFile(path.join(__dirname, "/public" , "output.json")); //send json
+  next();
+
 }
 
 function analytics4(req, res, next) {
-  country = "Afghanistan"; //testing
+  let country = "Afghanistan"; //testing
   let array = CountrySearch(result, country);
   fs.writeFileSync('./public/output.json', JSON.stringify(array));
 
