@@ -1,0 +1,13 @@
+Feature,Feature Points,Task Reference,Contributor 1,Contributor 2,Contributor 3,Contributor 4,Contributor 5,Comments/Special Notes
+Client-Sever Connection,2,Sprint 1; only task,Alex,Sabrina,Thomas,Steven,Caleb,
+Search Webpage Design,3,Sprint 2; 1,Sabrina,,,,,
+"Search by any one or more of country, state, and date",5,"Sprint 2; 2,4,5",Alex,Thomas,Caleb,,,
+"Search by minumum values on Confirmed Cases, Deaths, and Recoveries",8,Sprint 2; extra,Alex,Sabrina,Thomas,Steven,Caleb,Crunch Time in Lab
+Display results in a table,10,Sprint 2; 3,Steven,Sabrina,Alex,,,
+Insert new datapoints,4,"Sprint 3; 3,6",Thomas,Steven,,,,
+Update existing datapoints,5,"Sprint 3; 5,7",Thomas,Steven,,,,
+Delete existing datapoints,3,"Sprint 3; 4,8",Thomas,Alex,,,,
+"Insert, Update, Delete webpage Design",3,Sprint 3; 2,Sabrina,,,,,
+Navigation Bar,3,Sprint 3; 1,Sabrina,Alex,,,,
+Import previous changes to the dataset,5,Sprint 3; 10,Caleb,,,,,
+Backup any changes to dataset (automatic),8,Sprint 3; 9,Caleb,,,,,
