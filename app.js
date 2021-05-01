@@ -234,8 +234,8 @@ function analytics2(req, res, next) {
 }
 
 function analytics3(req, res, next) {
-  let country1 = "Afghanistan"; //testing
-  let country2 ="US";
+  let country1 = req.body.country1;
+  let country2 = req.body.country2;
   let array1 = CountrySearch(result, country1);
   let array2 = CountrySearch(result, country2);
 
