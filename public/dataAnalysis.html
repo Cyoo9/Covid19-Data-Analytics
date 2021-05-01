@@ -11,6 +11,11 @@
         <script src="script.js"></script>
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
         <!--script type="text/javascript" src="app.js"></script-->
+        
+        <!--include D3. JS Framework. -->
+        <script src="https://d3js.org/d3.v6.min.js"></script>
+        <!-- <script src = https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js></script> -->
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     </head>
     <body>
         <!--header-->
@@ -29,7 +34,7 @@
                 <div class="navbar-nav">
                     <a class="nav-item nav-link nav" href="/"> SEARCH </a>
                     <a class="nav-item nav-link" href="/update_page"> UPDATE DATASET </a>
-                    <a class="nav-item nav-link" href="/dataAnalysis"> DATA ANALYTICS </a>
+                    <a class="nav-item nav-link" href="/analysis_page"> DATA ANALYTICS </a>
                     </div>
                 </div>
                 </div>
@@ -55,7 +60,7 @@
                         <label for="option">Choose an question/statistic:</label><br>
                         <select id="updateOption" name="updateOption" required>
                             <option value ="">Select </option>
-                            <option value ="Q1">Q1: Lockdown efficacy </option>
+                            <option value ="Q1">Q1: Averages </option>
                             <option value="Q2">Q2: Effect of Vaccine</option>
                             <option value ="Q3">Q3: Country vs. World</option>    
                             <option value ="Q4">Q4: Cases vs. Deaths</option>    
@@ -64,21 +69,101 @@
                         <br>
                         
                         <div id = "Q1-wrapper" >
-                            <h4 class="optTitle"> Q1: Lockdown efficacy </h4>
+                            <h4 class="optTitle"> Q1: Average Statistics in each Country </h4>
+                            <h6>Click the button below to see a table of average daily cases, deaths, and recoveries in each country. </h6>
                             <form>
+                                <!--label for="q1country">Country:</label><br>
+                                <input type="text" id="q1country" name="q1country"-->
+                                <br>
+                                <script>
+                                function Q1Alert() {
+                                    console.log("epic");
+                                  }
+                                
+                                </script>
+                                <button id="Q1-btn" type = "button" class = "btn btn-info" onclick="Q1Alert()">Show Averages of all countries</button>
+                         
+                                <br>
+                                <br>
+                                <div id = "Q1-message"></div>
+
                             </form>
+                            <br>
+                            <br>
+                            <div id="showTable"></div>
                         </div>
                         
                         <div id = "Q2-wrapper">
+                            <br>
                             <h4 class="optTitle"> Q2: Effect of Vaccine </h4>
+                            <br>
+
+                            <form>
+                                <label for="q2Country">Input a country:</label><br>
+                                <input type="text" id="q2Country" name="q2Country">
+
+                                <br>
+                                <br>
+                               
+                                                        
+                                <button id="Q2-btn" type = "button" class = "btn btn-info">Show</button>
+                            
+                                <br>
+                                <br>
+                                <div id = "Q2-message"></div>
+
+                            </form>
+
+                            <br>
+                            <br>
+                            <div class="chart-container">
+                                <canvas id="q2-chart"></canvas>
+                            </div>
+
                         </div>
                         
                         <div id = "Q3-wrapper">
                             <h4 class="optTitle"> Q3: Country vs. World </h4>
+                            <form>
+                                <label for="q3country">Country:</label><br>
+                                <input type="text" id="q3country" name="q3country"><br>
+                                <br>
+                                <script>
+                                </script>
+                                <button id="Q3-btn" type = "button" class = "btn btn-info">Submit</button>
+                         
+                                <br>
+                                <br>
+                                <div id = "Q3-message"></div>
+
+                                <div class="chart-container">
+                                    <canvas id="q3-chart"></canvas>
+                                </div>
+                            </form>
                         </div>
 
                         <div id = "Q4-wrapper">
                             <h4 class="optTitle"> Q4: Cases vs. Deaths </h4>
+                            <h6>See how cases and deaths compare in a specific country. </h6>
+                            <form>
+                                <label for="q4country">Country:</label><br>
+                                <input type="text" id="q4country" name="q4country"><br>
+                                <br>
+                                <script>
+
+                                
+                                </script>
+                                <button id="Q4-btn" type = "button" class = "btn btn-info">Submit</button>
+                         
+                                <br>
+                                <br>
+                                <div id = "Q4-message"></div>
+
+                            </form>
+
+                            <div class="chart-container">
+                                <canvas id="q4-chart"></canvas>
+                            </div>
                         </div>
 
                     </form>
@@ -123,83 +208,7 @@
                 </script>
 
 
-
-
-                     
-
-                
-                <!-- <script> //this script is to keep html on click
-                document.getElementById("loadMore").onclick = function() {
-
-                    event.preventDefault();
-
-                    const inputs = document.getElementsByTagName("input");
-                    let at_least_one_checked = false;
-
-                    for (let i = 0; i < inputs.length; ++i) {
-                        at_least_one_checked |= inputs[i].type == "checkbox" && inputs[i].checked;
-                    }
-
-                    if (!at_least_one_checked) {
-                        const hidden_elems = document.getElementsByClassName("hidden");
-                        
-                        for (let i = 0; i < hidden_elems.length; ++i) {
-                            hidden_elems[i].classList.remove("hidden");
-                        }
-                        
-                        
-                    }
-
-                    if (!at_least_one_checked) {
-                        return false;
-                    }
-                    else {
-                        const error_elem = document.getElementById('error');
-                        error_elem.setAttribute('class', 'hidden');
-                    }
-
-                    const country = document.getElementById('country').value;
-                    const state = document.getElementById('state').value;
-                    const date = document.getElementById('date').value;
-                    const numCases = document.getElementsByName("confirmed")[0].value;
-                    const numDeaths = document.getElementsByName("died")[0].value;
-                    const numRecovered = document.getElementsByName("recovered")[0].value;
-
-                    
-                    console.log(country);
-                    console.log(state);
-                    console.log(date);
-                    console.log(numCases);
-                    console.log(numDeaths);
-                    console.log(numRecovered);
-                    var http = new XMLHttpRequest();
-                    var params = `country=${country}&state=${state}&date=${date}&Confirmed=${numCases}&Deaths=${numDeaths}&Recovered=${numRecovered}`;
-                    http.open('POST', '/', true);
-                    http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-                    http.onreadystatechange = function() {//Call a function when the state changes.
-                        if(http.readyState == 4 && http.status == 200) {
-                            console.log(http.responseText);
-
-                            // for (let i = 0; i < http.ResponseText.length; ++i) {
-                            //     const new_tr = document.createElement("tr");
-
-                            //     for (let j = 0; j < 6; ++j) {
-                            //         const new_td = document.createElement("td");
-                            //     }
-
-                            // }
-                            createTableFromJSON(http.responseText);
-                        }
-                        
-                    }   
-
-                    //console.log(params);
-                    http.send(params);
-
-                    return true;
-            }
-
-                </script> -->
+             
                 <h1 id="hehexd"></h1>
 
             <br>
@@ -209,7 +218,7 @@
             <!--h3>
                 Data extracted from External JSON file and converted to an HTML table
             </h3-->
-            <div id="showTable"></div>
+            <!--div id="showTable"></div-->
         </div>
 
         
@@ -218,6 +227,7 @@
 
     <script src="script.js"></script>
 
+    <!-- TABLE FOR Q1-->
     <script>
         
         // Create an HTML table using the JSON data.
@@ -229,9 +239,9 @@
             console.log("XDXD:");
             console.log(arrBirds);
 
-            const want_confirmed_cases = document.getElementsByName('confirmedCases')[0].checked;
+            /*const want_confirmed_cases = document.getElementsByName('confirmedCases')[0].checked;
             const want_deaths = document.getElementsByName('deaths')[0].checked;
-            const want_recoveries = document.getElementsByName('recoveries')[0].checked;
+            const want_recoveries = document.getElementsByName('recoveries')[0].checked;*/
 
 
     
@@ -239,7 +249,7 @@
             for (var i = 0; i < arrBirds.length; i++) {
                 for (var key in arrBirds[i]) {
                     if (col.indexOf(key) === -1) {
-                        if (key === "Confirmed" && !want_confirmed_cases) {
+                        /*if (key === "Confirmed" && !want_confirmed_cases) {
                             continue;
                         }
                         if (key === "Deaths" && !want_deaths) {
@@ -247,7 +257,7 @@
                         }
                         if (key === "Recovered" && !want_recoveries) {
                             continue;
-                        }
+                        }*/
 
                         col.push(key);
                     }
@@ -277,7 +287,7 @@
                 for (var j = 0; j < col.length; j++) {
                     var tabCell = tr.insertCell(-1);
 
-                        if (col[j] === 'Confirmed' && !want_confirmed_cases) {
+                        /*if (col[j] === 'Confirmed' && !want_confirmed_cases) {
                             tabCell.innerHTML = "";
                             continue;
                         }
@@ -288,7 +298,7 @@
                         if (col[j] === 'Recoveries' && !want_recoveries) {
                             tabCell.innerHTML = "";
                             continue;
-                        }
+                        }*/
 
                         tabCell.innerHTML = arrBirds[i][col[j]];
                         console.log( tabCell.innerHTML);
@@ -301,5 +311,361 @@
             divContainer.appendChild(table);
         };
     </script>
-    
+
+    <!-- q1 button --> 
+    <script>
+
+        document.getElementById("Q1-btn").onclick = () =>  {
+            console.log("Clicked on Q1 button")
+
+            var http = new XMLHttpRequest();
+                    var params = "";
+                    
+                    http.open('POST', '/Q1', true);
+                    http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+                    http.onreadystatechange = function() {//Call a function when the state changes.
+                        console.log(http.readyState);
+                        console.log(http.status);
+                        if(http.readyState == 4 && http.status == 200) {
+                            console.log(http.responseText);
+                            console.log(typeof http.responseText);
+
+                            /*const h2 = document.createElement("h2");
+                            const h2_text = document.createTextNode(http.responseText);
+                            const msg_container = document.getElementById("Q1-message");
+
+
+                            console.log(h2);
+                            console.log(h2_text);
+                            console.log(msg_container);
+
+                            h2.appendChild(h2_text);
+                            msg_container.appendChild(h2);*/
+                            createTableFromJSON(http.responseText); // how to output averages? 
+
+
+                            
+                        }
+                        
+                    }   
+
+                    //console.log(params);
+                    http.send(params);
+
+                    return true;
+
+            
+        };
+    </script>
+
+    <!-- q2 button -->
+    <script>
+
+        document.getElementById("Q2-btn").onclick = () =>  {
+            console.log("Clicked on Q2 button");
+
+            var http = new XMLHttpRequest();
+
+                    const input = document.getElementById("q2Country").value;
+                    var params = "";
+                    params += `Country=${input}`;
+
+                    http.open('POST', '/Q2', true);
+                    http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+                    http.onreadystatechange = function() {//Call a function when the state changes.
+                    if(http.readyState == 4 && http.status == 200) {
+                        //console.log(http.responseText);
+                        let response_arr = JSON.parse(http.responseText);
+                        console.log(response_arr);
+                        let country = response_arr[0].Country;
+                        console.log(country);
+                        let avgcasesbefore;
+                        let avgcasesafter;
+                        let avgdeathsbefore;
+                        let avgdeathsafter;
+                        let avgrecoverbefore;
+                        let avgrecoverafter;
+                        let vaccine;
+                        let vaxDate;
+                        
+                    //for (let i = 0; i < response_arr.length; ++i) {
+                        avgcasesbefore = response_arr[0].avgCasesBeforeVax;
+                        console.log(avgcasesbefore);
+                        avgcasesafter = (response_arr[0].avgCasesAfterVax);
+                        avgdeathsbefore = (response_arr[0].avgDeathsBeforeVax);
+                        avgdeathsafter = (response_arr[0].avgDeathsAfterVax);
+                        avgrecoverbefore = (response_arr[0].avgRecoveriesBeforeVax);
+                        avgrecoverafter= (response_arr[0].avgRecoveriesAfterVax);      
+                        vaccine = (response_arr[0].VaccineName);      
+                        vaxDate = (response_arr[0].VaccineDate);          
+                    //}
+                    
+                    var vaxInfo = `Country: ${input}; ` + " Distributed Vaccine: " + vaccine + ";  Vaccine Start Date: " + vaxDate;
+                    var divContainer = document.getElementById("Q2-message");
+                    divContainer.innerHTML = vaxInfo;
+
+                    let data = {
+                        labels: ['Avg. Cases Before', 
+                        'Avg. Cases After', 
+                        'Avg. Deaths Before', 
+                        'Avg. Deaths After', 
+                        'Avg. Recoveries Before', 
+                        'Avg. Recoveries After'],
+                        datasets: [{
+
+                                label: "Averages",
+                                data: [avgcasesbefore, avgcasesafter, avgdeathsbefore, avgdeathsafter, avgrecoverbefore, avgrecoverafter],
+                                backgroundColor: [
+                                    'rgba(75, 192, 192, 0.2)',
+                                    'rgba(54, 162, 235, 0.2)',
+                                    'rgba(75, 192, 192, 0.2)',
+                                    'rgba(54, 162, 235, 0.2)',
+                                    'rgba(75, 192, 192, 0.2)',
+                                    'rgba(54, 162, 235, 0.2)',
+                                ],
+                                borderColor: [
+                                    'rgb(75, 192, 192)',
+                                    'rgb(54, 162, 235)',
+                                    'rgb(75, 192, 192)',
+                                    'rgb(54, 162, 235)',
+                                    'rgb(75, 192, 192)',
+                                    'rgb(54, 162, 235)',
+                                ],
+                                borderWidth: 1,
+                                lineTension: 0.7,
+                            }]
+
+                    };
+                    const config = {
+                        type: 'bar',
+                        data: data,
+                        options: {
+                            plugins : {
+                                title: {
+                                    display: true,
+                                    text: `Effects of the Vaccine in ${input}`,
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        },
+                    };
+
+
+                    var myChart = new Chart(
+                        document.getElementById('q2-chart'),
+                        config
+                    );  
+                    
+                }
+                        
+            }   
+                    //console.log(params);
+                    http.send(params);
+                    return true;
+
+        };
+      
+    </script>
+
+
+  <!-- q3 button  i think --> 
+  <script>
+
+    document.getElementById("Q3-btn").onclick = () =>  {
+        console.log("Clicked on Q3 button")
+
+        var http = new XMLHttpRequest();
+
+        const input = document.getElementById("q3country").value;
+
+                var params = "";
+                params += `Country=${input}`;
+
+                http.open('POST', '/Q3', true);
+                http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+                http.onreadystatechange = function() {//Call a function when the state changes.
+
+                    if(http.readyState == 4 && http.status == 200) {
+                        //console.log(http.responseText);
+                      
+                        let response_arr = JSON.parse(http.responseText);
+
+
+                        let country = response_arr[0].Country;
+                        let observation_dates = [];
+                        let confirmed_cases = [];
+                        let deaths = [];
+                        let recoveries = [];
+
+                        //populates arrays above. Arrays are used in data object to set parameters for line chart
+                        for (let i = 0; i < response_arr.length; ++i) {
+                            observation_dates.push(response_arr[i].ObservationDate);
+                            confirmed_cases.push(response_arr[i].Confirmed);
+                            deaths.push(response_arr[i].Deaths);
+                            recoveries.push( Math.max(response_arr[i].Recovered, 0) );
+                            
+                        }
+
+                        let data = {
+                            labels: observation_dates,
+                            datasets: [
+                                {
+                                label: "Confirmed Cases",
+                                backgroundColor: 'rgb(235, 235, 52)',
+                                borderColor: 'rgb(235, 235, 52)',
+                                data: confirmed_cases,
+                                lineTension: 0.7,
+                                },
+                                {
+                                label: "Deaths",
+                                backgroundColor: 'rgb(255, 99, 132)',
+                                borderColor: 'rgb(255, 99, 132)',
+                                data: deaths,
+                                lineTension: 0.7, 
+                                },
+                                {
+                                label: "Recoveries",
+                                backgroundColor: 'rgb(66, 155, 245)',
+                                borderColor: 'rgb(66, 155, 245)',
+                                data: recoveries,
+                                lineTension: 0.7, 
+                                },
+                            ]
+                        };   
+
+   
+
+                        const config = {
+                            type: 'line',
+                            data,
+                            options: {
+                                plugins : {
+                                    title: {
+                                        display: true,
+                                        text: country,
+                                    },
+                                },
+                                elements: {
+                                    point:{
+                                        radius: 0
+                                    }
+                                },
+                                responsive: true,
+                                maintainAspectRatio: false,
+                            },
+
+                        };
+
+                        var myChart = new Chart(
+                            document.getElementById('q3-chart'),
+                            config
+                        );     
+                    }
+                    
+                }   
+                //console.log(params);
+                http.send(params);
+
+                return true;
+
+        
+    };
+
+   
+
+    document.getElementById("Q4-btn").onclick = () =>  {
+        console.log("Clicked on Q4 button")
+
+        const input = document.getElementById("q4country").value;
+
+        var http = new XMLHttpRequest();
+                var params = "";
+                params += `Country=${input}`;
+
+                http.open('POST', '/Q4', true);
+                http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+                http.onreadystatechange = function() {//Call a function when the state changes.
+
+                    if(http.readyState == 4 && http.status == 200) {
+
+
+                        //server sends a string, not an actual javascript object
+                        //JSON.parse converts the string into JSON
+                        let response_arr = JSON.parse(http.responseText);
+
+
+                        let country = response_arr[0].Country;
+                        let observation_dates = [];
+                        let confirmed_cases = [];
+                        let deaths = [];
+
+                        //populates arrays above. Arrays are used in data object to set parameters for line chart
+                        for (let i = 0; i < response_arr.length; ++i) {
+                            observation_dates.push(response_arr[i].ObservationDate);
+                            confirmed_cases.push(response_arr[i].Confirmed);
+                            deaths.push(response_arr[i].Deaths);
+                        }
+
+                        let data = {
+                            labels: observation_dates,
+                            datasets: [
+                                {
+                                label: "Confirmed Cases",
+                                backgroundColor: 'rgb(235, 235, 52)',
+                                borderColor: 'rgb(235, 235, 52)',
+                                data: confirmed_cases,
+                                lineTension: 0.7,
+                                },
+                                {
+                                label: "Deaths",
+                                backgroundColor: 'rgb(255, 99, 132)',
+                                borderColor: 'rgb(255, 99, 132)',
+                                data: deaths,
+                                lineTension: 0.7, 
+                                },
+                            ]
+                        };   
+
+   
+
+                        const config = {
+                            type: 'line',
+                            data,
+                            options: {
+                                plugins : {
+                                    title: {
+                                        display: true,
+                                        text: `Confirmed Cases vs. Deaths in ${country}`,
+                                    },
+                                },
+                                elements: {
+                                    point:{
+                                        radius: 0
+                                    }
+                                },
+                                responsive: true,
+                                maintainAspectRatio: false,
+                            },
+
+                        };
+
+                        var myChart = new Chart(
+                            document.getElementById('q4-chart'),
+                            config
+                        );                        
+                    }
+                    
+                }   
+                //console.log(params);
+                http.send(params);
+
+                return true;
+
+        
+    };
+</script>
 </html>

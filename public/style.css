@@ -31,6 +31,29 @@ body{
 
 
 }
+
+#Q1-wrapper {
+    display:none;
+}
+
+#Q2-wrapper {
+    display:none;
+
+}
+
+#Q3-wrapper {
+    display:none;
+
+}
+
+
+#Q4-wrapper {
+    display:none;
+
+}
+
+
+
 #delete-wrapper{
     display:none;
 }
@@ -78,3 +101,8 @@ th {
     font-weight:bold;
     background-color: #f0eae2;
 }        
+
+.chart-container {
+    width: 1750px;
+    height: 500px;
+}

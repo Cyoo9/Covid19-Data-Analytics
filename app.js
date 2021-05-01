@@ -131,8 +131,9 @@ function analytics1(req, res, next) {
 }
 
 function analytics2(req, res, next) {
-  let country = "Afghanistan"; //testing
-  let array = CountrySearch(result, country)
+  let country = req.body.Country; //testing
+  let array = CountrySearch(result, country);
+  let vaxarray = [];
 
   let beforeVax = [];
   let afterVax = [];
@@ -166,13 +167,15 @@ function analytics2(req, res, next) {
   for(let i = 0; i < afterIndex; i++) {
     beforeVax.push(array[i]);
   }
-
+  
   let avgCasesBeforeVax = 0;
   let sum = 0;
+  
   for(let i = 0; i < beforeVax.length; i++) {
     sum += parseInt(beforeVax[i]['Confirmed']);
   }
   avgCasesBeforeVax = sum / beforeVax.length;
+
 
   let avgCasesAfterVax = 0;
   sum = 0;
@@ -181,6 +184,7 @@ function analytics2(req, res, next) {
   }
   avgCasesAfterVax = sum / afterVax.length;
 
+  console.log(avgCasesAfterVax);
   let avgDeathsBeforeVax = 0;
   sum = 0;
   for(let i = 0; i < beforeVax.length; i++) {
@@ -208,7 +212,8 @@ function analytics2(req, res, next) {
     sum += parseInt(afterVax[i]['Recovered']);
   }
   avgRecoveriesAfterVax = sum / afterVax.length;
-
+  console.log(avgCasesBeforeVax);
+  console.log(avgCasesAfterVax);
   let vaxObj = {'avgCasesBeforeVax' : avgCasesBeforeVax,
                 'avgCasesAfterVax' : avgCasesAfterVax, 
                 'avgDeathsBeforeVax' : avgDeathsBeforeVax, 
@@ -218,9 +223,11 @@ function analytics2(req, res, next) {
                 'VaccineName' : vaccineName,
                 'VaccineDate' : vaccineDate
                 };
-
-  array.push(vaxObj);
-  fs.writeFileSync('./public/output.json', JSON.stringify(array));
+          
+  //array.push(vaxObj);
+  vaxarray.push(vaxObj);
+  console.log(vaxarray);
+  fs.writeFileSync('./public/output.json', JSON.stringify(vaxarray));
 
   res.sendFile(path.join(__dirname, "/public" , "output.json")); //send json
   next();
@@ -235,6 +242,16 @@ function analytics3(req, res, next) {
   for(let i = 0; i < array2.length; i++) {
     array1.push(array2[i]);
   }
+
+
+  //shows all objects with negative recovery
+  for (let i = 0; i < array1.length; ++i) {
+    if (array1[i].Recovered < 0) {
+      //console.log("negative recovery amount")
+      //console.log(array1[i]);
+    }
+  }
+
   fs.writeFileSync('./public/output.json', JSON.stringify(array1));
 
   res.sendFile(path.join(__dirname, "/public" , "output.json")); //send json
@@ -242,7 +259,7 @@ function analytics3(req, res, next) {
 }
 
 function analytics4(req, res, next) {
-  let country = "Afghanistan"; //testing
+  let country = req.body.Country; 
   let array = CountrySearch(result, country);
   let obj = {};
   let retArray = [];
