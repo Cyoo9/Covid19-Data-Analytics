@@ -488,7 +488,7 @@ function CountrySearch(arr, country) {
       }
     }
     if(!alreadyChecked) {
-      totalCon =  (search[i]['Confirmed']);
+      totalCon = parseInt(search[i]['Confirmed']);
       totalRec = parseInt(search[i]['Recovered']);
       totalDed = parseInt(search[i]['Deaths']);
       for(let j = i+1; j < search.length; j++) {
