@@ -172,7 +172,7 @@ function analytics2(req, res, next) {
   let sum = 0;
   
   for(let i = 0; i < beforeVax.length; i++) {
-    sum += parseInt(beforeVax[i]['Confirmed']);
+    sum += Math.max(0, (beforeVax[i]['Confirmed']));
   }
   avgCasesBeforeVax = sum / beforeVax.length;
 
@@ -180,7 +180,7 @@ function analytics2(req, res, next) {
   let avgCasesAfterVax = 0;
   sum = 0;
   for(let i = 0; i < afterVax.length; i++) {
-    sum += parseInt(afterVax[i]['Confirmed']);
+    sum += Math.max(0, (afterVax[i]['Confirmed']));
   }
   avgCasesAfterVax = sum / afterVax.length;
 
@@ -188,28 +188,28 @@ function analytics2(req, res, next) {
   let avgDeathsBeforeVax = 0;
   sum = 0;
   for(let i = 0; i < beforeVax.length; i++) {
-    sum += parseInt(beforeVax[i]['Deaths']);
+    sum += Math.max(0, (beforeVax[i]['Deaths']));
   }
   avgDeathsBeforeVax = sum / beforeVax.length;
 
   let avgDeathsAfterVax = 0;
   sum = 0;
   for(let i = 0; i < afterVax.length; i++) {
-    sum += parseInt(afterVax[i]['Deaths']);
+    sum += Math.max(0, parseInt(afterVax[i]['Deaths']));
   }
   avgDeathsAfterVax = sum / afterVax.length;
 
   let avgRecoveriesBeforeVax = 0;
   sum = 0;
   for(let i = 0; i < beforeVax.length; i++) {
-    sum += parseInt(beforeVax[i]['Recovered']);
+    sum += Math.max(0, (beforeVax[i]['Recovered']));
   }
   avgRecoveriesBeforeVax = sum / beforeVax.length;
 
   let avgRecoveriesAfterVax = 0;
   sum = 0;
   for(let i = 0; i < afterVax.length; i++) {
-    sum += parseInt(afterVax[i]['Recovered']);
+    sum += Math.max(0, (afterVax[i]['Recovered']));
   }
   avgRecoveriesAfterVax = sum / afterVax.length;
   console.log(avgCasesBeforeVax);
@@ -234,23 +234,28 @@ function analytics2(req, res, next) {
 }
 
 function analytics3(req, res, next) {
+
+
   let country1 = req.body.country1;
   let country2 = req.body.country2;
+
   let array1 = CountrySearch(result, country1);
   let array2 = CountrySearch(result, country2);
+
 
   for(let i = 0; i < array2.length; i++) {
     array1.push(array2[i]);
   }
 
 
+
   //shows all objects with negative recovery
-  for (let i = 0; i < array1.length; ++i) {
-    if (array1[i].Recovered < 0) {
-      //console.log("negative recovery amount")
-      //console.log(array1[i]);
-    }
-  }
+  // for (let i = 0; i < array1.length; ++i) {
+  //   if (array1[i].Recovered < 0) {
+  //     //console.log("negative recovery amount")
+  //     //console.log(array1[i]);
+  //   }
+  // }
 
   fs.writeFileSync('./public/output.json', JSON.stringify(array1));
 
@@ -483,7 +488,7 @@ function CountrySearch(arr, country) {
       }
     }
     if(!alreadyChecked) {
-      totalCon = parseInt(search[i]['Confirmed']);
+      totalCon =  (search[i]['Confirmed']);
       totalRec = parseInt(search[i]['Recovered']);
       totalDed = parseInt(search[i]['Deaths']);
       for(let j = i+1; j < search.length; j++) {
