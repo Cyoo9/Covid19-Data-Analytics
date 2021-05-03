@@ -77,34 +77,13 @@ app.post('/Q3', analytics3, (req, res) => {})
 
 app.post('/Q4', analytics4, (req, res) => {})
 
-app.post('/Q1', analytics5, (req, res) => {})
+app.post('/Q5', analytics5, (req, res) => {})
 
-app.post('/Q2', analytics6, (req, res) => {})
+app.post('/Q6', analytics6, (req, res) => {})
 
-app.post('/Q3', analytics7, (req, res) => {})
+app.post('/Q7', analytics7, (req, res) => {})
 
-app.post('/Q4', analytics8, (req, res) => {})
-
-function analytics5(req, res, next) {
-
-  next();
-}
-
-function analytics6(req, res, next) {
-  
-  next();
-}
-
-function analytics7(req, res, next) {
-  
-  next();
-}
-
-function analytics8(req, res, next) {
-  
-  next();
-}
-
+app.post('/Q8', analytics8, (req, res) => {})
 
 
 app.listen(server, function() {
@@ -308,6 +287,26 @@ function analytics4(req, res, next) {
   fs.writeFileSync('./public/output.json', JSON.stringify(retArray));
 
   res.sendFile(path.join(__dirname, "/public" , "output.json")); //send json
+  next();
+}
+
+function analytics5(req, res, next) {
+
+  next();
+}
+
+function analytics6(req, res, next) {
+  
+  next();
+}
+
+function analytics7(req, res, next) {
+  
+  next();
+}
+
+function analytics8(req, res, next) {
+  
   next();
 }
 
