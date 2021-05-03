@@ -77,6 +77,35 @@ app.post('/Q3', analytics3, (req, res) => {})
 
 app.post('/Q4', analytics4, (req, res) => {})
 
+app.post('/Q1', analytics5, (req, res) => {})
+
+app.post('/Q2', analytics6, (req, res) => {})
+
+app.post('/Q3', analytics7, (req, res) => {})
+
+app.post('/Q4', analytics8, (req, res) => {})
+
+function analytics5(req, res, next) {
+
+  next();
+}
+
+function analytics6(req, res, next) {
+  
+  next();
+}
+
+function analytics7(req, res, next) {
+  
+  next();
+}
+
+function analytics8(req, res, next) {
+  
+  next();
+}
+
+
 
 app.listen(server, function() {
     console.log(`Server is running on port: ${server}`);
