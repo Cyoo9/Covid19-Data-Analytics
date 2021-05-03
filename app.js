@@ -131,7 +131,7 @@ function analytics1(req, res, next) {
 }
 
 function analytics2(req, res, next) {
-  let country = req.body.Country; //testing
+  let country = req.body.Country;
   let array = CountrySearch(result, country);
   let vaxarray = [];
 
