@@ -47,7 +47,7 @@ app.post('/search', search, (req, res) => {
 })
 
 //called when import button is selected
-app.post('/import', analytics4, (req, res) => { 
+app.post('/import', analytics8, (req, res) => { 
   csv = fs.readFileSync(path.resolve(__dirname, './CSV Files/covid_19_data_updated.csv')); //change filepath to updated csv
   result = csvParser(csv); //reparse with updated csv file
   res.send("Import complete. Search now on updated database");
@@ -290,13 +290,51 @@ function analytics4(req, res, next) {
   next();
 }
 
-function analytics5(req, res, next) {
 
+function analytics5(req, res, next) {
+  
   next();
 }
 
 function analytics6(req, res, next) {
-  
+  let country;
+  let temp;
+  let sortType;
+  let stats = [];
+  for(let i = 0; i < outside_data.length; i++) {
+    country = outside_data[i]['Country'];
+    temp = CountrySearchAlt(result, country);
+    stats.push(temp[temp.length - 1]);
+  }
+
+  if(req.body.statType == 'Cases') {
+    //sort by cases
+    sortType = 'Confirmed';
+  } 
+  else if(req.body.statType == 'Deaths') {
+    //sort by deaths
+    sortType = 'Deaths';
+  } 
+  else {
+    //sort by recoveries
+    sortType = 'Recovered';
+  }  
+
+  for(let i = 0; i < stats.length; i++) { //biggest first to smallest last. 
+    let max = i;
+    for(let j = i+1; j < stats.length; j++) {
+      if(parseInt(stats[j][sortType]) > parseInt(stats[max][sortType])) {
+        max = j;
+      }
+    }
+    if(max != i) {
+      let temp = stats[i];
+      stats[i] = stats[max];
+      stats[max] = temp;
+    }
+  }
+
+  fs.writeFileSync('./public/output.json', JSON.stringify(stats)); 
   next();
 }
 
@@ -306,7 +344,55 @@ function analytics7(req, res, next) {
 }
 
 function analytics8(req, res, next) {
-  
+  let country;
+  let countryData = [];
+  let worldData = [];
+  let worldCases = 0;
+  let worldDeaths = 0;
+  let worldRecovered = 0;
+
+  for(let i = 0; i < outside_data.length; i++) {
+    country = outside_data[i]['Country'];
+    countryData.push(CountrySearchAlt(result, country));
+  }
+
+  let maxNumDates = 0;
+  for(let i = 0; i < countryData.length; i++) {
+    if(countryData[i].length > maxNumDates) {
+      maxNumDates = countryData[i].length;
+    }
+  } 
+
+  let dateIsSet;
+  let statDate;
+  for(let i = 0; i < maxNumDates; i++) {
+    dateIsSet = false;
+    for(let j = 0; j < countryData.length; j++) {
+      if(countryData[j][i]) { //future scalability. some countries might only have up to 5/25/2021 while some have 6/1/2021. Need to check. 
+        worldCases += parseInt(countryData[j][i]['Confirmed']);
+        worldDeaths += parseInt(countryData[j][i]['Deaths']);
+        worldRecovered += parseInt(countryData[j][i]['Recovered']);
+        
+        if(!dateIsSet) {
+          statDate = countryData[j][i]['ObservationDate'];
+          dateIsSet = true;
+
+        }
+      }
+    }
+    worldData.push({
+      'Date': statDate,
+      'Global Cases': worldCases, 
+      'Global Deaths': worldDeaths,
+      'Global Recovered': worldRecovered
+    });
+    worldCases = 0;
+    worldDeaths = 0;
+    worldRecovered = 0;
+  }
+
+  fs.writeFileSync('./public/output.json', JSON.stringify(worldData)); 
+
   next();
 }
 
@@ -550,3 +636,57 @@ function CountrySearch(arr, country) {
 
   return retArray;
 }
+
+function CountrySearchAlt(arr, country) {
+  
+  let search = [];
+
+  for(let i = 0; i < arr.length; i++) {
+    if(arr[i]['Country/Region'] == country) {
+      search.push(arr[i]);
+      if(arr[i]['Province/State'] == 'Recovered') {
+        search[search.length-2]['Recovered'] == arr[i]
+      }
+    }
+  }
+
+  let datesChecked = [];
+  let totalCon = 0;
+  let totalRec = 0;
+  let totalDed = 0;
+  let newObj = {};
+  let array = [];
+  let alreadyChecked = false;
+
+  for(let i = 0; i < search.length; i++) {
+    alreadyChecked = false;
+    for(var index in datesChecked) {
+      if(datesChecked[index].includes(search[i]['ObservationDate'])) {
+        alreadyChecked = true;
+      }
+    }
+    if(!alreadyChecked) {
+      totalCon = parseInt(search[i]['Confirmed']);
+      totalRec = parseInt(search[i]['Recovered']);
+      totalDed = parseInt(search[i]['Deaths']);
+      for(let j = i+1; j < search.length; j++) {
+        if(search[i]['ObservationDate'] == search[j]['ObservationDate']) {
+          totalCon += parseInt(search[j]['Confirmed']);
+          totalRec += parseInt(search[j]['Recovered']);
+          totalDed += parseInt(search[j]['Deaths']);
+        }
+      }
+      datesChecked.push(search[i]['ObservationDate']);
+      newObj = {'ObservationDate' : search[i]['ObservationDate'],
+                'Country' : country, 
+                'Confirmed' : totalCon, 
+                'Deaths' : totalDed, 
+                'Recovered' : totalRec
+                };
+      array.push(newObj);
+    }
+  }
+
+  return array;
+}
+
