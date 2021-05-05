@@ -47,7 +47,7 @@ app.post('/search', search, (req, res) => {
 })
 
 //called when import button is selected
-app.post('/import', analytics5, (req, res) => { 
+app.post('/import', analytics7, (req, res) => { 
   csv = fs.readFileSync(path.resolve(__dirname, './CSV Files/covid_19_data_updated.csv')); //change filepath to updated csv
   result = csvParser(csv); //reparse with updated csv file
   res.send("Import complete. Search now on updated database");
@@ -310,15 +310,8 @@ function analytics5(req, res, next) {
   }
   else {
     let allCountries = [];
-    let alreadyChecked = false;
     for(let i = 0; i < result.length; i++) {
-      alreadyChecked = false;
-      for(var index in allCountries) {
-        if(allCountries[index].includes(result[i]['Country/Region'])) {
-          alreadyChecked = true;
-        }
-      }
-      if(!alreadyChecked) {
+      if(!(allCountries.includes(result[i]['Country/Region']))) {
         allCountries.push(result[i]['Country/Region']);
       }
     }
@@ -406,7 +399,22 @@ function analytics6(req, res, next) {
 }
 
 function analytics7(req, res, next) {
-  
+  var country = "US";
+  var stat = "Confirmed";
+  var array = CountrySearch(country, "Non-Cumulative");
+
+  let maxIndex = 0;
+  for(let i = 1; i < array.length; i++) {
+    if(array[maxIndex][stat] < array[i][stat]) {
+      maxIndex = i;
+    }
+  }
+  var obj = {'Peak Date' : array[maxIndex]['ObservationDate'],
+             'Country' : country
+            };
+  obj[stat] = array[maxIndex][stat];
+  array.push(obj);
+  fs.writeFileSync('./public/output.json', JSON.stringify(array));
   next();
 }
 
