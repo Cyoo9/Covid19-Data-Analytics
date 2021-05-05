@@ -47,7 +47,7 @@ app.post('/search', search, (req, res) => {
 })
 
 //called when import button is selected
-app.post('/import', (req, res) => { 
+app.post('/import', analytics7, (req, res) => { 
   csv = fs.readFileSync(path.resolve(__dirname, './CSV Files/covid_19_data_updated.csv')); //change filepath to updated csv
   result = csvParser(csv); //reparse with updated csv file
   res.send("Import complete. Search now on updated database");
@@ -105,7 +105,7 @@ function analytics1(req, res, next) {
   let retArray = [];
 
   for(let i = 0; i < countries.length; i++) {
-    temp = CountrySearch(result, countries[i]);
+    temp = CountrySearch(countries[i], "Non-Cumulative");
     allCountryData.push(temp);
   }
 
@@ -140,7 +140,7 @@ function analytics1(req, res, next) {
 
 function analytics2(req, res, next) {
   let country = req.body.Country;
-  let array = CountrySearch(result, country);
+  let array = CountrySearch(country, "Non-Cumulative");
   let vaxarray = [];
 
   let beforeVax = [];
@@ -247,23 +247,13 @@ function analytics3(req, res, next) {
   let country1 = req.body.country1;
   let country2 = req.body.country2;
 
-  let array1 = CountrySearch(result, country1);
-  let array2 = CountrySearch(result, country2);
+  let array1 = CountrySearch(country1, "Non-Cumulative");
+  let array2 = CountrySearch(country2, "Non-Cumulative");
 
 
   for(let i = 0; i < array2.length; i++) {
     array1.push(array2[i]);
   }
-
-
-
-  //shows all objects with negative recovery
-  // for (let i = 0; i < array1.length; ++i) {
-  //   if (array1[i].Recovered < 0) {
-  //     //console.log("negative recovery amount")
-  //     //console.log(array1[i]);
-  //   }
-  // }
 
   fs.writeFileSync('./public/output.json', JSON.stringify(array1));
 
@@ -273,7 +263,7 @@ function analytics3(req, res, next) {
 
 function analytics4(req, res, next) {
   let country = req.body.Country; 
-  let array = CountrySearch(result, country);
+  let array = CountrySearch(country, "Non-Cumulative");
   let obj = {};
   let retArray = [];
   for(let i = 0; i < array.length; i++) {
@@ -293,7 +283,7 @@ function analytics4(req, res, next) {
 function analytics5(req, res, next) {
   let country = "";
   if(country != "") {
-    let array = CountrySearchAlt(result, country);
+    let array = CountrySearch(country, "Cumulative");
     let latestIndex = -1;
     for(let i = array.length-1; i >= 0; i--) {
       if(array[i]['Recovered'] > 0) {
@@ -320,15 +310,8 @@ function analytics5(req, res, next) {
   }
   else {
     let allCountries = [];
-    let alreadyChecked = false;
     for(let i = 0; i < result.length; i++) {
-      alreadyChecked = false;
-      for(var index in allCountries) {
-        if(allCountries[index].includes(result[i]['Country/Region'])) {
-          alreadyChecked = true;
-        }
-      }
-      if(!alreadyChecked) {
+      if(!(allCountries.includes(result[i]['Country/Region']))) {
         allCountries.push(result[i]['Country/Region']);
       }
     }
@@ -338,7 +321,7 @@ function analytics5(req, res, next) {
     let rate = "";
     let latestIndex = -1;
     for(let i = 0; i < allCountries.length; i++) {
-      array = CountrySearchAlt(result, allCountries[i]);
+      array = CountrySearch(allCountries[i], "Cumulative");
       latestIndex = -1;
       for(let j = array.length-1; j >= 0; j--) {
         if(array[j]['Recovered'] > 0) {
@@ -380,7 +363,7 @@ function analytics6(req, res, next) {
   let stats = [];
   for(let i = 0; i < outside_data.length; i++) {
     country = outside_data[i]['Country'];
-    temp = CountrySearchAlt(result, country);
+    temp = CountrySearch(country, "Cumulative");
     stats.push(temp[temp.length - 1]);
   }
 
@@ -416,7 +399,22 @@ function analytics6(req, res, next) {
 }
 
 function analytics7(req, res, next) {
-  
+  var country = "US";
+  var stat = "Confirmed";
+  var array = CountrySearch(country, "Non-Cumulative");
+
+  let maxIndex = 0;
+  for(let i = 1; i < array.length; i++) {
+    if(array[maxIndex][stat] < array[i][stat]) {
+      maxIndex = i;
+    }
+  }
+  var obj = {'Peak Date' : array[maxIndex]['ObservationDate'],
+             'Country' : country
+            };
+  obj[stat] = array[maxIndex][stat];
+  array.push(obj);
+  fs.writeFileSync('./public/output.json', JSON.stringify(array));
   next();
 }
 
@@ -430,7 +428,7 @@ function analytics8(req, res, next) {
 
   for(let i = 0; i < outside_data.length; i++) {
     country = outside_data[i]['Country'];
-    countryData.push(CountrySearchAlt(result, country));
+    countryData.push(CountrySearch(country, "Cumulative"));
   }
 
   let maxNumDates = 0;
@@ -649,16 +647,13 @@ function ReformatDate(old_date) {
   }
 }
 
-function CountrySearch(arr, country) {
+function CountrySearch(country, version) {
   
   let search = [];
 
-  for(let i = 0; i < arr.length; i++) {
-    if(arr[i]['Country/Region'] == country) {
-      search.push(arr[i]);
-      if(arr[i]['Province/State'] == 'Recovered') {
-        search[search.length-2]['Recovered'] == arr[i]
-      }
+  for(let i = 0; i < result.length; i++) {
+    if(result[i]['Country/Region'] == country) {
+      search.push(result[i]);
     }
   }
 
@@ -700,6 +695,10 @@ function CountrySearch(arr, country) {
     }
   }
 
+  if(version != "Non-Cumulative") {
+    return array;
+  }
+
   retArray.push(array[0]);
   for(let i = 1; i < array.length; i++) {
     newObj = {'ObservationDate' : array[i]['ObservationDate'],
@@ -712,57 +711,4 @@ function CountrySearch(arr, country) {
   }
 
   return retArray;
-}
-
-function CountrySearchAlt(arr, country) {
-  
-  let search = [];
-
-  for(let i = 0; i < arr.length; i++) {
-    if(arr[i]['Country/Region'] == country) {
-      search.push(arr[i]);
-      if(arr[i]['Province/State'] == 'Recovered') {
-        search[search.length-2]['Recovered'] == arr[i]
-      }
-    }
-  }
-
-  let datesChecked = [];
-  let totalCon = 0;
-  let totalRec = 0;
-  let totalDed = 0;
-  let newObj = {};
-  let array = [];
-  let alreadyChecked = false;
-
-  for(let i = 0; i < search.length; i++) {
-    alreadyChecked = false;
-    for(var index in datesChecked) {
-      if(datesChecked[index].includes(search[i]['ObservationDate'])) {
-        alreadyChecked = true;
-      }
-    }
-    if(!alreadyChecked) {
-      totalCon = parseInt(search[i]['Confirmed']);
-      totalRec = parseInt(search[i]['Recovered']);
-      totalDed = parseInt(search[i]['Deaths']);
-      for(let j = i+1; j < search.length; j++) {
-        if(search[i]['ObservationDate'] == search[j]['ObservationDate']) {
-          totalCon += parseInt(search[j]['Confirmed']);
-          totalRec += parseInt(search[j]['Recovered']);
-          totalDed += parseInt(search[j]['Deaths']);
-        }
-      }
-      datesChecked.push(search[i]['ObservationDate']);
-      newObj = {'ObservationDate' : search[i]['ObservationDate'],
-                'Country' : country, 
-                'Confirmed' : totalCon, 
-                'Deaths' : totalDed, 
-                'Recovered' : totalRec
-                };
-      array.push(newObj);
-    }
-  }
-
-  return array;
 }
