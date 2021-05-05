@@ -7,7 +7,7 @@ let ejs = require('ejs');
 
 var bodyParser = require("body-parser");
 var multer  = require('multer');
-const { ap } = require('list');
+const { ap, all } = require('list');
 const { parse } = require('path');
 var result = [];
 var searched_results = [];
@@ -47,7 +47,7 @@ app.post('/search', search, (req, res) => {
 })
 
 //called when import button is selected
-app.post('/import', analytics8, (req, res) => { 
+app.post('/import', (req, res) => { 
   csv = fs.readFileSync(path.resolve(__dirname, './CSV Files/covid_19_data_updated.csv')); //change filepath to updated csv
   result = csvParser(csv); //reparse with updated csv file
   res.send("Import complete. Search now on updated database");
@@ -290,9 +290,86 @@ function analytics4(req, res, next) {
   next();
 }
 
-
 function analytics5(req, res, next) {
-  
+  let country = "";
+  if(country != "") {
+    let array = CountrySearchAlt(result, country);
+    let latestIndex = -1;
+    for(let i = array.length-1; i >= 0; i--) {
+      if(array[i]['Recovered'] > 0) {
+        latestIndex = i;
+        break;
+      }
+    }
+    if(latestIndex > -1) {
+      let rate = ((array[latestIndex]['Recovered'] / array[latestIndex]['Confirmed'])*100) + "";
+      rate = rate.substr(0,5) + "%";
+      let obj = {'As of' : array[latestIndex]['ObservationDate'],
+                'Country' : country, 
+                'Effective Recovery Rate' : rate
+                };
+      fs.writeFileSync('./public/output.json', JSON.stringify(obj));
+    }
+    else {
+      let obj = {
+                'Country' : country, 
+                'Effective Recovery Rate' : 'No Data'
+                };
+                fs.writeFileSync('./public/output.json', JSON.stringify(obj));
+    }
+  }
+  else {
+    let allCountries = [];
+    let alreadyChecked = false;
+    for(let i = 0; i < result.length; i++) {
+      alreadyChecked = false;
+      for(var index in allCountries) {
+        if(allCountries[index].includes(result[i]['Country/Region'])) {
+          alreadyChecked = true;
+        }
+      }
+      if(!alreadyChecked) {
+        allCountries.push(result[i]['Country/Region']);
+      }
+    }
+    let array = [];
+    let retArray = [];
+    let obj = {};
+    let rate = "";
+    let latestIndex = -1;
+    for(let i = 0; i < allCountries.length; i++) {
+      array = CountrySearchAlt(result, allCountries[i]);
+      latestIndex = -1;
+      for(let j = array.length-1; j >= 0; j--) {
+        if(array[j]['Recovered'] > 0) {
+          latestIndex = j;
+          break;
+        }
+      }
+      if(latestIndex > -1) {
+        rate = ((array[latestIndex]['Recovered'] / array[latestIndex]['Confirmed'])*100) + "";
+        rate = rate.substr(0,5) + "%";
+        obj = {'As of' : array[latestIndex]['ObservationDate'],
+              'Country' : allCountries[i], 
+              'Effective Recovery Rate' : rate 
+              };
+        retArray.push(obj);
+      }
+    }
+    let maxIndex = -1;
+    for(let i = 0; i < retArray.length; i++) {
+      maxIndex = i;
+      for(let j = i+1; j < retArray.length; j++) {
+        if(parseInt(retArray[maxIndex]['Effective Recovery Rate']) < parseInt(retArray[j]['Effective Recovery Rate'])) {
+          maxIndex = j;
+        }
+      }
+      obj = retArray[maxIndex];
+      retArray[maxIndex] = retArray[i];
+      retArray[i] = obj;
+    }
+    fs.writeFileSync('./public/output.json', JSON.stringify(retArray));
+  }
   next();
 }
 
@@ -689,4 +766,3 @@ function CountrySearchAlt(arr, country) {
 
   return array;
 }
-
