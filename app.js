@@ -47,7 +47,7 @@ app.post('/search', search, (req, res) => {
 })
 
 //called when import button is selected
-app.post('/import', analytics7, (req, res) => { 
+app.post('/import', analytics6, (req, res) => { 
   csv = fs.readFileSync(path.resolve(__dirname, './CSV Files/covid_19_data_updated.csv')); //change filepath to updated csv
   result = csvParser(csv); //reparse with updated csv file
   res.send("Import complete. Search now on updated database");
@@ -394,7 +394,12 @@ function analytics6(req, res, next) {
     }
   }
 
-  fs.writeFileSync('./public/output.json', JSON.stringify(stats)); 
+  let topTen = [];
+  for(let i = 0; i < 9; i++) {
+    topTen.push(stats[i]);
+  }
+
+  fs.writeFileSync('./public/output.json', JSON.stringify(topTen)); 
   next();
 }
 
