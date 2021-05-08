@@ -6,30 +6,90 @@ $(document).ready(function() {
             $("#Q2-wrapper").hide();
             $("#Q3-wrapper").hide();
             $("#Q4-wrapper").hide();
+            $("#Q5-wrapper").hide();
+            $("#Q6-wrapper").hide();
+            $("#Q7-wrapper").hide();
+            $("#Q8-wrapper").hide();
         }
         else if (this.value === "Q1") {
             $("#Q1-wrapper").show();
             $("#Q2-wrapper").hide();
             $("#Q3-wrapper").hide();
             $("#Q4-wrapper").hide();
+            $("#Q5-wrapper").hide();
+            $("#Q6-wrapper").hide();
+            $("#Q7-wrapper").hide();
+            $("#Q8-wrapper").hide();
         }
         else if (this.value === "Q2") {
             $("#Q2-wrapper").show();
             $("#Q1-wrapper").hide();
             $("#Q3-wrapper").hide();
             $("#Q4-wrapper").hide();
+            $("#Q5-wrapper").hide();
+            $("#Q6-wrapper").hide();
+            $("#Q7-wrapper").hide();
+            $("#Q8-wrapper").hide();
         }
         else if (this.value === "Q3") {
             $("#Q3-wrapper").show();
             $("#Q1-wrapper").hide();
             $("#Q2-wrapper").hide();
             $("#Q4-wrapper").hide();
+            $("#Q5-wrapper").hide();
+            $("#Q6-wrapper").hide();
+            $("#Q7-wrapper").hide();
+            $("#Q8-wrapper").hide();
         }
         else if (this.value === "Q4") {
             $("#Q4-wrapper").show();
             $("#Q1-wrapper").hide();
             $("#Q2-wrapper").hide();
             $("#Q3-wrapper").hide();
+            $("#Q5-wrapper").hide();
+            $("#Q6-wrapper").hide();
+            $("#Q7-wrapper").hide();
+            $("#Q8-wrapper").hide();
+        }
+        else if (this.value === "Q5") {
+            $("#Q5-wrapper").show();
+            $("#Q1-wrapper").hide();
+            $("#Q2-wrapper").hide();
+            $("#Q3-wrapper").hide();
+            $("#Q4-wrapper").hide();
+            $("#Q6-wrapper").hide();
+            $("#Q7-wrapper").hide();
+            $("#Q8-wrapper").hide();
+        }
+        else if (this.value === "Q6") {
+            $("#Q6-wrapper").show();
+            $("#Q1-wrapper").hide();
+            $("#Q2-wrapper").hide();
+            $("#Q3-wrapper").hide();
+            $("#Q4-wrapper").hide();
+            $("#Q5-wrapper").hide();
+            $("#Q7-wrapper").hide();
+            $("#Q8-wrapper").hide();
+        }
+        else if (this.value === "Q7") {
+            $("#Q7-wrapper").show();
+            $("#Q1-wrapper").hide();
+            $("#Q2-wrapper").hide();
+            $("#Q3-wrapper").hide();
+            $("#Q4-wrapper").hide();
+            $("#Q5-wrapper").hide();
+            $("#Q6-wrapper").hide();
+            $("#Q8-wrapper").hide();
+        }
+        else if (this.value === "Q8") {
+            $("#Q8-wrapper").show();
+            $("#Q1-wrapper").hide();
+            $("#Q2-wrapper").hide();
+            $("#Q3-wrapper").hide();
+            $("#Q4-wrapper").hide();
+            $("#Q5-wrapper").hide();
+            $("#Q6-wrapper").hide();
+            $("#Q7-wrapper").hide();
         }
     });
 });     
@@ -389,6 +449,38 @@ document.getElementById("Q4-btn").onclick = () =>  {
             );  
         }
 
+    }
+
+    SendRequest(args);
+    
+};
+
+document.getElementById("Q5-btn").onclick = () =>  {
+    console.log("Clicked on Q5 button");
+    const input = document.getElementById("q2Country").value;
+    const params = `Country=${input}`;
+
+    let args = {
+        endpoint: '/Q5',
+        method: 'POST',
+        params: params,
+        callback: (cb_args) => {
+            let response_arr = JSON.parse(cb_args.response_text);
+            console.log(response_arr);
+
+            // let country = response_arr[0].Country;
+            // let observation_dates = [];
+            // let confirmed_cases = [];
+            // let deaths = [];
+
+            // for (let i = 0; i < response_arr.length; ++i) {
+            //     observation_dates.push(response_arr[i].ObservationDate);
+            //     confirmed_cases.push(response_arr[i].Confirmed);
+            //     deaths.push(response_arr[i].Deaths);
+            // }
+            
+            console.log("Hello");
+            createTableFromJSON__3(cb_args.response_text)},
     }
 
     SendRequest(args);

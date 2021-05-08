@@ -46,8 +46,26 @@ body{
 
 }
 
-
 #Q4-wrapper {
+    display:none;
+
+}
+
+#Q5-wrapper {
+    display:none;
+
+}
+
+#Q6-wrapper {
+    display:none;
+
+}
+
+#Q7-wrapper {
+    display:none;
+
+}
+#Q8-wrapper {
     display:none;
 
 }

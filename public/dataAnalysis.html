@@ -62,7 +62,11 @@
                             <option value ="Q1">Q1: Averages </option>
                             <option value="Q2">Q2: Effect of Vaccine</option>
                             <option value ="Q3">Q3: Country vs. Country</option>    
-                            <option value ="Q4">Q4: Cases vs. Deaths</option>    
+                            <option value ="Q4">Q4: Cases vs. Deaths</option>     
+                            <option value ="Q5">Q5: Recovery Rate</option>        
+                            <option value ="Q6">Q6: Highest Rankings (10) </option> 
+                            <option value ="Q7">Q7: Country Max Data</option> 
+                            <option value ="Q8">Q8: Total Daily Stats</option> 
                         </select>
                         <br>
                         <br>
@@ -143,21 +147,92 @@
                                 <label for="q4country">Country:</label><br>
                                 <input type="text" id="q4country" name="q4country"><br>
                                 <br>
-                                <script>
-
-                                
-                                </script>
+                               
                                 <button id="Q4-btn" type = "button" class = "btn btn-info">Submit</button>
                          
                                 <br>
                                 <br>
                                 <div id = "Q4-message"></div>
-
                             </form>
 
                             <div class="chart-container">
                                 <canvas id="q4-chart"></canvas>
                             </div>
+                        </div>
+
+                        <div id = "Q5-wrapper" >
+                            <h4 class="optTitle"> Q5: Ratio of Effective Recovery Rate </h4>
+                            <h6>Enter a specific country to see its recovery rate. </h6>
+                                <form>
+                                    <label for="q5country">Country:</label><br>
+                                    <input type="text" id="q5country" name="q5country"><br>
+                                    <br>
+                                    <br>
+                                    <button id="Q5-btn" type = "button" class = "btn btn-info">See Recovery Rate</button>   
+                                    <br>
+                                    <br>
+                                    <div id = "Q5-message"></div>
+                                </form>
+                            <br>
+                            <br> 
+                            <div id="showTable5"></div>
+                        </div>
+                        
+                        <div id = "Q6-wrapper" >
+                            <h4 class="optTitle"> Q6: Highest Rankings (10) </h4>
+                            <h6> See the top ten countries which have the highest statistic of your choice. </h6>
+                                <form>
+                                    <label for="q6statistic">Statistic:</label><br>
+                                    <input type="text" id="q6statistic" name="q6statistic"><br>
+                                    <br>
+                                    <br>
+                                    <button id="Q6-btn" type = "button" class = "btn btn-info">See top 10</button>   
+                                    <br>
+                                    <br>
+                                    <div id = "Q6-message"></div>
+                                </form>
+                            <br>
+                            <br> 
+                            <div id="showTable6"></div>
+                        </div>
+
+                        <div id = "Q7-wrapper" >
+                            <h4 class="optTitle"> Q7: Country Max Data</h4>
+                            <h6>Enter a specific country to see its peak statistics. </h6>
+                                <form>
+                                    <label for="q7country">Country:</label><br>
+                                    <input type="text" id="q7country" name="q7country"><br>
+                                    <br>
+                                    <br>
+                                    <button id="Q7-btn" type = "button" class = "btn btn-info">See Peak statistics</button>   
+                                    <br>
+                                    <br>
+                                    <div id = "Q7-message"></div>
+                                </form>
+                            <br>
+                            <br> 
+                            <div id="showTable7"></div>
+                            <div class="chart-container">
+                                <canvas id="q7-chart"></canvas>
+                            </div>
+                        </div>
+
+                        <div id = "Q8-wrapper" >
+                            <h4 class="optTitle"> Q8: Total Daily Stats</h4>
+                            <h6> Enter a date to see the world total cases, deaths, and recoveries up to that date. </h6>
+                                <form>
+                                    <label for="q8date">Date:</label><br>
+                                    <input type="date" id="q8date" name="q8date">
+                                    <br>
+                                    <br>
+                                    <button id="Q8-btn" type = "button" class = "btn btn-info">See world total</button>   
+                                    <br>
+                                    <br>
+                                    <div id = "Q8-message"></div>
+                                </form>
+                            <br>
+                            <br> 
+                            <div id="showTable8"></div>
                         </div>
 
                     </form>
