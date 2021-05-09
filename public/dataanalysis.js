@@ -541,16 +541,13 @@ document.getElementById("Q7-btn").onclick = () =>  {
 document.getElementById("Q8-btn").onclick = () =>  {
     console.log("Clicked on Q8 button");
 
-    
-    const date = document.getElementById("q8date").value;
-    const params = `statType=${date}`;
-
-
+    // const date = document.getElementById("q8date").value;
+    // const params = `statType=${date}`;
 
     let args = {
         endpoint: '/Q8',
         method: 'POST',
-        params: params,
+        params: '',
         callback: (cb_args) => {
             let response_arr = JSON.parse(cb_args.response_text);
             console.log(response_arr);
