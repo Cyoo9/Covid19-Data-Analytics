@@ -281,7 +281,7 @@ function analytics4(req, res, next) {
 }
 
 function analytics5(req, res, next) {
-  let country = "";
+  let country = req.body.Country;
   if(country != "") {
     let array = CountrySearch(country, "Cumulative");
     let latestIndex = -1;
@@ -299,6 +299,7 @@ function analytics5(req, res, next) {
                 'Effective Recovery Rate' : rate
                 };
       fs.writeFileSync('./public/output.json', JSON.stringify(obj));
+      
     }
     else {
       let obj = {
@@ -353,6 +354,7 @@ function analytics5(req, res, next) {
     }
     fs.writeFileSync('./public/output.json', JSON.stringify(retArray));
   }
+  res.sendFile(path.join(__dirname, "/public" , "output.json"));
   next();
 }
 
@@ -395,16 +397,17 @@ function analytics6(req, res, next) {
   }
 
   let topTen = [];
-  for(let i = 0; i < 9; i++) {
+  for(let i = 0; i < 10; i++) {
     topTen.push(stats[i]);
   }
 
   fs.writeFileSync('./public/output.json', JSON.stringify(topTen)); 
+  res.sendFile(path.join(__dirname, "/public" , "output.json"));
   next();
 }
 
 function analytics7(req, res, next) {
-  var country = "US";
+  var country = req.body.Country;
   var stat = "Confirmed";
   var array = CountrySearch(country, "Non-Cumulative");
 
@@ -420,6 +423,7 @@ function analytics7(req, res, next) {
   obj[stat] = array[maxIndex][stat];
   array.push(obj);
   fs.writeFileSync('./public/output.json', JSON.stringify(array));
+  res.sendFile(path.join(__dirname, "/public" , "output.json"));
   next();
 }
 
@@ -472,6 +476,7 @@ function analytics8(req, res, next) {
   }
 
   fs.writeFileSync('./public/output.json', JSON.stringify(worldData)); 
+  res.sendFile(path.join(__dirname, "/public" , "output.json"));
 
   next();
 }

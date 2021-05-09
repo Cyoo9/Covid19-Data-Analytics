@@ -54,7 +54,10 @@ document.getElementById("loadMore").onclick = () => {
         endpoint: '/search',
         method: 'POST',
         params: params,
-        callback: (cb_args) => { createTableFromJSON(cb_args.response_text) },
+        callback: (cb_args) => {
+            let response_arr = JSON.parse(cb_args.response_text);
+            CreateTable(response_arr, "showTable");
+        },
     }
 
     SendRequest(args);

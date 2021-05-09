@@ -28,149 +28,49 @@ function SendRequest(args) {
 }
 
 
-function createTableFromJSON(jsonData) {
-    var arrBirds = [];
-    arrBirds = JSON.parse(jsonData); 	// Convert JSON to array.
+function CreateTable(arr_of_jsondata, div_id) {
+    
+    function LengthOf(json) {
+        //returns number of attributes in a json object
+        return Object.keys(json).length
+    }
 
-    const want_confirmed_cases = document.getElementsByName('confirmedCases')[0].checked;
-    const want_deaths = document.getElementsByName('deaths')[0].checked;
-    const want_recoveries = document.getElementsByName('recoveries')[0].checked;
+    const front_json = arr_of_jsondata[0];
+    let num_cols = LengthOf(front_json); // i.e., num of headers
+    let num_rows = arr_of_jsondata.length + 1; // Extra row for header. Hence add 1 to length.
+    const keys = Object.keys(front_json); //array of the json object's attributes
+
+    const table = document.createElement("table");
 
 
+    //Create Table Rows
+    for (let i = 0; i < num_rows; ++i) {
+        const tr = document.createElement('tr');
+        table.appendChild(tr);
 
-    var col = [];
-    for (var i = 0; i < arrBirds.length; i++) {
-        for (var key in arrBirds[i]) {
-            if (col.indexOf(key) === -1) {
-                if (key === "Confirmed" && !want_confirmed_cases) {
-                    continue;
-                }
-                if (key === "Deaths" && !want_deaths) {
-                    continue;
-                }
-                if (key === "Recovered" && !want_recoveries) {
-                    continue;
-                }
 
-                col.push(key);
+        //Create Table Columns
+        for (let j = 0; j < num_cols; ++j) {   
+
+            // first row of the table (header)
+            if (i == 0) {
+                const th = document.createElement('th');
+                th.innerHTML = keys[j];
+                tr.appendChild(th);
+            }
+            else {
+                const td = document.createElement('td');
+                const key = keys[j];
+
+                // i-1 because of the extra header row
+                td.innerHTML = arr_of_jsondata[i-1][key];
+
+                tr.append(td);
             }
         }
     }
+    
+    let elem = document.getElementById(div_id);
+    elem.appendChild(table);
 
-    // Create a dynamic table.
-    var table = document.createElement("table")// Create table header.
-
-    var tr = table.insertRow(-1);                   // Table row.
-
-    for (var i = 0; i < col.length; i++) {
-        var th = document.createElement("th");      // Table header.
-        th.innerHTML = col[i];
-        tr.appendChild(th);
-    }
-
-
-
-    // Add JSON to the table rows.
-    console.log(arrBirds.length);
-    console.log(col.length);
-    for (var i = 0; i < arrBirds.length; i++) {
-
-        tr = table.insertRow(-1);
-
-        for (var j = 0; j < col.length; j++) {
-            var tabCell = tr.insertCell(-1);
-
-                if (col[j] === 'Confirmed' && !want_confirmed_cases) {
-                    tabCell.innerHTML = "";
-                    continue;
-                }
-                if (col[j] === 'Deaths'  && !want_deaths) {
-                    tabCell.innerHTML = "";
-                    continue;
-                }
-                if (col[j] === 'Recoveries' && !want_recoveries) {
-                    tabCell.innerHTML = "";
-                    continue;
-                }
-
-                tabCell.innerHTML = arrBirds[i][col[j]];
-                console.log( tabCell.innerHTML);
-        }
-    }
-
-    // Finally, add the dynamic table to a container.
-    var divContainer = document.getElementById("showTable");
-    divContainer.innerHTML = "";
-    divContainer.appendChild(table);
-};
-
-function createTableFromJSON__2(jsonData) {
-    var arrBirds = [];
-    arrBirds = JSON.parse(jsonData); 	// Convert JSON to array.
-
-
-    var col = [];
-    for (var i = 0; i < arrBirds.length; i++) {
-        for (var key in arrBirds[i]) {
-            if (col.indexOf(key) === -1) {
-                if (key === "Confirmed" && !want_confirmed_cases) {
-                    continue;
-                }
-                if (key === "Deaths" && !want_deaths) {
-                    continue;
-                }
-                if (key === "Recovered" && !want_recoveries) {
-                    continue;
-                }
-
-                col.push(key);
-            }
-        }
-    }
-
-    // Create a dynamic table.
-    var table = document.createElement("table")// Create table header.
-
-    var tr = table.insertRow(-1);                   // Table row.
-
-    for (var i = 0; i < col.length; i++) {
-        var th = document.createElement("th");      // Table header.
-        th.innerHTML = col[i];
-        tr.appendChild(th);
-    }
-
-
-
-    // Add JSON to the table rows.
-    console.log(arrBirds.length);
-    console.log(col.length);
-    for (var i = 0; i < arrBirds.length; i++) {
-
-        tr = table.insertRow(-1);
-
-        for (var j = 0; j < col.length; j++) {
-            var tabCell = tr.insertCell(-1);
-
-                if (col[j] === 'Confirmed' && !want_confirmed_cases) {
-                    tabCell.innerHTML = "";
-                    continue;
-                }
-                if (col[j] === 'Deaths'  && !want_deaths) {
-                    tabCell.innerHTML = "";
-                    continue;
-                }
-                if (col[j] === 'Recoveries' && !want_recoveries) {
-                    tabCell.innerHTML = "";
-                    continue;
-                }
-
-                tabCell.innerHTML = arrBirds[i][col[j]];
-                console.log( tabCell.innerHTML);
-        }
-    }
-
-    // Finally, add the dynamic table to a container.
-    var divContainer = document.getElementById("showTable");
-    divContainer.innerHTML = "";
-    divContainer.appendChild(table);
-};
+}

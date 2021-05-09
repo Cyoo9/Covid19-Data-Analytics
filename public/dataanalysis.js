@@ -101,7 +101,10 @@ document.getElementById("Q1-btn").onclick = () =>  {
         endpoint: '/Q1',
         method: 'POST',
         params: '',
-        callback: (cb_args) => { createTableFromJSON__2(cb_args.response_text)},
+        callback: (cb_args) => { 
+            let response_arr = JSON.parse(cb_args.response_text);
+            CreateTable(response_arr, "showTable");
+        },
     }
 
     SendRequest(args);
@@ -406,17 +409,19 @@ document.getElementById("Q4-btn").onclick = () =>  {
                 datasets: [
                     {
                     label: "Confirmed Cases",
+                    yAxisID: 'y1',
                     backgroundColor: 'rgb(235, 235, 52)',
                     borderColor: 'rgb(235, 235, 52)',
                     data: confirmed_cases,
-                    lineTension: 0.7,
+                    lineTension: 0.4,
                     },
                     {
                     label: "Deaths",
+                    yAxisID: 'y2',
                     backgroundColor: 'rgb(255, 99, 132)',
                     borderColor: 'rgb(255, 99, 132)',
                     data: deaths,
-                    lineTension: 0.7, 
+                    lineTension: 0.4, 
                     },
                 ]
             };   
@@ -439,6 +444,18 @@ document.getElementById("Q4-btn").onclick = () =>  {
                     },
                     responsive: true,
                     maintainAspectRatio: false,
+                    scales: {
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                        },
+                        y2 : {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                        }
+                      },
                 },
 
             };
@@ -457,7 +474,7 @@ document.getElementById("Q4-btn").onclick = () =>  {
 
 document.getElementById("Q5-btn").onclick = () =>  {
     console.log("Clicked on Q5 button");
-    const input = document.getElementById("q2Country").value;
+    const input = document.getElementById("q5Country").value;
     const params = `Country=${input}`;
 
     let args = {
@@ -465,24 +482,81 @@ document.getElementById("Q5-btn").onclick = () =>  {
         method: 'POST',
         params: params,
         callback: (cb_args) => {
-            let response_arr = JSON.parse(cb_args.response_text);
+            console.log(cb_args.response_text);
+            let response_arr = [JSON.parse(cb_args.response_text)];
+            //console.log("Hello");
             console.log(response_arr);
-
-            // let country = response_arr[0].Country;
-            // let observation_dates = [];
-            // let confirmed_cases = [];
-            // let deaths = [];
-
-            // for (let i = 0; i < response_arr.length; ++i) {
-            //     observation_dates.push(response_arr[i].ObservationDate);
-            //     confirmed_cases.push(response_arr[i].Confirmed);
-            //     deaths.push(response_arr[i].Deaths);
-            // }
-            
-            console.log("Hello");
-            createTableFromJSON__3(cb_args.response_text)},
+            CreateTable(response_arr, "showTable5");
+        },
     }
-
     SendRequest(args);
     
 };
+
+document.getElementById("Q6-btn").onclick = () =>  {
+    console.log("Clicked on Q6 button");
+
+    
+    const statistic = document.getElementById("Q6-statistic").value;
+    const params = `statType=${statistic}`;
+
+
+
+    let args = {
+        endpoint: '/Q6',
+        method: 'POST',
+        params: params,
+        callback: (cb_args) => {
+            let response_arr = JSON.parse(cb_args.response_text);
+            console.log(response_arr);
+            CreateTable(response_arr, "showTable6");
+        },
+    }
+
+    SendRequest(args);
+}
+
+document.getElementById("Q7-btn").onclick = () =>  {
+    console.log("Clicked on Q7 button");
+    const input = document.getElementById("q7country").value;
+    const params = `Country=${input}`;
+
+    let args = {
+        endpoint: '/Q7',
+        method: 'POST',
+        params: params,
+        callback: (cb_args) => {
+            let response_arr = [JSON.parse(cb_args.response_text)];
+            //console.log("Hello");
+            console.log(response_arr);
+            CreateTable(response_arr, "showTable7");
+        },
+    }
+    
+
+    SendRequest(args);
+}
+
+
+document.getElementById("Q8-btn").onclick = () =>  {
+    console.log("Clicked on Q8 button");
+
+    
+    const date = document.getElementById("q8date").value;
+    const params = `statType=${date}`;
+
+
+
+    let args = {
+        endpoint: '/Q8',
+        method: 'POST',
+        params: params,
+        callback: (cb_args) => {
+            let response_arr = JSON.parse(cb_args.response_text);
+            console.log(response_arr);
+            CreateTable(response_arr, "showTable8");
+        },
+    }
+
+    SendRequest(args);
+}
