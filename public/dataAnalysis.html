@@ -164,8 +164,8 @@
                             <h4 class="optTitle"> Q5: Ratio of Effective Recovery Rate </h4>
                             <h6>Enter a specific country to see its recovery rate. </h6>
                                 <form>
-                                    <label for="q5country">Country:</label><br>
-                                    <input type="text" id="q5country" name="q5country"><br>
+                                    <label for="q5ountry">Country:</label><br>
+                                    <input type="text" id="q5Country" name="q5Country"><br>
                                     <br>
                                     <br>
                                     <button id="Q5-btn" type = "button" class = "btn btn-info">See Recovery Rate</button>   
@@ -183,7 +183,13 @@
                             <h6> See the top ten countries which have the highest statistic of your choice. </h6>
                                 <form>
                                     <label for="q6statistic">Statistic:</label><br>
-                                    <input type="text" id="q6statistic" name="q6statistic"><br>
+                                    <input id="Q6-statistic" list="Q6-statistics">
+                                    <datalist id="Q6-statistics">
+                                        <option value ="Cases">Cases</option>
+                                        <option value ="Deaths">Deaths</option>
+                                        <option value ="Recoveries">Recoveries</option>
+                                    </datalist>
+
                                     <br>
                                     <br>
                                     <button id="Q6-btn" type = "button" class = "btn btn-info">See top 10</button>   
