@@ -526,7 +526,7 @@ document.getElementById("Q7-btn").onclick = () =>  {
         method: 'POST',
         params: params,
         callback: (cb_args) => {
-            let response_arr = [JSON.parse(cb_args.response_text)];
+            let response_arr = JSON.parse(cb_args.response_text);
             //console.log("Hello");
             console.log(response_arr);
             CreateTable(response_arr, "showTable7");

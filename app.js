@@ -421,8 +421,8 @@ function analytics7(req, res, next) {
              'Country' : country
             };
   obj[stat] = array[maxIndex][stat];
-  array.push(obj);
-  fs.writeFileSync('./public/output.json', JSON.stringify(array));
+  //array.push(obj);
+  fs.writeFileSync('./public/output.json', JSON.stringify([obj]));
   res.sendFile(path.join(__dirname, "/public" , "output.json"));
   next();
 }
