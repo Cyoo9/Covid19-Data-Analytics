@@ -483,7 +483,7 @@ document.getElementById("Q5-btn").onclick = () =>  {
         params: params,
         callback: (cb_args) => {
             console.log(cb_args.response_text);
-            let response_arr = [JSON.parse(cb_args.response_text)];
+            let response_arr = JSON.parse(cb_args.response_text);
             //console.log("Hello");
             console.log(response_arr);
             CreateTable(response_arr, "showTable5");
