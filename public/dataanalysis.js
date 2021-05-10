@@ -483,7 +483,7 @@ document.getElementById("Q5-btn").onclick = () =>  {
         params: params,
         callback: (cb_args) => {
             console.log(cb_args.response_text);
-            let response_arr = [JSON.parse(cb_args.response_text)];
+            let response_arr = JSON.parse(cb_args.response_text);
             //console.log("Hello");
             console.log(response_arr);
             CreateTable(response_arr, "showTable5");
@@ -519,7 +519,11 @@ document.getElementById("Q6-btn").onclick = () =>  {
 document.getElementById("Q7-btn").onclick = () =>  {
     console.log("Clicked on Q7 button");
     const input = document.getElementById("q7country").value;
-    const params = `Country=${input}`;
+    const input2 = document.getElementById("q7stat").value;
+    
+    var params = "";
+    params += `Country=${input}`,
+    params += `&Stat=${input2}`;
 
     let args = {
         endpoint: '/Q7',
@@ -529,7 +533,66 @@ document.getElementById("Q7-btn").onclick = () =>  {
             let response_arr = JSON.parse(cb_args.response_text);
             //console.log("Hello");
             console.log(response_arr);
-            CreateTable(response_arr, "showTable7");
+            let peak = [];
+            peak.push(response_arr[response_arr.length-1]);
+            CreateTable(peak, "showTable7");
+
+            let country = response_arr[0].Country;
+            let observation_dates = [];
+            let statistic = [];
+
+            for (let i = 0; i < response_arr.length-1; ++i) {
+                observation_dates.push(response_arr[i]['ObservationDate']);
+                statistic.push(response_arr[i][input2]);
+            }
+
+            let data = {
+                labels: observation_dates,
+                datasets: [
+                    {
+                    label: input2,
+                    yAxisID: 'y1',
+                    backgroundColor: 'rgb(235, 235, 52)',
+                    borderColor: 'rgb(235, 235, 52)',
+                    data: statistic,
+                    lineTension: 0.4,
+                    }
+                ]
+            };   
+
+            
+            const config = {
+                type: 'line',
+                data,
+                options: {
+                    plugins : {
+                        title: {
+                            display: true,
+                            text: `${input2} in ${country}`,
+                        },
+                    },
+                    elements: {
+                        point:{
+                            radius: 0
+                        }
+                    },
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                        }
+                      },
+                },
+
+            };
+
+            var myChart = new Chart(
+                document.getElementById('q7-chart'),
+                config
+            );
         },
     }
     

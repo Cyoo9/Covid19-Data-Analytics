@@ -162,7 +162,7 @@
 
                         <div id = "Q5-wrapper" >
                             <h4 class="optTitle"> Q5: Ratio of Effective Recovery Rate </h4>
-                            <h6>Enter a specific country to see its recovery rate. </h6>
+                            <h6>Enter a specific country to see its recovery rate. (Leave blank to see all countries) </h6>
                                 <form>
                                     <label for="q5ountry">Country:</label><br>
                                     <input type="text" id="q5Country" name="q5Country"><br>
@@ -204,10 +204,19 @@
 
                         <div id = "Q7-wrapper" >
                             <h4 class="optTitle"> Q7: Country Max Data</h4>
-                            <h6>Enter a specific country to see its date of peak confirmed cases. </h6>
+                            <h6>Enter a specific country and statistic to see its date of its peak. </h6>
                                 <form>
                                     <label for="q7country">Country:</label><br>
                                     <input type="text" id="q7country" name="q7country"><br>
+
+                                    <label for="q7stat">Statistic:</label><br>
+                                    <input type="text" id="q7stat" name="q7stat" list="q7statistics">
+                                    <datalist id="q7statistics">
+                                        <option value ="Confirmed">Cases</option>
+                                        <option value ="Deaths">Deaths</option>
+                                        <option value ="Recovered">Recovered</option>
+                                    </datalist>
+
                                     <br>
                                     <br>
                                     <button id="Q7-btn" type = "button" class = "btn btn-info">See Peak statistics</button>   

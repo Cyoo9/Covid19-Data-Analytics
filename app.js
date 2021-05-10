@@ -408,7 +408,7 @@ function analytics6(req, res, next) {
 
 function analytics7(req, res, next) {
   var country = req.body.Country;
-  var stat = "Confirmed";
+  var stat = req.body.Stat;
   var array = CountrySearch(country, "Non-Cumulative");
 
   let maxIndex = 0;
@@ -421,8 +421,8 @@ function analytics7(req, res, next) {
              'Country' : country
             };
   obj[stat] = array[maxIndex][stat];
-  //array.push(obj);
-  fs.writeFileSync('./public/output.json', JSON.stringify([obj]));
+  array.push(obj);
+  fs.writeFileSync('./public/output.json', JSON.stringify(array));
   res.sendFile(path.join(__dirname, "/public" , "output.json"));
   next();
 }
