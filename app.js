@@ -298,8 +298,9 @@ function analytics5(req, res, next) {
                 'Country' : country, 
                 'Effective Recovery Rate' : rate
                 };
-      fs.writeFileSync('./public/output.json', JSON.stringify(obj));
-      
+      let coolArray = [];
+      coolArray.push(obj);
+      fs.writeFileSync('./public/output.json', JSON.stringify(coolArray));
     }
     else {
       let obj = {

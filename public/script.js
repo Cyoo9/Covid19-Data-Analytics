@@ -29,7 +29,7 @@ function SendRequest(args) {
 
 
 function CreateTable(arr_of_jsondata, div_id) {
-    
+
     function LengthOf(json) {
         //returns number of attributes in a json object
         return Object.keys(json).length
