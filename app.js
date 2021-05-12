@@ -10,28 +10,28 @@ var multer  = require('multer');
 const { ap, all } = require('list');
 const { parse } = require('path');
 const { PassThrough } = require('stream');
-var result = [];
-var searched_results = [];
-var outside_data = [];
-var aggregatedCountryData = [];
-var worldData = [];
-var countryData = [];
+var result = []; //holds all data
+var searched_results = []; //holds data from a search
+var outside_data = []; //holds data collected outside original file
+var aggregatedCountryData = []; //holds data for each country aggregate totals
+var worldData = []; //holds data for aggregate world totals
+var countryData = []; //2D array holds non-cumulative data for each country
 
 console.log("Starting Server...");
 
 var csv = fs.readFileSync(path.resolve(__dirname, './CSV Files/covid_19_data.csv')); //reads in a cvs file
-result = csvParser(csv); //Call csvParser on original data by default
+result = csvParser(csv); //put into usable array
 
-csv = fs.readFileSync(path.resolve(__dirname, './CSV Files/outside_metrics.csv'));
-outside_data = csvParser(csv);
+csv = fs.readFileSync(path.resolve(__dirname, './CSV Files/outside_metrics.csv')); //gathers outside metrics
+outside_data = csvParser(csv); //put into usable array
 
-csv = fs.readFileSync(path.resolve(__dirname, './CSV Files/aggregated_country_data.csv'));
-aggregatedCountryData = csvParser(csv);
+csv = fs.readFileSync(path.resolve(__dirname, './CSV Files/aggregated_country_data.csv')); //aggregated data
+aggregatedCountryData = csvParser(csv); //put into usable array
 
-csv = fs.readFileSync(path.resolve(__dirname, './CSV Files/world_data.csv'));
-worldData = csvParser(csv);
+csv = fs.readFileSync(path.resolve(__dirname, './CSV Files/world_data.csv')); //world data
+worldData = csvParser(csv); //put into usable array
 
-countryData = createCountryData();
+countryData = createCountryData(); //create 2D array of non-cumulative data for each country
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -83,48 +83,52 @@ app.post('/delete', deleteData, (req, res) => {
   ConvertToCSV(result); //automatically backsup array for importing later
 })
 
-app.post('/Q1', analytics1, (req, res) => {})
+app.post('/Q1', analytics1, (req, res) => {}) //calls analytic 1 middlewear
 
-app.post('/Q2', analytics2, (req, res) => {})
+app.post('/Q2', analytics2, (req, res) => {}) //calls analytic 1 middlewear
 
-app.post('/Q3', analytics3, (req, res) => {})
+app.post('/Q3', analytics3, (req, res) => {}) //calls analytic 1 middlewear
 
-app.post('/Q4', analytics4, (req, res) => {})
+app.post('/Q4', analytics4, (req, res) => {}) //calls analytic 1 middlewear
 
-app.post('/Q5', analytics5, (req, res) => {})
+app.post('/Q5', analytics5, (req, res) => {}) //calls analytic 1 middlewear
 
-app.post('/Q6', analytics6, (req, res) => {})
+app.post('/Q6', analytics6, (req, res) => {}) //calls analytic 1 middlewear
 
-app.post('/Q7', analytics7, (req, res) => {})
+app.post('/Q7', analytics7, (req, res) => {}) //calls analytic 1 middlewear
 
-app.post('/Q8', analytics8, (req, res) => {})
+app.post('/Q8', analytics8, (req, res) => {}) //calls analytic 1 middlewear
 
 app.listen(server, function() {
     console.log(`Server is running on port: ${server}`);
 })
 
+//Writes array of the average cases, deaths, and recoveries for each country
 function analytics1(req, res, next) {
   let retArray = [];
   let obj = {};
+  //divide each aggregated metric by the number of dates recorded in order to get average
   for(let i = 0; i < aggregatedCountryData.length; i++) {
     obj = { 'Country' : aggregatedCountryData[i]['Country'],
             'avgCasesPerDay' : aggregatedCountryData[i]['Confirmed'] / aggregatedCountryData[i]['numDates'],
             'avgDeathsPerDay' : aggregatedCountryData[i]['Deaths'] / aggregatedCountryData[i]['numDates'],
             'avgRecoveriesPerDay' : aggregatedCountryData[i]['Deaths'] / aggregatedCountryData[i]['numDates']
           };
-    retArray.push(obj);
+    retArray.push(obj); // push to array
   }
 
-  fs.writeFileSync('./public/output.json', JSON.stringify(retArray));
+  fs.writeFileSync('./public/output.json', JSON.stringify(retArray)); //write array to json
   res.sendFile(path.join(__dirname, "/public" , "output.json")); //send json
 
   next();
 }
 
+//sends average cases, deaths, and recoveries before and after some countries recorded first vaccination date
 function analytics2(req, res, next) {
-  let country = req.body.Country;
+  let country = req.body.Country; //get country
   let array = [];
 
+  //find countries non-cumulative data
   for(var i = 0; i < countryData.length; i++) {
     if(countryData[i][0]['Country'] == country) {
       array = countryData[i];
@@ -132,21 +136,20 @@ function analytics2(req, res, next) {
     }
   }
 
+  //vaccine info stored at the 2nd to last object of the non-cumulative data
   let vaccineName = array[array.length-2]['vaxName'];
   let vaccineDate = array[array.length-2]['vaxDate'];
   
   let casesBeforeSum = 0;
   let casesAfterSum = 0;
-
   let deathsBeforeSum = 0;
   let deathsAfterSum = 0;
-
   let recoveriesBeforeSum = 0;
   let recoveriesAfterSum = 0;
-
   let countBefore = 0;
   let countAfter = 0;
 
+  //go through data (not last two objects), and sum up all the statistics for before and after the vaccine date
   for(let i = 0; i < array.length-2; i++) {
     if(ReformatDate("" + array[i]['ObservationDate']) <= vaccineDate) {
       casesBeforeSum += Math.max(0, parseInt(array[i]['Confirmed']));
@@ -162,6 +165,7 @@ function analytics2(req, res, next) {
     }
   }
 
+  //created object of averages
   let vaxObj = {'avgCasesBeforeVax' : casesBeforeSum/countBefore,
                 'avgCasesAfterVax' : casesAfterSum/countAfter, 
                 'avgDeathsBeforeVax' : deathsBeforeSum/countBefore, 
@@ -172,22 +176,26 @@ function analytics2(req, res, next) {
                 'VaccineDate' : vaccineDate
                 };
 
+  //must put object into array for front end
   let retArray = [];
   retArray.push(vaxObj);
 
-  fs.writeFileSync('./public/output.json', JSON.stringify(retArray));
+  fs.writeFileSync('./public/output.json', JSON.stringify(retArray)); //write array to json
   res.sendFile(path.join(__dirname, "/public" , "output.json")); //send json
 
   next();
 }
 
+//finds two countries and compares their graphs
 function analytics3(req, res, next) {
+  //get countries
   let country1 = req.body.country1;
   let country2 = req.body.country2;
 
   let array1 = [];
   let array2 = [];
 
+  //find each counties non-cumulative data
   for(var i = 0; i < countryData.length; i++) {
     if(countryData[i][0]['Country'] == country1) {
       array1 = countryData[i];
@@ -197,20 +205,23 @@ function analytics3(req, res, next) {
     }
   }
 
+  //combine arrays, front end will seperate the data into graphs
   for(let i = 0; i < array2.length; i++) {
     array1.push(array2[i]);
   }
 
-  fs.writeFileSync('./public/output.json', JSON.stringify(array1));
+  fs.writeFileSync('./public/output.json', JSON.stringify(array1)); //write to json
   res.sendFile(path.join(__dirname, "/public" , "output.json")); //send json
 
   next();
 }
 
+//compares an input countries cases and deaths in a graph
 function analytics4(req, res, next) {
-  let country = req.body.Country; 
+  let country = req.body.Country; //get country
   let array = [];
 
+  //find non-cumulative data
   for(var i = 0; i < countryData.length; i++) {
     if(countryData[i][0]['Country'] == country) {
       array = countryData[i];
@@ -218,18 +229,22 @@ function analytics4(req, res, next) {
     }
   }
 
-  fs.writeFileSync('./public/output.json', JSON.stringify(array));
+  //front end will handle how graph looks, send
+  fs.writeFileSync('./public/output.json', JSON.stringify(array)); //write to json
   res.sendFile(path.join(__dirname, "/public" , "output.json")); //send json
 
   next();
 }
 
+//finds recoveries rates of an input country, or gives sorted list of all countries recovery rates
 function analytics5(req, res, next) {
-  let country = req.body.Country;
+  let country = req.body.Country; //get country
+
+  //user entered a country, only send its recover rate
   if(country != "") {
-    let array = [];
     let index = -1;
 
+    //find country in aggregated data
     for(var i = 0; i < aggregatedCountryData.length; i++) {
       if(aggregatedCountryData[i]['Country'] == country) {
         index = i;
@@ -238,22 +253,30 @@ function analytics5(req, res, next) {
     }
 
     if(index > -1) {
+      //rate = total recovered / total cases
       let rate = ((parseInt(aggregatedCountryData[index]['Recovered'])/parseInt(aggregatedCountryData[index]['Confirmed']))*100) + "";
       rate = rate.substr(0,5) + "%";
+
+      //create object for rate
       let obj = {'Country' : country, 
                 'Effective Recovery Rate' : rate
                 };
 
-      let coolArray = [];
-      coolArray.push(obj);
-      fs.writeFileSync('./public/output.json', JSON.stringify(coolArray));
+      //send as array for front-end
+      let array = [];
+      array.push(obj);
+      fs.writeFileSync('./public/output.json', JSON.stringify(array)); //write to json
     }
   }
+  //user did not enter a country, find rates for all countries
   else {
     let retArray = [];
     let rate = 0;
     let obj = {};
+
+    //go through all aggregated data, for each, find rate and push to array
     for(let i = 0; i < aggregatedCountryData.length; i++) {
+      //rate = total recovered / total cases
       rate = ((parseInt(aggregatedCountryData[i]['Recovered']) / parseInt(aggregatedCountryData[i]['Confirmed']))*100) + "";
       rate = rate.substr(0,5) + "%";
       if(parseInt(aggregatedCountryData[i]['Confirmed']) == 0) {rate = "0%";}
@@ -262,6 +285,8 @@ function analytics5(req, res, next) {
             };
       retArray.push(obj);
     }
+
+    //selection sort; find index of max and swap, repeat until end
     let maxIndex = -1;
     for(let i = 0; i < retArray.length; i++) {
       maxIndex = i;
@@ -276,12 +301,14 @@ function analytics5(req, res, next) {
       retArray[maxIndex] = retArray[i];
       retArray[i] = obj;
     }
-    fs.writeFileSync('./public/output.json', JSON.stringify(retArray));
+
+    fs.writeFileSync('./public/output.json', JSON.stringify(retArray)); //write to json
   }
-  res.sendFile(path.join(__dirname, "/public" , "output.json"));
+  res.sendFile(path.join(__dirname, "/public" , "output.json")); //send json
   next();
 }
 
+//find top ten countries for maximum of an input statistic
 function analytics6(req, res, next) {
   if(req.body.statType == 'Cases') {
     //sort by cases
@@ -296,7 +323,8 @@ function analytics6(req, res, next) {
     sortType = 'Recovered';
   }  
 
-  for(let i = 0; i < 10; i++) { //biggest first to smallest last. 
+  //selection sort, only for the first 10 objects
+  for(let i = 0; i < 10; i++) {
     let max = i;
     for(let j = i+1; j < aggregatedCountryData.length; j++) {
       if(parseInt(aggregatedCountryData[j][sortType]) > parseInt(aggregatedCountryData[max][sortType])) {
@@ -312,6 +340,7 @@ function analytics6(req, res, next) {
 
   let topTen = [];
   let obj = {};
+  //gather first 10 from the list and put into another array
   for(let i = 0; i < 10; i++) {
     obj = {
       'Country' : aggregatedCountryData[i]['Country'],
@@ -322,16 +351,19 @@ function analytics6(req, res, next) {
     topTen.push(obj);
   }
 
-  fs.writeFileSync('./public/output.json', JSON.stringify(topTen)); 
-  res.sendFile(path.join(__dirname, "/public" , "output.json"));
+  fs.writeFileSync('./public/output.json', JSON.stringify(topTen)); //write to json
+  res.sendFile(path.join(__dirname, "/public" , "output.json")); //send json
   next();
 }
 
+//find the date which a country peaked in one day observation on a given statistic
 function analytics7(req, res, next) {
+  //get data
   var country = req.body.Country;
   var stat = req.body.Stat;
   var array = [];
 
+  //find non-cumulative data for country
   for(var i = 0; i < countryData.length; i++) {
     if(countryData[i][0]['Country'] == country) {
       array = countryData[i];
@@ -342,6 +374,7 @@ function analytics7(req, res, next) {
   let date = "";
   let peak = "";
 
+  //all peaks are stored in last object of non-cumulative data; retrieve
   if(stat == "Confirmed") {
     date = array[array.length-1]['casesDate'];
     peak = array[array.length-1]['peakCases'];
@@ -356,17 +389,19 @@ function analytics7(req, res, next) {
   }
   else {}
 
+  //create object
   var obj = {'Country' : country,
             'Peak Date' : date
             };
   obj[stat] = peak;
   array.splice(array.length-2, 2);
-  array.push(obj);
-  fs.writeFileSync('./public/output.json', JSON.stringify(array));
-  res.sendFile(path.join(__dirname, "/public" , "output.json"));
+  array.push(obj); //push to end of array for front end, along with usable graph data (not last two objects)
+  fs.writeFileSync('./public/output.json', JSON.stringify(array)); //write to json
+  res.sendFile(path.join(__dirname, "/public" , "output.json")); //send json
   next();
 }
 
+//outputs cumulative totals for world data
 function analytics8(req, res, next) {
   fs.writeFileSync('./public/output.json', JSON.stringify(worldData)); 
   res.sendFile(path.join(__dirname, "/public" , "output.json"));
@@ -550,10 +585,12 @@ function ReformatDate(old_date) {
   }
 }
 
+//given a country, output cumlative or non cumulative data for it (merge state totals when applicable)
 function CountrySearch(country, version) {
   
   let search = [];
 
+  //find all data with the given country
   for(let i = 0; i < result.length; i++) {
     if(result[i]['Country/Region'] == country) {
       search.push(result[i]);
@@ -571,11 +608,13 @@ function CountrySearch(country, version) {
 
   for(let i = 0; i < search.length; i++) {
     alreadyChecked = false;
+    //check if this date was captured previously
     for(var index in datesChecked) {
       if(datesChecked[index].includes(search[i]['ObservationDate'])) {
         alreadyChecked = true;
       }
     }
+    //if not, sum all statistics on all data with same date (should sum the individual states together)
     if(!alreadyChecked) {
       totalCon = parseInt(search[i]['Confirmed']);
       totalRec = parseInt(search[i]['Recovered']);
@@ -597,11 +636,11 @@ function CountrySearch(country, version) {
       array.push(newObj);
     }
   }
-
+  //if cumlative, can just return
   if(version != "Non-Cumulative") {
     return array;
   }
-
+  //if non-cumulative, we must minus the previous days from this day, to get #new cases, etc recorded that day
   retArray.push(array[0]);
   for(let i = 1; i < array.length; i++) {
     newObj = {'ObservationDate' : array[i]['ObservationDate'],
@@ -613,12 +652,14 @@ function CountrySearch(country, version) {
     retArray.push(newObj);
   }
 
-  return retArray;
+  return retArray; //return array
 }
 
+//creates the 2D non-cumulative array for each country
 function createCountryData() {
   countryData = [];
   let allCountries = [];
+  //get list of all countries
   for(let i = 0; i < result.length; i++) {
     if(!(allCountries.includes(result[i]['Country/Region']))) {
       allCountries.push(result[i]['Country/Region']);
@@ -631,10 +672,12 @@ function createCountryData() {
   let maxIndexCases = 0;
   let maxIndexDeaths = 0;
   let maxIndexRecovered = 0;
+  //for each country, get noncumulative datapoints and append the vaccineData and the peak data
   for(let i = 0; i < allCountries.length; i++) {
     array = CountrySearch(allCountries[i], "Non-Cumulative");
     vaccineName = "";
     vaccineDate = "";
+    //find vaccine data
     for(let j = 0; j < outside_data.length; j++) {
       if(outside_data[j]['Country'] == allCountries[i]) {
         vaccineName = outside_data[j]['vaxName'];
@@ -646,10 +689,11 @@ function createCountryData() {
       'vaxName' : vaccineName,
       'vaxDate' : vaccineDate,
     };
-    array.push(obj);
+    array.push(obj); //append vaccine data
     maxIndexCases = 0;
     maxIndexDeaths = 0;
     maxIndexRecovered = 0;
+    //find peak data
     for(let j = 1; j < array.length-1; j++) {
       if(parseInt(array[maxIndexCases]['Confirmed']) < parseInt(array[j]['Confirmed'])) {
         maxIndexCases = j;
@@ -670,7 +714,7 @@ function createCountryData() {
       'peakRecovered' : array[maxIndexRecovered]['Recovered'],
       'recoveredDate' : array[maxIndexRecovered]['ObservationDate']
     };
-    array.push(obj);
+    array.push(obj); //append peak data
     countryData.push(array);
   }
   return countryData;
