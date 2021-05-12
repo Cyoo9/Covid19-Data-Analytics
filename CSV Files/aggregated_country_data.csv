@@ -1,4 +1,4 @@
-Country,totalCases,totalDeaths,totalRecovered,numDates
+Country,Confirmed,Deaths,Recovered,numDates
 Mainland China,90622,4636,85669,462
 Hong Kong,11748,209,11379,462
 Macau,49,0,49,462
