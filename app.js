@@ -81,31 +81,31 @@ app.post('/update', updateData, (req, res) => {
 app.post('/delete', deleteData, (req, res) => {
   ConvertToCSV(result); //automatically backsup array for importing later
 })
-/*
+
 app.post('/Q1', analytics1, (req, res) => {})
 
-app.post('/Q2', analytics2, (req, res) => {})
+/*app.post('/Q2', analytics2, (req, res) => {})
 
 app.post('/Q3', analytics3, (req, res) => {})
 
 app.post('/Q4', analytics4, (req, res) => {})
 
-app.post('/Q5', analytics5, (req, res) => {})
+app.post('/Q5', analytics5, (req, res) => {}) */
 
 app.post('/Q6', analytics6, (req, res) => {})
 
-app.post('/Q7', analytics7, (req, res) => {})
-
-app.post('/Q8', analytics8, (req, res) => {})
+/*app.post('/Q7', analytics7, (req, res) => {})
 */
+app.post('/Q8', analytics8, (req, res) => {})
+
 
 app.listen(server, function() {
     console.log(`Server is running on port: ${server}`);
 })
 
-/*
+
 function analytics1(req, res, next) {
-  let countries = [];
+  /*let countries = [];
   let countryCount = 0;
   for(let i = 0; i < result.length; i++) {
     if(!(countries.includes(result[i]['Country/Region']))) {
@@ -144,6 +144,17 @@ function analytics1(req, res, next) {
             'avgRecoveriesPerDay' : (totalRecoveries/temp.length)
           };
     retArray.push(obj);
+  } */
+
+  let retArray = [];
+  let obj;
+  for(let i = 0; i < aggregatedCountryData.length; i++) {
+    obj = { 'Country' : aggregatedCountryData[i]['Country'],
+            'avgCasesPerDay' : aggregatedCountryData[i]['Confirmed'] / aggregatedCountryData[i]['numDates'],
+            'avgDeathsPerDay' : aggregatedCountryData[i]['Deaths'] / aggregatedCountryData[i]['numDates'],
+            'avgRecoveriesPerDay' : aggregatedCountryData[i]['Deaths'] / aggregatedCountryData[i]['numDates']
+          };
+    retArray.push(obj);
   }
 
   fs.writeFileSync('./public/output.json', JSON.stringify(retArray));
@@ -151,7 +162,7 @@ function analytics1(req, res, next) {
   res.sendFile(path.join(__dirname, "/public" , "output.json")); //send json
   next();
 }
-
+/*
 function analytics2(req, res, next) {
   let country = req.body.Country;
   let array = CountrySearch(country, "Non-Cumulative");
@@ -371,18 +382,18 @@ function analytics5(req, res, next) {
   }
   res.sendFile(path.join(__dirname, "/public" , "output.json"));
   next();
-}
+}*/
 
 function analytics6(req, res, next) {
-  let country;
-  let temp;
-  let sortType;
-  let stats = [];
-  for(let i = 0; i < outside_data.length; i++) {
+  //let country;
+  //let temp;
+  //let sortType;
+  //let stats = [];
+  /*for(let i = 0; i < outside_data.length; i++) {
     country = outside_data[i]['Country'];
     temp = CountrySearch(country, "Cumulative");
     stats.push(temp[temp.length - 1]);
-  }
+  }*/
 
   if(req.body.statType == 'Cases') {
     //sort by cases
@@ -397,30 +408,30 @@ function analytics6(req, res, next) {
     sortType = 'Recovered';
   }  
 
-  for(let i = 0; i < stats.length; i++) { //biggest first to smallest last. 
+  for(let i = 0; i < aggregatedCountryData.length; i++) { //biggest first to smallest last. 
     let max = i;
-    for(let j = i+1; j < stats.length; j++) {
-      if(parseInt(stats[j][sortType]) > parseInt(stats[max][sortType])) {
+    for(let j = i+1; j < aggregatedCountryData.length; j++) {
+      if(parseInt(aggregatedCountryData[j][sortType]) > parseInt(aggregatedCountryData[max][sortType])) {
         max = j;
       }
     }
     if(max != i) {
-      let temp = stats[i];
-      stats[i] = stats[max];
-      stats[max] = temp;
+      let temp = aggregatedCountryData[i];
+      aggregatedCountryData[i] = aggregatedCountryData[max];
+      aggregatedCountryData[max] = temp;
     }
   }
 
   let topTen = [];
   for(let i = 0; i < 10; i++) {
-    topTen.push(stats[i]);
+    topTen.push(aggregatedCountryData[i]);
   }
 
   fs.writeFileSync('./public/output.json', JSON.stringify(topTen)); 
   res.sendFile(path.join(__dirname, "/public" , "output.json"));
   next();
 }
-
+/*
 function analytics7(req, res, next) {
   var country = req.body.Country;
   var stat = req.body.Stat;
@@ -441,9 +452,9 @@ function analytics7(req, res, next) {
   res.sendFile(path.join(__dirname, "/public" , "output.json"));
   next();
 }
-
+*/
 function analytics8(req, res, next) {
-  let country;
+  /*let country;
   let countryData = [];
   let worldData = [];
   let worldCases = 0;
@@ -488,14 +499,14 @@ function analytics8(req, res, next) {
     worldCases = 0;
     worldDeaths = 0;
     worldRecovered = 0;
-  }
+  }*/
 
   fs.writeFileSync('./public/output.json', JSON.stringify(worldData)); 
   res.sendFile(path.join(__dirname, "/public" , "output.json"));
 
   next();
 }
-*/
+
 //parses a cvs file into an array
 function csvParser(csv){
 
