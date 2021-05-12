@@ -9,6 +9,7 @@ var bodyParser = require("body-parser");
 var multer  = require('multer');
 const { ap, all } = require('list');
 const { parse } = require('path');
+const { PassThrough } = require('stream');
 var result = [];
 var searched_results = [];
 var outside_data = [];
@@ -84,70 +85,27 @@ app.post('/delete', deleteData, (req, res) => {
 
 app.post('/Q1', analytics1, (req, res) => {})
 
-/*app.post('/Q2', analytics2, (req, res) => {})
+app.post('/Q2', analytics2, (req, res) => {})
 
 app.post('/Q3', analytics3, (req, res) => {})
 
 app.post('/Q4', analytics4, (req, res) => {})
 
-app.post('/Q5', analytics5, (req, res) => {}) */
+app.post('/Q5', analytics5, (req, res) => {})
 
 app.post('/Q6', analytics6, (req, res) => {})
 
-/*app.post('/Q7', analytics7, (req, res) => {})
-*/
-app.post('/Q8', analytics8, (req, res) => {})
+app.post('/Q7', analytics7, (req, res) => {})
 
+app.post('/Q8', analytics8, (req, res) => {})
 
 app.listen(server, function() {
     console.log(`Server is running on port: ${server}`);
 })
 
-
 function analytics1(req, res, next) {
-  /*let countries = [];
-  let countryCount = 0;
-  for(let i = 0; i < result.length; i++) {
-    if(!(countries.includes(result[i]['Country/Region']))) {
-      countries.push(result[i]['Country/Region']);
-      countryCount++;
-    }
-  }
-
-  let allCountryData = []; 
-  let temp = [];
   let retArray = [];
-
-  for(let i = 0; i < countries.length; i++) {
-    temp = CountrySearch(countries[i], "Non-Cumulative");
-    allCountryData.push(temp);
-  }
-
-  let totalCases;
-  let totalDeaths;
-  let totalRecoveries;
-  let obj;
-  
-  for(let i = 0; i < allCountryData.length; i++) {
-    temp = allCountryData[i];
-    totalCases = 0;
-    totalDeaths = 0;
-    totalRecoveries = 0;
-    for(let j = 0; j < temp.length; j++) {
-      totalCases += parseInt(temp[j]['Confirmed']);
-      totalDeaths += parseInt(temp[j]['Deaths']);
-      totalRecoveries += parseInt(temp[j]['Recovered']);
-    }
-    obj = { 'Country' : temp[0]['Country'],
-            'avgCasesPerDay' : (totalCases/temp.length),
-            'avgDeathsPerDay' : (totalDeaths/temp.length),
-            'avgRecoveriesPerDay' : (totalRecoveries/temp.length)
-          };
-    retArray.push(obj);
-  } */
-
-  let retArray = [];
-  let obj;
+  let obj = {};
   for(let i = 0; i < aggregatedCountryData.length; i++) {
     obj = { 'Country' : aggregatedCountryData[i]['Country'],
             'avgCasesPerDay' : aggregatedCountryData[i]['Confirmed'] / aggregatedCountryData[i]['numDates'],
@@ -158,219 +116,159 @@ function analytics1(req, res, next) {
   }
 
   fs.writeFileSync('./public/output.json', JSON.stringify(retArray));
-
   res.sendFile(path.join(__dirname, "/public" , "output.json")); //send json
+
   next();
 }
-/*
+
 function analytics2(req, res, next) {
   let country = req.body.Country;
-  let array = CountrySearch(country, "Non-Cumulative");
-  let vaxarray = [];
+  let array = [];
 
-  let beforeVax = [];
-  let afterVax = [];
-  let afterIndex = -1;
-  let vaccineName = "";
-  let vaccineDate = "";
-  
-  for(let i = 0; i < outside_data.length; i++) {
-    if(outside_data[i]['Country'] == country) {
-      vaccineName = outside_data[i]['vaxName'];
-      vaccineDate = outside_data[i]['vaxDate']; //use this for searching csv 
+  for(var i = 0; i < countryData.length; i++) {
+    if(countryData[i][0]['Country'] == country) {
+      array = countryData[i];
+      break;
     }
   }
 
-  console.log(vaccineName);
-  console.log(vaccineDate);
+  let vaccineName = array[array.length-2]['vaxName'];
+  let vaccineDate = array[array.length-2]['vaxDate'];
+  
+  let casesBeforeSum = 0;
+  let casesAfterSum = 0;
 
-  for(let i = 0; i < array.length; i++) {
-    if(ReformatDate(array[i]['ObservationDate']) == vaccineDate) {
-      afterIndex = i; 
+  let deathsBeforeSum = 0;
+  let deathsAfterSum = 0;
+
+  let recoveriesBeforeSum = 0;
+  let recoveriesAfterSum = 0;
+
+  let countBefore = 0;
+  let countAfter = 0;
+
+  for(let i = 0; i < array.length-2; i++) {
+    if(ReformatDate("" + array[i]['ObservationDate']) <= vaccineDate) {
+      casesBeforeSum += Math.max(0, parseInt(array[i]['Confirmed']));
+      deathsBeforeSum += Math.max(0, parseInt(array[i]['Deaths']));
+      recoveriesBeforeSum += Math.max(0, parseInt(array[i]['Recovered']));
+      countBefore++;
+    }
+    else {
+      casesAfterSum += Math.max(0, parseInt(array[i]['Confirmed']));
+      deathsAfterSum += Math.max(0, parseInt(array[i]['Deaths']));
+      recoveriesAfterSum += Math.max(0, parseInt(array[i]['Recovered']));
+      countAfter++;
     }
   }
-  
-  console.log(afterIndex);
-  console.log(array[afterIndex]);
 
-  for(let i = afterIndex; i < array.length; i++) {
-    afterVax.push(array[i]);
-  }
-
-  for(let i = 0; i < afterIndex; i++) {
-    beforeVax.push(array[i]);
-  }
-  
-  let avgCasesBeforeVax = 0;
-  let sum = 0;
-  
-  for(let i = 0; i < beforeVax.length; i++) {
-    sum += Math.max(0, (beforeVax[i]['Confirmed']));
-  }
-  avgCasesBeforeVax = sum / beforeVax.length;
-
-
-  let avgCasesAfterVax = 0;
-  sum = 0;
-  for(let i = 0; i < afterVax.length; i++) {
-    sum += Math.max(0, (afterVax[i]['Confirmed']));
-  }
-  avgCasesAfterVax = sum / afterVax.length;
-
-  console.log(avgCasesAfterVax);
-  let avgDeathsBeforeVax = 0;
-  sum = 0;
-  for(let i = 0; i < beforeVax.length; i++) {
-    sum += Math.max(0, (beforeVax[i]['Deaths']));
-  }
-  avgDeathsBeforeVax = sum / beforeVax.length;
-
-  let avgDeathsAfterVax = 0;
-  sum = 0;
-  for(let i = 0; i < afterVax.length; i++) {
-    sum += Math.max(0, parseInt(afterVax[i]['Deaths']));
-  }
-  avgDeathsAfterVax = sum / afterVax.length;
-
-  let avgRecoveriesBeforeVax = 0;
-  sum = 0;
-  for(let i = 0; i < beforeVax.length; i++) {
-    sum += Math.max(0, (beforeVax[i]['Recovered']));
-  }
-  avgRecoveriesBeforeVax = sum / beforeVax.length;
-
-  let avgRecoveriesAfterVax = 0;
-  sum = 0;
-  for(let i = 0; i < afterVax.length; i++) {
-    sum += Math.max(0, (afterVax[i]['Recovered']));
-  }
-  avgRecoveriesAfterVax = sum / afterVax.length;
-  console.log(avgCasesBeforeVax);
-  console.log(avgCasesAfterVax);
-  let vaxObj = {'avgCasesBeforeVax' : avgCasesBeforeVax,
-                'avgCasesAfterVax' : avgCasesAfterVax, 
-                'avgDeathsBeforeVax' : avgDeathsBeforeVax, 
-                'avgDeathsAfterVax' : avgDeathsAfterVax, 
-                'avgRecoveriesBeforeVax' : avgRecoveriesBeforeVax,
-                'avgRecoveriesAfterVax' : avgRecoveriesAfterVax,
+  let vaxObj = {'avgCasesBeforeVax' : casesBeforeSum/countBefore,
+                'avgCasesAfterVax' : casesAfterSum/countAfter, 
+                'avgDeathsBeforeVax' : deathsBeforeSum/countBefore, 
+                'avgDeathsAfterVax' : deathsAfterSum/countAfter, 
+                'avgRecoveriesBeforeVax' : recoveriesBeforeSum/countBefore,
+                'avgRecoveriesAfterVax' : recoveriesAfterSum/countAfter,
                 'VaccineName' : vaccineName,
                 'VaccineDate' : vaccineDate
                 };
-          
-  //array.push(vaxObj);
-  vaxarray.push(vaxObj);
-  console.log(vaxarray);
-  fs.writeFileSync('./public/output.json', JSON.stringify(vaxarray));
 
+  let retArray = [];
+  retArray.push(vaxObj);
+
+  fs.writeFileSync('./public/output.json', JSON.stringify(retArray));
   res.sendFile(path.join(__dirname, "/public" , "output.json")); //send json
+
   next();
 }
 
 function analytics3(req, res, next) {
-
-
   let country1 = req.body.country1;
   let country2 = req.body.country2;
 
-  let array1 = CountrySearch(country1, "Non-Cumulative");
-  let array2 = CountrySearch(country2, "Non-Cumulative");
+  let array1 = [];
+  let array2 = [];
 
+  for(var i = 0; i < countryData.length; i++) {
+    if(countryData[i][0]['Country'] == country1) {
+      array1 = countryData[i];
+    }
+    if(countryData[i][0]['Country'] == country2) {
+      array2 = countryData[i];
+    }
+  }
 
   for(let i = 0; i < array2.length; i++) {
     array1.push(array2[i]);
   }
 
   fs.writeFileSync('./public/output.json', JSON.stringify(array1));
-
   res.sendFile(path.join(__dirname, "/public" , "output.json")); //send json
+
   next();
 }
 
 function analytics4(req, res, next) {
   let country = req.body.Country; 
-  let array = CountrySearch(country, "Non-Cumulative");
-  let obj = {};
-  let retArray = [];
-  for(let i = 0; i < array.length; i++) {
-    obj = { 'ObservationDate' : array[i]['ObservationDate'],
-            'Country' : array[i]['Country'],
-            'Confirmed' : array[i]['Confirmed'],
-            'Deaths' : array[i]['Deaths']
-          }
-    retArray.push(obj);
-  }
-  fs.writeFileSync('./public/output.json', JSON.stringify(retArray));
+  let array = [];
 
+  for(var i = 0; i < countryData.length; i++) {
+    if(countryData[i][0]['Country'] == country) {
+      array = countryData[i];
+      break;
+    }
+  }
+
+  fs.writeFileSync('./public/output.json', JSON.stringify(array));
   res.sendFile(path.join(__dirname, "/public" , "output.json")); //send json
+
   next();
 }
 
 function analytics5(req, res, next) {
   let country = req.body.Country;
   if(country != "") {
-    let array = CountrySearch(country, "Cumulative");
-    let latestIndex = -1;
-    for(let i = array.length-1; i >= 0; i--) {
-      if(array[i]['Recovered'] > 0) {
-        latestIndex = i;
+    let array = [];
+    let index = -1;
+
+    for(var i = 0; i < aggregatedCountryData.length; i++) {
+      if(aggregatedCountryData[i]['Country'] == country) {
+        index = i;
         break;
       }
     }
-    if(latestIndex > -1) {
-      let rate = ((array[latestIndex]['Recovered'] / array[latestIndex]['Confirmed'])*100) + "";
+
+    if(index > -1) {
+      let rate = ((parseInt(aggregatedCountryData[index]['Recovered'])/parseInt(aggregatedCountryData[index]['Confirmed']))*100) + "";
       rate = rate.substr(0,5) + "%";
-      let obj = {'As of' : array[latestIndex]['ObservationDate'],
-                'Country' : country, 
+      let obj = {'Country' : country, 
                 'Effective Recovery Rate' : rate
                 };
+
       let coolArray = [];
       coolArray.push(obj);
       fs.writeFileSync('./public/output.json', JSON.stringify(coolArray));
     }
-    else {
-      let obj = {
-                'Country' : country, 
-                'Effective Recovery Rate' : 'No Data'
-                };
-                fs.writeFileSync('./public/output.json', JSON.stringify(obj));
-    }
   }
   else {
-    let allCountries = [];
-    for(let i = 0; i < result.length; i++) {
-      if(!(allCountries.includes(result[i]['Country/Region']))) {
-        allCountries.push(result[i]['Country/Region']);
-      }
-    }
-    let array = [];
     let retArray = [];
+    let rate = 0;
     let obj = {};
-    let rate = "";
-    let latestIndex = -1;
-    for(let i = 0; i < allCountries.length; i++) {
-      array = CountrySearch(allCountries[i], "Cumulative");
-      latestIndex = -1;
-      for(let j = array.length-1; j >= 0; j--) {
-        if(array[j]['Recovered'] > 0) {
-          latestIndex = j;
-          break;
-        }
-      }
-      if(latestIndex > -1) {
-        rate = ((array[latestIndex]['Recovered'] / array[latestIndex]['Confirmed'])*100) + "";
-        rate = rate.substr(0,5) + "%";
-        obj = {'As of' : array[latestIndex]['ObservationDate'],
-              'Country' : allCountries[i], 
-              'Effective Recovery Rate' : rate 
-              };
-        retArray.push(obj);
-      }
+    for(let i = 0; i < aggregatedCountryData.length; i++) {
+      rate = ((parseInt(aggregatedCountryData[i]['Recovered']) / parseInt(aggregatedCountryData[i]['Confirmed']))*100) + "";
+      rate = rate.substr(0,5) + "%";
+      if(parseInt(aggregatedCountryData[i]['Confirmed']) == 0) {rate = "0%";}
+      obj = {'Country' : aggregatedCountryData[i]['Country'], 
+             'Effective Recovery Rate' : rate 
+            };
+      retArray.push(obj);
     }
     let maxIndex = -1;
     for(let i = 0; i < retArray.length; i++) {
       maxIndex = i;
       for(let j = i+1; j < retArray.length; j++) {
-        if(parseInt(retArray[maxIndex]['Effective Recovery Rate']) < parseInt(retArray[j]['Effective Recovery Rate'])) {
+        substr1 = retArray[maxIndex]['Effective Recovery Rate'].substring(0, retArray[maxIndex]['Effective Recovery Rate'].length-1);
+        substr2 = retArray[j]['Effective Recovery Rate'].substring(0, retArray[j]['Effective Recovery Rate'].length-1);
+        if(parseFloat(substr1) < parseFloat(substr2)) {
           maxIndex = j;
         }
       }
@@ -382,19 +280,9 @@ function analytics5(req, res, next) {
   }
   res.sendFile(path.join(__dirname, "/public" , "output.json"));
   next();
-}*/
+}
 
 function analytics6(req, res, next) {
-  //let country;
-  //let temp;
-  //let sortType;
-  //let stats = [];
-  /*for(let i = 0; i < outside_data.length; i++) {
-    country = outside_data[i]['Country'];
-    temp = CountrySearch(country, "Cumulative");
-    stats.push(temp[temp.length - 1]);
-  }*/
-
   if(req.body.statType == 'Cases') {
     //sort by cases
     sortType = 'Confirmed';
@@ -408,7 +296,7 @@ function analytics6(req, res, next) {
     sortType = 'Recovered';
   }  
 
-  for(let i = 0; i < aggregatedCountryData.length; i++) { //biggest first to smallest last. 
+  for(let i = 0; i < 10; i++) { //biggest first to smallest last. 
     let max = i;
     for(let j = i+1; j < aggregatedCountryData.length; j++) {
       if(parseInt(aggregatedCountryData[j][sortType]) > parseInt(aggregatedCountryData[max][sortType])) {
@@ -423,84 +311,63 @@ function analytics6(req, res, next) {
   }
 
   let topTen = [];
+  let obj = {};
   for(let i = 0; i < 10; i++) {
-    topTen.push(aggregatedCountryData[i]);
+    obj = {
+      'Country' : aggregatedCountryData[i]['Country'],
+      'Cases' : aggregatedCountryData[i]['Confirmed'],
+      'Deaths' : aggregatedCountryData[i]['Deaths'],
+      'Recoveries' : aggregatedCountryData[i]['Recovered']
+    };
+    topTen.push(obj);
   }
 
   fs.writeFileSync('./public/output.json', JSON.stringify(topTen)); 
   res.sendFile(path.join(__dirname, "/public" , "output.json"));
   next();
 }
-/*
+
 function analytics7(req, res, next) {
   var country = req.body.Country;
   var stat = req.body.Stat;
-  var array = CountrySearch(country, "Non-Cumulative");
+  var array = [];
 
-  let maxIndex = 0;
-  for(let i = 1; i < array.length; i++) {
-    if(array[maxIndex][stat] < array[i][stat]) {
-      maxIndex = i;
+  for(var i = 0; i < countryData.length; i++) {
+    if(countryData[i][0]['Country'] == country) {
+      array = countryData[i];
+      break;
     }
   }
-  var obj = {'Peak Date' : array[maxIndex]['ObservationDate'],
-             'Country' : country
+
+  let date = "";
+  let peak = "";
+
+  if(stat == "Confirmed") {
+    date = array[array.length-1]['casesDate'];
+    peak = array[array.length-1]['peakCases'];
+  }
+  else if(stat == "Deaths") {
+    date = array[array.length-1]['deathsDate'];
+    peak = array[array.length-1]['peakDeaths'];
+  }
+  else if(stat == "Recovered") {
+    date = array[array.length-1]['recoveredDate'];
+    peak = array[array.length-1]['peakRecovered'];
+  }
+  else {}
+
+  var obj = {'Country' : country,
+            'Peak Date' : date
             };
-  obj[stat] = array[maxIndex][stat];
+  obj[stat] = peak;
+  array.splice(array.length-2, 2);
   array.push(obj);
   fs.writeFileSync('./public/output.json', JSON.stringify(array));
   res.sendFile(path.join(__dirname, "/public" , "output.json"));
   next();
 }
-*/
+
 function analytics8(req, res, next) {
-  /*let country;
-  let countryData = [];
-  let worldData = [];
-  let worldCases = 0;
-  let worldDeaths = 0;
-  let worldRecovered = 0;
-
-  for(let i = 0; i < outside_data.length; i++) {
-    country = outside_data[i]['Country'];
-    countryData.push(CountrySearch(country, "Cumulative"));
-  }
-
-  let maxNumDates = 0;
-  for(let i = 0; i < countryData.length; i++) {
-    if(countryData[i].length > maxNumDates) {
-      maxNumDates = countryData[i].length;
-    }
-  } 
-
-  let dateIsSet;
-  let statDate;
-  for(let i = 0; i < maxNumDates; i++) {
-    dateIsSet = false;
-    for(let j = 0; j < countryData.length; j++) {
-      if(countryData[j][i]) { //future scalability. some countries might only have up to 5/25/2021 while some have 6/1/2021. Need to check. 
-        worldCases += parseInt(countryData[j][i]['Confirmed']);
-        worldDeaths += parseInt(countryData[j][i]['Deaths']);
-        worldRecovered += parseInt(countryData[j][i]['Recovered']);
-        
-        if(!dateIsSet) {
-          statDate = countryData[j][i]['ObservationDate'];
-          dateIsSet = true;
-
-        }
-      }
-    }
-    worldData.push({
-      'Date': statDate,
-      'Global Cases': worldCases, 
-      'Global Deaths': worldDeaths,
-      'Global Recovered': worldRecovered
-    });
-    worldCases = 0;
-    worldDeaths = 0;
-    worldRecovered = 0;
-  }*/
-
   fs.writeFileSync('./public/output.json', JSON.stringify(worldData)); 
   res.sendFile(path.join(__dirname, "/public" , "output.json"));
 
@@ -661,7 +528,7 @@ function ConvertToCSV(objArray) {
       }
      str += line + '\r\n';
   }
-  fs.writeFileSync('./CSV Files/aggregated_country_data.csv', str); //writes to file
+  fs.writeFileSync('./CSV Files/covid_data_updated.csv', str); //writes to file
 }
 
 //Reformats dates from something like 12/19/2020 to 2020-12-19
