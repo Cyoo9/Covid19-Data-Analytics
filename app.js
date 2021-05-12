@@ -12,12 +12,25 @@ const { parse } = require('path');
 var result = [];
 var searched_results = [];
 var outside_data = [];
+var aggregatedCountryData = [];
+var worldData = [];
+var countryData = [];
+
+console.log("Starting Server...");
 
 var csv = fs.readFileSync(path.resolve(__dirname, './CSV Files/covid_19_data.csv')); //reads in a cvs file
 result = csvParser(csv); //Call csvParser on original data by default
 
 csv = fs.readFileSync(path.resolve(__dirname, './CSV Files/outside_metrics.csv'));
 outside_data = csvParser(csv);
+
+csv = fs.readFileSync(path.resolve(__dirname, './CSV Files/aggregated_country_data.csv'));
+aggregatedCountryData = csvParser(csv);
+
+csv = fs.readFileSync(path.resolve(__dirname, './CSV Files/world_data.csv'));
+worldData = csvParser(csv);
+
+countryData = createCountryData();
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -47,7 +60,7 @@ app.post('/search', search, (req, res) => {
 })
 
 //called when import button is selected
-app.post('/import', analytics6, (req, res) => { 
+app.post('/import', (req, res) => { 
   csv = fs.readFileSync(path.resolve(__dirname, './CSV Files/covid_19_data_updated.csv')); //change filepath to updated csv
   result = csvParser(csv); //reparse with updated csv file
   res.send("Import complete. Search now on updated database");
@@ -68,7 +81,7 @@ app.post('/update', updateData, (req, res) => {
 app.post('/delete', deleteData, (req, res) => {
   ConvertToCSV(result); //automatically backsup array for importing later
 })
-
+/*
 app.post('/Q1', analytics1, (req, res) => {})
 
 app.post('/Q2', analytics2, (req, res) => {})
@@ -84,12 +97,13 @@ app.post('/Q6', analytics6, (req, res) => {})
 app.post('/Q7', analytics7, (req, res) => {})
 
 app.post('/Q8', analytics8, (req, res) => {})
-
+*/
 
 app.listen(server, function() {
     console.log(`Server is running on port: ${server}`);
 })
 
+/*
 function analytics1(req, res, next) {
   let countries = [];
   let countryCount = 0;
@@ -481,7 +495,7 @@ function analytics8(req, res, next) {
 
   next();
 }
-
+*/
 //parses a cvs file into an array
 function csvParser(csv){
 
@@ -636,7 +650,7 @@ function ConvertToCSV(objArray) {
       }
      str += line + '\r\n';
   }
-  fs.writeFileSync('./CSV Files/covid_19_data_updated.csv', str); //writes to file
+  fs.writeFileSync('./CSV Files/aggregated_country_data.csv', str); //writes to file
 }
 
 //Reformats dates from something like 12/19/2020 to 2020-12-19
@@ -722,4 +736,64 @@ function CountrySearch(country, version) {
   }
 
   return retArray;
+}
+
+function createCountryData() {
+  countryData = [];
+  let allCountries = [];
+  for(let i = 0; i < result.length; i++) {
+    if(!(allCountries.includes(result[i]['Country/Region']))) {
+      allCountries.push(result[i]['Country/Region']);
+    }
+  }
+  let array = [];
+  let obj = {};
+  let vaccineName = "";
+  let vaccineDate = "";
+  let maxIndexCases = 0;
+  let maxIndexDeaths = 0;
+  let maxIndexRecovered = 0;
+  for(let i = 0; i < allCountries.length; i++) {
+    array = CountrySearch(allCountries[i], "Non-Cumulative");
+    vaccineName = "";
+    vaccineDate = "";
+    for(let j = 0; j < outside_data.length; j++) {
+      if(outside_data[j]['Country'] == allCountries[i]) {
+        vaccineName = outside_data[j]['vaxName'];
+        vaccineDate = outside_data[j]['vaxDate'];
+      }
+    }
+    obj = {
+      'Country' : allCountries[i],
+      'vaxName' : vaccineName,
+      'vaxDate' : vaccineDate,
+    };
+    array.push(obj);
+    maxIndexCases = 0;
+    maxIndexDeaths = 0;
+    maxIndexRecovered = 0;
+    for(let j = 1; j < array.length-1; j++) {
+      if(parseInt(array[maxIndexCases]['Confirmed']) < parseInt(array[j]['Confirmed'])) {
+        maxIndexCases = j;
+      }
+      if(parseInt(array[maxIndexDeaths]['Deaths']) < parseInt(array[j]['Deaths'])) {
+        maxIndexDeaths = j;
+      }
+      if(parseInt(array[maxIndexRecovered]['Recovered']) < parseInt(array[j]['Recovered'])) {
+        maxIndexRecovered = j;
+      }
+    }
+    obj = {
+      'Country' : allCountries[i],
+      'peakCases' : array[maxIndexCases]['Confirmed'],
+      'casesDate' : array[maxIndexCases]['ObservationDate'],
+      'peakDeaths' : array[maxIndexDeaths]['Deaths'],
+      'deathsDate' : array[maxIndexDeaths]['ObservationDate'],
+      'peakRecovered' : array[maxIndexRecovered]['Recovered'],
+      'recoveredDate' : array[maxIndexRecovered]['ObservationDate']
+    };
+    array.push(obj);
+    countryData.push(array);
+  }
+  return countryData;
 }
