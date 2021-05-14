@@ -566,13 +566,20 @@ function deleteData(req, res, next) {
 function ConvertToCSV(objArray) {
   var array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray; //gets array
 
-  var str = 'SNo,ObservationDate,Province/State,Country/Region,Last Update,Confirmed,Deaths,Recovered\r\n'; //harcode headers
+  //var str = 'SNo,ObservationDate,Province/State,Country/Region,Last Update,Confirmed,Deaths,Recovered\r\n'; //harcode headers
+  let str = "";
+  for(let i = 0; i < array[0].length; i++) {
+    if(i != array[0].length - 1)
+      str += array[0] + ',';
+    else 
+      str += array[0] + '\r\n';
+  }
 
   //adds each value from each array object, sperated by commas
   for (var i = 0; i < array.length; i++) {
       var line = '';
       for (var index in array[i]) {
-        if(index != 'Recovered') {
+        if(index != array[0].length - 1) { 
           if(array[i][index].includes(',')) { 
             line += '\"' + array[i][index] + '\"' + ',';
           }
@@ -586,7 +593,12 @@ function ConvertToCSV(objArray) {
       }
      str += line + '\r\n';
   }
-  fs.writeFileSync('./CSV Files/covid_data_updated.csv', str); //writes to file
+  if(array[0] === 'Sno')
+    fs.writeFileSync('./CSV Files/covid_data_updated.csv', str); //writes to file
+  else if(array[0] === 'Country')
+    fs.writeFileSync('./CSV Files/aggregated_country_data_updated.csv', str); //writes to file
+  else if(array[0] === 'Date')
+    fs.writeFileSync('./CSV Files/world_date_updated.csv', str); //writes to file
 }
 
 //Reformats dates from something like 12/19/2020 to 2020-12-19
