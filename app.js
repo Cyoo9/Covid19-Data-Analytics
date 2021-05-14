@@ -495,6 +495,11 @@ function insertData(req, res, next) {
   };
   //pushes new insert
   result.push(obj);
+
+  InsertWorldData(req.body.insertCountry, req.body.insertDate, req.body.newCases, req.body.newDeaths, req.body.newRecoveries);
+  Insert2D(req.body.insertCountry, req.body.insertDate, req.body.newCases, req.body.newDeaths, req.body.newRecoveries);
+  InsertAggregate(req.body.insertCountry, req.body.newCases, req.body.newDeaths, req.body.newRecoveries);
+
   next();
 }
 
@@ -718,4 +723,142 @@ function createCountryData() {
     countryData.push(array);
   }
   return countryData;
+}
+
+function InsertWorldData(country, date, cases, deaths, recoveries) {
+  var existingCountry = false;
+  var index = -1;
+  for(let i = 0; i < aggregatedCountryData.length; i++) {
+    if(aggregatedCountryData[i]['Country'] == country) {
+      existingCountry = true;
+      index = i;
+      break;
+    }
+  }
+  var insertedWorld = false;
+  for(let i = 0; i < worldData.length; i++) {
+    if(ReformatDate(worldData[i]['Date']) == date) {
+      if(existingCountry) {
+        worldData[i]['worldCases'] -= aggregatedCountryData[index]['Confirmed'];
+        worldData[i]['worldCases'] += cases;
+        worldData[i]['worldDeaths'] -= aggregatedCountryData[index]['Deaths'];
+        worldData[i]['worldDeaths'] += deaths;
+        worldData[i]['worldRecovered'] -= aggregatedCountryData[index]['Recovered'];
+        worldData[i]['worldRecovered'] += recoveries;
+      }
+      else {
+        worldData[i]['worldCases'] += cases;
+        worldData[i]['worldDeaths'] += deaths;
+        worldData[i]['worldRecovered'] += recoveries;
+      }
+      insertedWorld = true;
+    }
+  }
+  if(!insertedWorld) {
+    var obj = {
+      'Date' : date,
+      'worldCases' : cases,
+      'worldDeaths' : deaths,
+      'worldRecovered' : recoveries
+    };
+    worldData.push(obj); 
+  }
+}
+
+function Insert2D(country, date, cases, deaths, recoveries) {
+  let countryIndex = -1;
+  for(let i = 0; i < countryData.length; i++) {
+    if(countryData[i][0]['Country'] == country) {
+      countryIndex = i;
+      break;
+    }
+  }
+  if(countryIndex != -1) {
+    let aggregatedIndex = -1;
+    for(let i = 0; i < aggregatedCountryData.length; i++) {
+      if(aggregatedCountryData[i]['Country'] == country) {
+        aggregatedIndex = i;
+        break;
+      }
+    }
+    let peakObj = countryData[countryIndex][countryData[countryIndex].length-1];
+    let vaxObj = countryData[countryIndex][countryData[countryIndex].length-2];
+    countryData[countryIndex].splice(countryData[countryIndex].length-2, 2);
+    let obj = {
+      'ObservationDate' : date,
+      'Country' : country, 
+      'Confirmed' : cases - aggregatedCountryData[aggregatedIndex]['Confirmed'], 
+      'Deaths' : deaths - aggregatedCountryData[aggregatedIndex]['Deaths'], 
+      'Recovered' : recoveries - aggregatedCountryData[aggregatedIndex]['Recovered'] 
+    };
+    countryData[countryIndex].push(obj);
+    if(peakObj['peakCases'] < obj['Confirmed']) {
+      peakObj['peakCases'] = obj['Confirmed'];
+      peakObj['casesDate'] = obj['ObservationDate'];
+    }
+    if(peakObj['peakDeaths'] < obj['Deaths']) {
+      peakObj['peakDeaths'] = obj['Deaths'];
+      peakObj['deathsDate'] = obj['ObservationDate'];
+    }   
+    if(peakObj['peakRecovered'] < obj['Recovered']) {
+      peakObj['peakRecovered'] = obj['Recovered'];
+      peakObj['recoveredDate'] = obj['ObservationDate'];
+    }
+    countryData[countryIndex].push(vaxObj);
+    countryData[countryIndex].push(peakObj);
+  }
+  else {
+    let array = [];
+    let obj = {
+      'ObservationDate' : date,
+      'Country' : country, 
+      'Confirmed' : cases, 
+      'Deaths' : deaths, 
+      'Recovered' : recoveries 
+    };
+    array.push(obj);
+    obj = {
+      'Country' : country,
+      'vaxName' : "",
+      'vaxDate' : ""
+    };
+    array.push(obj);
+    obj = {
+      'Country' : country,
+      'peakCases' : cases,
+      'casesDate' : date,
+      'peakDeaths' : deaths,
+      'deathsDate' : date,
+      'peakRecovered' : recoveries,
+      'recoveredDate' : date
+    };
+    array.push(obj);
+    countryData.push(array);
+  }
+}
+
+function InsertAggregate (country, cases, deaths, recoveries) {
+  let index = -1;
+  for(let i = 0; i < aggregatedCountryData.length; i++) {
+    if(aggregatedCountryData[i]['Country'] == country) {
+      index = i;
+      break;
+    }
+  }
+  if(index != -1) {
+    aggregatedCountryData[index]['Confirmed'] = cases;
+    aggregatedCountryData[index]['Deaths'] = deaths;
+    aggregatedCountryData[index]['Recovered'] = recoveries;
+    aggregatedCountryData[index]['numDates']++;
+  }
+  else {
+    let obj = {
+      'Country' : country,
+      'Confirmed' : cases,
+      'Deaths' : deaths,
+      'Recovered' : recoveries,
+      'numDates' : 1
+    };
+    aggregatedCountryData.push(obj);
+  }
 }
