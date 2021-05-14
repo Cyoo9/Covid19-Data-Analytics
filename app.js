@@ -971,9 +971,9 @@ function deleteAggregate(country, date, state, confirmed, deaths, recoveries) {
           aggregatedCountryData[aggregatedCountryData.findIndex(x => x.Country === country)]['Recovered'] = result[i]['Recovered'];
         }
         else {
-          aggregatedCountryData[aggregatedCountryData.findIndex(x => x.Country === country)]['Confirmed'] = parseInt(aggregatedCountryData[aggregatedCountryData.findIndex(x => x.country === country)]['Confirmed']) - parseInt(confirmed);
-          aggregatedCountryData[aggregatedCountryData.findIndex(x => x.Country === country)]['Deaths'] = parseInt(aggregatedCountryData[aggregatedCountryData.findIndex(x => x.country === country)]['Deaths']) - parseInt(deaths);
-          aggregatedCountryData[aggregatedCountryData.findIndex(x => x.Country === country)]['Recovered'] = parseInt(aggregatedCountryData[aggregatedCountryData.findIndex(x => x.country === country)]['Recovered']) - parseInt(recoveries);
+          aggregatedCountryData[aggregatedCountryData.findIndex(x => x.Country === country)]['Confirmed'] = parseInt(aggregatedCountryData[aggregatedCountryData.findIndex(x => x.Country === country)]['Confirmed']) - parseInt(confirmed);
+          aggregatedCountryData[aggregatedCountryData.findIndex(x => x.Country === country)]['Deaths'] = parseInt(aggregatedCountryData[aggregatedCountryData.findIndex(x => x.Country === country)]['Deaths']) - parseInt(deaths);
+          aggregatedCountryData[aggregatedCountryData.findIndex(x => x.Country === country)]['Recovered'] = parseInt(aggregatedCountryData[aggregatedCountryData.findIndex(x => x.Country === country)]['Recovered']) - parseInt(recoveries);
         }
         break;
       }
@@ -1078,7 +1078,7 @@ function delete2D(country, date, state) {
 }
 
 function deleteWorldData(date, confirmed, deaths, recoveries) {
-  worldData[worldData.findIndex(x => x.date === date)]['worldCases'] -= confirmed; 
-  worldData[worldData.findIndex(x => x.date === date)]['worldDeaths'] -= deaths; 
-  worldData[worldData.findIndex(x => x.date === date)]['worldRecovered'] -= recoveries; 
+  worldData[worldData.findIndex(x => x.Date === date)]['worldCases'] = parseInt(worldData[worldData.findIndex(x => x.Date === date)]['worldCases']) - parseInt(confirmed); 
+  worldData[worldData.findIndex(x => x.Date === date)]['worldDeaths'] = parseInt(worldData[worldData.findIndex(x => x.Date === date)]['worldCases']) - parseInt(deaths); 
+  worldData[worldData.findIndex(x => x.Date === date)]['worldRecovered'] = parseInt(worldData[worldData.findIndex(x => x.Date === date)]['worldCases']) - parseInt(recoveries); 
 }
