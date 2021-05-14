@@ -535,13 +535,29 @@ function updateData(req, res, next) {
 //deletes data in result array
 function deleteData(req, res, next) {
   //deletes data at given SNo if SNo exists
+  let country, date, index, confirmed, deaths, recoveries; 
+
   if(result.findIndex(x => x.SNo === req.body.deleteSno) != -1) {
-    result.splice(result.findIndex(x => x.SNo === req.body.deleteSno), 1); //removes from array
+
+    index = result.findIndex(x => x.SNo === req.body.deleteSno);
+
+    result.splice(index, 1); //removes from array
+    country = result[index]['Country'];
+    date = result[index]['ObservationDate'];
+
+    confirmed = result[index]['Confirmed'];
+    deaths = result[index]['Deaths'];
+    recoveries = result[index]['Recovered'];
+
+    deleteAggregate(country, confirmed, deaths, recoveries);
+    delete2D(country, date, confirmed, deaths, recoveries);
+    deleteWorldData(date, confirmed, deaths, recoveries);
     res.send("Successfully deleted data");
   }
   else {
     res.send("Incorrect serial number. Try again.");
   }
+
   next();
 }
 
@@ -942,3 +958,23 @@ function InsertAggregate (country, date, cases, deaths, recoveries) {
     aggregatedCountryData.push(obj);
   }
 }
+
+function deleteAggregate(country, confirmed, deaths, recoveries) {
+  aggregatedCountryData[aggregatedCountryData.findIndex(x => x.country === country)]['Confirmed'] -= confirmed;
+  aggregatedCountryData[aggregatedCountryData.findIndex(x => x.country === country)]['Deaths'] -= deaths;
+  aggregatedCountryData[aggregatedCountryData.findIndex(x => x.country === country)]['Recovered'] -= recoveries;
+}
+
+function delete2D(country, date, confirmed, deaths, recoveries) {
+  countryData[countryData.findIndex(x => x.country === country)][countryData.findIndex(x => x.date === date)]['Confirmed'] -= confirmed;
+  countryData[countryData.findIndex(x => x.country === country)][countryData.findIndex(x => x.date === date)]['Deaths'] -= deaths;
+  countryData[countryData.findIndex(x => x.country === country)][countryData.findIndex(x => x.date === date)]['Recovered'] -= recoveries;
+}
+
+function deleteWorldData(date, confirmed, deaths, recoveries) {
+  worldData[worldData.findIndex(x => x.date === date)]['worldCases'] -= confirmed; 
+  worldData[worldData.findIndex(x => x.date === date)]['worldDeaths'] -= deaths; 
+  worldData[worldData.findIndex(x => x.date === date)]['worldRecovered'] -= recoveries; 
+}
+
+
