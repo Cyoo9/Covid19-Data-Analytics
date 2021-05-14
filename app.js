@@ -7,7 +7,7 @@ let ejs = require('ejs');
 
 var bodyParser = require("body-parser");
 var multer  = require('multer');
-const { ap, all } = require('list');
+const { ap, all, of } = require('list');
 const { parse } = require('path');
 const { PassThrough } = require('stream');
 var result = []; //holds all data
@@ -535,23 +535,24 @@ function updateData(req, res, next) {
 //deletes data in result array
 function deleteData(req, res, next) {
   //deletes data at given SNo if SNo exists
-  let country, date, index, confirmed, deaths, recoveries; 
+  let country, date, state, index, confirmed, deaths, recoveries; 
 
   if(result.findIndex(x => x.SNo === req.body.deleteSno) != -1) {
 
     index = result.findIndex(x => x.SNo === req.body.deleteSno);
 
-    result.splice(index, 1); //removes from array
-    country = result[index]['Country'];
+    country = result[index]['Country/Region'];
     date = result[index]['ObservationDate'];
+    state = result[index]['Province/State'];
 
     confirmed = result[index]['Confirmed'];
     deaths = result[index]['Deaths'];
     recoveries = result[index]['Recovered'];
 
-    deleteAggregate(country, confirmed, deaths, recoveries);
-    delete2D(country, date, confirmed, deaths, recoveries);
+    deleteAggregate(country, date, state, confirmed, deaths, recoveries);
+    delete2D(country, date, state);
     deleteWorldData(date, confirmed, deaths, recoveries);
+    result.splice(index, 1); //removes from array
     res.send("Successfully deleted data");
   }
   else {
@@ -959,16 +960,121 @@ function InsertAggregate (country, date, cases, deaths, recoveries) {
   }
 }
 
-function deleteAggregate(country, confirmed, deaths, recoveries) {
-  aggregatedCountryData[aggregatedCountryData.findIndex(x => x.country === country)]['Confirmed'] -= confirmed;
-  aggregatedCountryData[aggregatedCountryData.findIndex(x => x.country === country)]['Deaths'] -= deaths;
-  aggregatedCountryData[aggregatedCountryData.findIndex(x => x.country === country)]['Recovered'] -= recoveries;
+function deleteAggregate(country, date, state, confirmed, deaths, recoveries) {
+  var changeAggregate = false;
+  for(let i = result.length-1; i >= 0; i--) {
+    if(result[i]['Country/Region'] == country && result[i]['Province/State'] == state) {
+      if(changeAggregate) {
+        if(state == "") {
+          aggregatedCountryData[aggregatedCountryData.findIndex(x => x.Country === country)]['Confirmed'] = result[i]['Confirmed'];
+          aggregatedCountryData[aggregatedCountryData.findIndex(x => x.Country === country)]['Deaths'] = result[i]['Deaths'];
+          aggregatedCountryData[aggregatedCountryData.findIndex(x => x.Country === country)]['Recovered'] = result[i]['Recovered'];
+        }
+        else {
+          aggregatedCountryData[aggregatedCountryData.findIndex(x => x.Country === country)]['Confirmed'] = parseInt(aggregatedCountryData[aggregatedCountryData.findIndex(x => x.country === country)]['Confirmed']) - parseInt(confirmed);
+          aggregatedCountryData[aggregatedCountryData.findIndex(x => x.Country === country)]['Deaths'] = parseInt(aggregatedCountryData[aggregatedCountryData.findIndex(x => x.country === country)]['Deaths']) - parseInt(deaths);
+          aggregatedCountryData[aggregatedCountryData.findIndex(x => x.Country === country)]['Recovered'] = parseInt(aggregatedCountryData[aggregatedCountryData.findIndex(x => x.country === country)]['Recovered']) - parseInt(recoveries);
+        }
+        break;
+      }
+      if(result[i]['ObservationDate'] == date) {
+        changeAggregate = true;
+      }
+      else {
+        break;
+      }
+    }
+  }
 }
 
-function delete2D(country, date, confirmed, deaths, recoveries) {
-  countryData[countryData.findIndex(x => x.country === country)][countryData.findIndex(x => x.date === date)]['Confirmed'] -= confirmed;
-  countryData[countryData.findIndex(x => x.country === country)][countryData.findIndex(x => x.date === date)]['Deaths'] -= deaths;
-  countryData[countryData.findIndex(x => x.country === country)][countryData.findIndex(x => x.date === date)]['Recovered'] -= recoveries;
+function delete2D(country, date, state) {
+  var index = -1;
+  for(var i = 0; i < countryData.length; i++) {
+    if(countryData[i][0]['Country'] == country) {
+      index = i;
+      break;
+    }
+  }
+  if(state == "") {
+    for(var i = 0; i < countryData[index].length; i++) {
+      if(countryData[index][i]['ObservationDate'] == date) {
+        countryData[index].splice(i, 1);
+        break;
+      }
+    }
+    if(countryData[index][countryData[index].length-1]['casesDate'] == date || countryData[index][countryData[index].length-1]['deathsDate'] == date || countryData[index][countryData[index].length-1]['recoveredDate'] == date) {
+      maxIndexCases = 0;
+      maxIndexDeaths = 0;
+      maxIndexRecovered = 0;
+      //find peak data
+      for(let j = 1; j < array.length-1; j++) {
+        if(parseInt(countryData[index][maxIndexCases]['Confirmed']) < parseInt(countryData[index][j]['Confirmed'])) {
+          maxIndexCases = j;
+        }
+        if(parseInt(countryData[index][maxIndexDeaths]['Deaths']) < parseInt(countryData[index][j]['Deaths'])) {
+          maxIndexDeaths = j;
+        }
+        if(parseInt(countryData[index][maxIndexRecovered]['Recovered']) < parseInt(countryData[index][j]['Recovered'])) {
+          maxIndexRecovered = j;
+        }
+      }
+      countryData[index][countryData[index].length-1]['peakCases'] = countryData[index][maxIndexCases]['Confirmed'];
+      countryData[index][countryData[index].length-1]['casesDate'] = countryData[index][maxIndexCases]['ObservationDate'];
+      countryData[index][countryData[index].length-1]['peakDeaths'] = countryData[index][maxIndexDeaths]['Deaths'];
+      countryData[index][countryData[index].length-1]['deathsDate'] = countryData[index][maxIndexDeaths]['ObservationDate'];
+      countryData[index][countryData[index].length-1]['peakRecovered'] = countryData[index][maxIndexRecovered]['Recovered'];
+      countryData[index][countryData[index].length-1]['recoveredDate'] = countryData[index][maxIndexRecovered]['ObservationDate'];
+    }
+  }
+  else {
+    var resultIndex = -1;
+    for(var i = 0; i < result.length; i++) {
+      if(result[i]['ObservationDate'] == date && result[i]['Province/State'] == state && result[i]['Country/Region'] == country) {
+        resultIndex = i;
+      }
+    }
+    var addedCases = parseInt(result[index]['Confirmed']);
+    var addedDeaths = parseInt(result[index]['Deaths']);
+    var addedRecoveries = parseInt(result[index]['Recovered']);
+    for(var i = resultIndex-1; i >= 0; i--) {
+      if(result[i]['Province/State'] == state && result[i]['Country/Region'] == country) {
+        addedCases = parseInt(result[index]['Confirmed']) - parseInt(result[i]['Confirmed']);
+        addedDeaths = parseInt(result[index]['Deaths']) - parseInt(result[i]['Deaths']);
+        addedRecoveries = parseInt(result[index]['Recovered']) - parseInt(result[i]['Recovered']);
+        break;
+      }
+    }
+    for(var i = 0; i < countryData[index]; i++) {
+      if(countryData[index][i]['ObservationDate'] == date) {
+        countryData[index][i]['Confirmed'] = parseInt(countryData[index][i]['Confirmed']) - addedCases;
+        countryData[index][i]['Deaths'] = parseInt(countryData[index][i]['Deaths']) - addedDeaths;
+        countryData[index][i]['Recovered'] = parseInt(countryData[index][i]['Recovered']) - addedRecoveries;
+        if(countryData[index][countryData[index].length-1]['casesDate'] == date || countryData[index][countryData[index].length-1]['deathsDate'] == date || countryData[index][countryData[index].length-1]['recoveredDate'] == date) {
+          maxIndexCases = 0;
+          maxIndexDeaths = 0;
+          maxIndexRecovered = 0;
+          //find peak data
+          for(let j = 1; j < array.length-1; j++) {
+            if(parseInt(countryData[index][maxIndexCases]['Confirmed']) < parseInt(countryData[index][j]['Confirmed'])) {
+              maxIndexCases = j;
+            }
+            if(parseInt(countryData[index][maxIndexDeaths]['Deaths']) < parseInt(countryData[index][j]['Deaths'])) {
+              maxIndexDeaths = j;
+            }
+            if(parseInt(countryData[index][maxIndexRecovered]['Recovered']) < parseInt(countryData[index][j]['Recovered'])) {
+              maxIndexRecovered = j;
+            }
+          }
+          countryData[index][countryData[index].length-1]['peakCases'] = countryData[index][maxIndexCases]['Confirmed'];
+          countryData[index][countryData[index].length-1]['casesDate'] = countryData[index][maxIndexCases]['ObservationDate'];
+          countryData[index][countryData[index].length-1]['peakDeaths'] = countryData[index][maxIndexDeaths]['Deaths'];
+          countryData[index][countryData[index].length-1]['deathsDate'] = countryData[index][maxIndexDeaths]['ObservationDate'];
+          countryData[index][countryData[index].length-1]['peakRecovered'] = countryData[index][maxIndexRecovered]['Recovered'];
+          countryData[index][countryData[index].length-1]['recoveredDate'] = countryData[index][maxIndexRecovered]['ObservationDate'];
+        }
+      }
+    }
+  }
 }
 
 function deleteWorldData(date, confirmed, deaths, recoveries) {
@@ -976,5 +1082,3 @@ function deleteWorldData(date, confirmed, deaths, recoveries) {
   worldData[worldData.findIndex(x => x.date === date)]['worldDeaths'] -= deaths; 
   worldData[worldData.findIndex(x => x.date === date)]['worldRecovered'] -= recoveries; 
 }
-
-
