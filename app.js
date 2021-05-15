@@ -502,7 +502,7 @@ function insertData(req, res, next) {
 
   InsertWorldData(req.body.insertCountry, req.body.insertState, req.body.insertDate, req.body.newCases, req.body.newDeaths, req.body.newRecoveries);
   Insert2D(req.body.insertCountry, req.body.insertState, req.body.insertDate, req.body.newCases, req.body.newDeaths, req.body.newRecoveries);
-  InsertAggregate(req.body.insertCountry, req.body.insertDate, req.body.newCases, req.body.newDeaths, req.body.newRecoveries);
+  InsertAggregate(req.body.insertCountry, req.body.insertState, req.body.insertDate, req.body.newCases, req.body.newDeaths, req.body.newRecoveries);
 
   //pushes new insert
   result.push(obj);
@@ -521,15 +521,38 @@ function updateData(req, res, next) {
                   + currentdate.getMinutes() + ":"
                   + currentdate.getSeconds();
 
+  let country, date, state, confirmed, deaths, recoveries;
   //updates data at given SNo if the SNo exists
-  if(result.findIndex(x => x.SNo === req.body.updateSno) != -1) {
-    result[result.findIndex(x => x.SNo === req.body.updateSno)]['ObservationDate'] = req.body.updateDate;
-    result[result.findIndex(x => x.SNo === req.body.updateSno)]['Province/State'] = req.body.updateState;
-    result[result.findIndex(x => x.SNo === req.body.updateSno)]['Country/Region'] = req.body.updateCountry;
-    result[result.findIndex(x => x.SNo === req.body.updateSno)]['Confirmed'] = req.body.updateCases;
-    result[result.findIndex(x => x.SNo === req.body.updateSno)]['Deaths'] = req.body.updateDeaths;
-    result[result.findIndex(x => x.SNo === req.body.updateSno)]['Recovered'] = req.body.updateRecoveries;
-    result[result.findIndex(x => x.SNo === req.body.updateSno)]['Last Update'] = datetime;
+  var index = result.findIndex(x => x.SNo === req.body.updateSno);
+  if(index != -1) {
+    country = result[index]['Country/Region'];
+    date = result[index]['ObservationDate'];
+    state = result[index]['Province/State'];
+
+    confirmed = result[index]['Confirmed'];
+    deaths = result[index]['Deaths'];
+    recoveries = result[index]['Recovered'];
+
+    deleteAggregate(country, date, state, confirmed, deaths, recoveries);
+    delete2D(country, date, state);
+    deleteWorldData(date, confirmed, deaths, recoveries);
+    result.splice(index, 1); //removes from array
+
+    InsertWorldData(req.body.updateCountry, req.body.updateState, req.body.updateDate, req.body.updateCases, req.body.updateDeaths, req.body.updateRecoveries);
+    Insert2D(req.body.updateCountry, req.body.updateState, req.body.updateDate, req.body.updateCases, req.body.updateDeaths, req.body.updateRecoveries);
+    InsertAggregate(req.body.updateCountry, req.body.updateState, req.body.updateDate, req.body.updateCases, req.body.updateDeaths, req.body.updateRecoveries);
+
+    let obj = {};
+    obj['SNo'] = req.body.updateSno;
+    obj['ObservationDate'] = req.body.updateDate;
+    obj['Province/State'] = req.body.updateState;
+    obj['Country/Region'] = req.body.updateCountry;
+    obj['Last Update'] = datetime;
+    obj['Confirmed'] = req.body.updateCases;
+    obj['Deaths'] = req.body.updateDeaths;
+    obj['Recovered'] = req.body.updateRecoveries;
+    result.splice(index, 0, obj);
+
     res.send("Successfully updated data");
   }
   else {
@@ -815,7 +838,7 @@ function Insert2D(country, state, date, cases, deaths, recoveries) {
   if(countryIndex != -1) {
     let peakObj = countryData[countryIndex][countryData[countryIndex].length-1];
     let vaxObj = countryData[countryIndex][countryData[countryIndex].length-2];
-    countryData[countryIndex].splice(countryData[countryIndex].length-2, 2);
+    countryData[countryIndex].splice(countryData[countryIndex].length-2, 2);;
     let obj = {};
     let index = -1;
     if(state == "") {
@@ -935,7 +958,7 @@ function Insert2D(country, state, date, cases, deaths, recoveries) {
   }
 }
 
-function InsertAggregate (country, date, cases, deaths, recoveries) {
+function InsertAggregate (country, state, date, cases, deaths, recoveries) {
   let index = -1;
   for(let i = 0; i < aggregatedCountryData.length; i++) {
     if(aggregatedCountryData[i]['Country'] == country) {
@@ -944,14 +967,33 @@ function InsertAggregate (country, date, cases, deaths, recoveries) {
     }
   }
   if(index != -1) {
-    aggregatedCountryData[index]['Confirmed'] = cases;
-    aggregatedCountryData[index]['Deaths'] = deaths;
-    aggregatedCountryData[index]['Recovered'] = recoveries;
-    aggregatedCountryData[index]['numDates'] = parseInt(aggregatedCountryData[index]['numDates']) + 1;
-    for(var i = 0; i < result.length; i++) {
-      if(result[i][ObservationDate] == date) {
-        aggregatedCountryData[index]['numDates'] = parseInt(aggregatedCountryData[index]['numDates']) - 1;
+    if(state == "") {
+      if(parseInt(aggregatedCountryData[index]['Confirmed']) < parseInt(cases)) {
+        aggregatedCountryData[index]['Confirmed'] = cases;
       }
+      if(parseInt(aggregatedCountryData[index]['Deaths']) < parseInt(deaths)) {
+        aggregatedCountryData[index]['Deaths'] = deaths;
+      }
+      if(parseInt(aggregatedCountryData[index]['Recovered']) < parseInt(recoveries)) {
+        aggregatedCountryData[index]['Recovered'] = recoveries;
+      }
+      aggregatedCountryData[index]['numDates'] = parseInt(aggregatedCountryData[index]['numDates']) + 1;
+    }
+    else {
+      for(var i = result.length-1; i >= 0; i--) {
+        if(result[i]['Country/Region'] == country) {
+          if(ReformatDate(result[i]['ObservationDate']) == date) {
+            aggregatedCountryData[index]['Confirmed'] = parseInt(aggregatedCountryData[index]['Confirmed']) + parseInt(cases);
+            aggregatedCountryData[index]['Deaths'] = parseInt(aggregatedCountryData[index]['Deaths']) + parseInt(deaths);
+            aggregatedCountryData[index]['Recovered'] = parseInt(aggregatedCountryData[index]['Recovered']) + parseInt(recoveries);
+            break;
+          }
+          else {
+            break;
+          }
+        }
+      }
+      aggregatedCountryData[index]['numDates'] = parseInt(aggregatedCountryData[index]['numDates']) + 1;
     }
   }
   else {
@@ -1015,7 +1057,6 @@ function delete2D(country, date, state) {
   if(state == "") {
     for(var i = 0; i < countryData[index].length; i++) {
       if(countryData[index][i]['ObservationDate'] == date) {
-        console.log("deleted");
         countryData[index].splice(i, 1);
         break;
       }
