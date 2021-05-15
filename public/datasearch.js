@@ -56,6 +56,7 @@ document.getElementById("loadMore").onclick = () => {
         params: params,
         callback: (cb_args) => {
             let response_arr = JSON.parse(cb_args.response_text);
+            //document.getElementById("showTable").innerHTML = "";
             CreateTable(response_arr, "showTable");
         },
     }

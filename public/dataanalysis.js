@@ -96,7 +96,7 @@ $(document).ready(function() {
 
 document.getElementById("Q1-btn").onclick = () =>  {
     console.log("Clicked on Q1 button")
-
+    
     let args = {
         endpoint: '/Q1',
         method: 'POST',
@@ -474,6 +474,7 @@ document.getElementById("Q4-btn").onclick = () =>  {
 
 document.getElementById("Q5-btn").onclick = () =>  {
     console.log("Clicked on Q5 button");
+    document.getElementById("showTable5").innerHTML = "";
     const input = document.getElementById("q5Country").value;
     const params = `Country=${input}`;
 
@@ -496,7 +497,7 @@ document.getElementById("Q5-btn").onclick = () =>  {
 document.getElementById("Q6-btn").onclick = () =>  {
     console.log("Clicked on Q6 button");
 
-    
+    document.getElementById("showTable6").innerHTML = "";
     const statistic = document.getElementById("Q6-statistic").value;
     const params = `statType=${statistic}`;
 
@@ -603,7 +604,7 @@ document.getElementById("Q7-btn").onclick = () =>  {
 
 document.getElementById("Q8-btn").onclick = () =>  {
     console.log("Clicked on Q8 button");
-
+    document.getElementById("showTable8").innerHTML = "";
     // const date = document.getElementById("q8date").value;
     // const params = `statType=${date}`;
 
