@@ -23,7 +23,14 @@ document.getElementById("import-btn").onclick = () =>  {
         endpoint: '/import',
         method: 'POST',
         params: `import-btn-clicked=true`,
-        callback: () => {},
+        callback: (cb_args) => {
+            const h2 = document.createElement("h7");
+            const h2_text = document.createTextNode(cb_args.response_text);
+            const msg_container = document.getElementById("import-message");
+
+            h2.appendChild(h2_text);
+            msg_container.appendChild(h2);
+        }
     }
 
     SendRequest(args);
