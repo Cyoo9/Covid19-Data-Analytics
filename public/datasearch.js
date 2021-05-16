@@ -55,8 +55,19 @@ document.getElementById("loadMore").onclick = () => {
         method: 'POST',
         params: params,
         callback: (cb_args) => {
+            document.getElementById("showTable").innerHTML = "";
             let response_arr = JSON.parse(cb_args.response_text);
-            //document.getElementById("showTable").innerHTML = "";
+
+            if (response_arr.length == 0) {
+                const result_div = document.getElementById("showTable");
+                const h5 = document.createElement("h5");
+                h5.innerText = "No results to display";
+        
+                result_div.appendChild(h5);
+                return;
+
+            }
+            ClearElementContentsById("showTable");
             CreateTable(response_arr, "showTable");
         },
     }

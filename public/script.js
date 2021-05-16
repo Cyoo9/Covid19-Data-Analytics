@@ -29,7 +29,7 @@ function SendRequest(args) {
 
 
 function CreateTable(arr_of_jsondata, div_id) {
-    document.getElementById("showTable").innerHTML = "";
+
     
     function LengthOf(json) {
         //returns number of attributes in a json object
@@ -74,4 +74,19 @@ function CreateTable(arr_of_jsondata, div_id) {
     let elem = document.getElementById(div_id);
     elem.appendChild(table);
 
+}
+
+function ClearElementContentsById(id) {
+    const elem = document.getElementById(id);
+    const children = elem.childNodes;
+
+    elem.innerText = "";
+    elem.innerHTML = "";
+
+    for (let i = 0; i < children.length; ++i) {
+        children[i].innerHTML = "";
+        children[i].innerText = "";
+    }
+
+    
 }

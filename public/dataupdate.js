@@ -20,12 +20,25 @@ document.getElementById("insert-btn").onclick = () =>  {
         method: 'POST',
         params: params,
         callback: (cb_args) => {
-            const h2 = document.createElement("h2");
-            const h2_text = document.createTextNode(cb_args.response_text);
+
+            ClearElementContentsById("insert-message");
+
+            const h2 = document.createElement("h5");
+            const h2_text = document.createTextNode("Successfully Inserted The Following Data:");
             const msg_container = document.getElementById("insert-message");
+            const input_data = {
+                Country : insert_country,
+                "Province/State" : insert_state,
+                Date : insert_date,
+                Cases: new_cases,
+                Deaths : new_deaths,
+                Recovered : new_recoveries,
+            };
 
             h2.appendChild(h2_text);
             msg_container.appendChild(h2);
+            CreateTable([input_data], "insert-message");
+            
         }
     }
 
@@ -60,12 +73,25 @@ document.getElementById("update-btn").onclick = () => {
         method: 'POST',
         params: params,
         callback: (cb_args) => {
-            const h2 = document.createElement("h2");
-            const h2_text = document.createTextNode(cb_args.response_text);
+
+            ClearElementContentsById("update-message");
+
+            const h2 = document.createElement("h5");
+            const h2_text = document.createTextNode("Successfully Updated");
             const msg_container = document.getElementById("update-message");
+            const input_data = {
+                "Serial Number" : update_sno,
+                Country : update_country,
+                "Province / State" : update_state,
+                Date: update_date,
+                Cases : update_cases,
+                Deaths: update_deaths,
+                Recovered : update_recoveries,
+            };
 
             h2.appendChild(h2_text);
             msg_container.appendChild(h2);
+            CreateTable([input_data], "update-message");
         },
     }
 
@@ -86,8 +112,11 @@ document.getElementById("delete-btn").onclick = () =>  {
         method: 'POST',
         params: params,
         callback: (cb_args) => {
-            const h2 = document.createElement("h2");
-            const h2_text = document.createTextNode(cb_args.response_text);
+
+            ClearElementContentsById("delete-message");
+
+            const h2 = document.createElement("h5");
+            const h2_text = document.createTextNode(`Successfully Deleted Serial Number ${delete_sno}`);
             const msg_container = document.getElementById("delete-message");
             h2.appendChild(h2_text);
             msg_container.appendChild(h2);

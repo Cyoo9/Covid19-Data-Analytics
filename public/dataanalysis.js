@@ -94,6 +94,31 @@ $(document).ready(function() {
     });
 });     
 
+let charts = {
+    'Q1' : [],
+    'Q2' : [],
+    'Q3' : [],
+    'Q4' : [],
+    'Q5' : [],
+    'Q6' : [],
+    'Q7' : [],
+    'Q8' : [],
+};
+
+function DestroyCharts(chart_name) {
+
+    console.log(chart_name);
+    if (charts[chart_name] == undefined) {
+        return;
+    }
+
+    for (let i = 0; i < charts[chart_name].length; ++i) {
+        charts[chart_name][i].destroy();
+    }
+
+
+}
+
 document.getElementById("Q1-btn").onclick = () =>  {
     console.log("Clicked on Q1 button")
     
@@ -103,6 +128,7 @@ document.getElementById("Q1-btn").onclick = () =>  {
         params: '',
         callback: (cb_args) => { 
             let response_arr = JSON.parse(cb_args.response_text);
+            ClearElementContentsById("showTable");
             CreateTable(response_arr, "showTable");
         },
     }
@@ -202,10 +228,13 @@ document.getElementById("Q2-btn").onclick = () =>  {
                 },
             };
 
-            var myChart = new Chart(
+            DestroyCharts("Q2");
+
+            charts.Q2.push( new Chart(
                 document.getElementById('q2-chart'),
                 config
-            );  
+            ));  
+
         }
     }
 
@@ -359,16 +388,21 @@ document.getElementById("Q3-btn").onclick = () =>  {
 
             };
 
-            
-            var myChart = new Chart(
+            DestroyCharts("Q3");
+    
+            var q3_chart1 = new Chart(
                 document.getElementById('q3-chart'),
                 config1
             );     
 
-            var myChart = new Chart(
+            var q3_chart2 = new Chart(
                 document.getElementById('q3-chart2'),
                 config2
             );     
+
+            charts.Q3.push(q3_chart1);
+            charts.Q3.push(q3_chart2);
+
 
         }
     }
@@ -460,10 +494,14 @@ document.getElementById("Q4-btn").onclick = () =>  {
 
             };
 
+            DestroyCharts("Q4");
+
             var myChart = new Chart(
                 document.getElementById('q4-chart'),
                 config
             );  
+
+            charts.Q4.push(myChart);
         }
 
     }
@@ -474,7 +512,6 @@ document.getElementById("Q4-btn").onclick = () =>  {
 
 document.getElementById("Q5-btn").onclick = () =>  {
     console.log("Clicked on Q5 button");
-    document.getElementById("showTable5").innerHTML = "";
     const input = document.getElementById("q5Country").value;
     const params = `Country=${input}`;
 
@@ -485,8 +522,8 @@ document.getElementById("Q5-btn").onclick = () =>  {
         callback: (cb_args) => {
             console.log(cb_args.response_text);
             let response_arr = JSON.parse(cb_args.response_text);
-            //console.log("Hello");
-            console.log(response_arr);
+
+            ClearElementContentsById("showTable5");
             CreateTable(response_arr, "showTable5");
         },
     }
@@ -497,10 +534,9 @@ document.getElementById("Q5-btn").onclick = () =>  {
 document.getElementById("Q6-btn").onclick = () =>  {
     console.log("Clicked on Q6 button");
 
-    document.getElementById("showTable6").innerHTML = "";
+
     const statistic = document.getElementById("Q6-statistic").value;
     const params = `statType=${statistic}`;
-
 
 
     let args = {
@@ -510,6 +546,8 @@ document.getElementById("Q6-btn").onclick = () =>  {
         callback: (cb_args) => {
             let response_arr = JSON.parse(cb_args.response_text);
             console.log(response_arr);
+
+            ClearElementContentsById("showTable6");
             CreateTable(response_arr, "showTable6");
         },
     }
@@ -536,6 +574,8 @@ document.getElementById("Q7-btn").onclick = () =>  {
             console.log(response_arr);
             let peak = [];
             peak.push(response_arr[response_arr.length-1]);
+
+            ClearElementContentsById("showTable7");
             CreateTable(peak, "showTable7");
 
             let country = response_arr[0].Country;
@@ -590,10 +630,13 @@ document.getElementById("Q7-btn").onclick = () =>  {
 
             };
 
+            DestroyCharts("Q7");
             var myChart = new Chart(
                 document.getElementById('q7-chart'),
                 config
             );
+
+            charts.Q7.push(myChart);
         },
     }
     
@@ -604,9 +647,7 @@ document.getElementById("Q7-btn").onclick = () =>  {
 
 document.getElementById("Q8-btn").onclick = () =>  {
     console.log("Clicked on Q8 button");
-    document.getElementById("showTable8").innerHTML = "";
-    // const date = document.getElementById("q8date").value;
-    // const params = `statType=${date}`;
+
 
     let args = {
         endpoint: '/Q8',
@@ -615,6 +656,7 @@ document.getElementById("Q8-btn").onclick = () =>  {
         callback: (cb_args) => {
             let response_arr = JSON.parse(cb_args.response_text);
             console.log(response_arr);
+            ClearElementContentsById("showTable8");
             CreateTable(response_arr, "showTable8");
         },
     }
