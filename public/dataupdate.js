@@ -1,3 +1,5 @@
+
+
 document.getElementById("insert-btn").onclick = () =>  {
     console.log("Clicked on insert button")
     const insert_country = document.getElementById("insertCountry").value;
@@ -20,11 +22,10 @@ document.getElementById("insert-btn").onclick = () =>  {
         method: 'POST',
         params: params,
         callback: (cb_args) => {
+     
 
-            ClearElementContentsById("insert-message");
-
-            const h2 = document.createElement("h5");
-            const h2_text = document.createTextNode("Successfully Inserted The Following Data:");
+            const h5 = document.createElement("h5");
+            const h5_text = document.createTextNode("Successfully Inserted The Following Data:");
             const msg_container = document.getElementById("insert-message");
             const input_data = {
                 Country : insert_country,
@@ -35,16 +36,30 @@ document.getElementById("insert-btn").onclick = () =>  {
                 Recovered : new_recoveries,
             };
 
-            h2.appendChild(h2_text);
-            msg_container.appendChild(h2);
+            h5.appendChild(h5_text);
+            msg_container.appendChild(h5);
             CreateTable([input_data], "insert-message");
             
-        }
+        },
+
+        OnClientError: (args) => {
+            let server_response = JSON.parse(args.response_text);
+            const h5 = document.createElement("h5");
+            const msg_container = document.getElementById("insert-message");
+
+            h5.innerHTML = "Failed to insert data:";
+            msg_container.appendChild(h5);
+
+            CreateErrorMessage(server_response, "insert-message");
+        },
     }
 
+    ClearElementContentsById("insert-message");
     SendRequest(args);
     
 };
+
+
 
 
 document.getElementById("update-btn").onclick = () => {
@@ -74,10 +89,10 @@ document.getElementById("update-btn").onclick = () => {
         params: params,
         callback: (cb_args) => {
 
-            ClearElementContentsById("update-message");
+        
 
-            const h2 = document.createElement("h5");
-            const h2_text = document.createTextNode("Successfully Updated");
+            const h5 = document.createElement("h5");
+            const h5_text = document.createTextNode("Successfully Updated");
             const msg_container = document.getElementById("update-message");
             const input_data = {
                 "Serial Number" : update_sno,
@@ -89,12 +104,23 @@ document.getElementById("update-btn").onclick = () => {
                 Recovered : update_recoveries,
             };
 
-            h2.appendChild(h2_text);
-            msg_container.appendChild(h2);
+            h5.appendChild(h5_text);
+            msg_container.appendChild(h5);
             CreateTable([input_data], "update-message");
         },
+
+        OnClientError : (args) => {
+            let server_response = JSON.parse(args.response_text);
+            const h5 = document.createElement("h5");   
+            const msg_container = document.getElementById("update-message");
+
+            h5.innerHTML = "Failed To Update";
+            msg_container.appendChild(h5);
+            CreateErrorMessage(server_response, "update-message");
+        }
     }
 
+    ClearElementContentsById("update-message");
     SendRequest(args);
 
 
@@ -113,16 +139,30 @@ document.getElementById("delete-btn").onclick = () =>  {
         params: params,
         callback: (cb_args) => {
 
-            ClearElementContentsById("delete-message");
-
-            const h2 = document.createElement("h5");
-            const h2_text = document.createTextNode(`Successfully Deleted Serial Number ${delete_sno}`);
+            console.log(cb_args.response_text);
+            const server_response = JSON.parse(cb_args.response_text);
+            
+            const h5 = document.createElement("h5");
+            const h5_text = document.createTextNode(`Successfully Deleted Serial Number ${delete_sno}`);
             const msg_container = document.getElementById("delete-message");
-            h2.appendChild(h2_text);
-            msg_container.appendChild(h2);
+            h5.appendChild(h5_text);
+            msg_container.appendChild(h5);
+
+            CreateTable([server_response], "delete-message");
+        },
+
+        OnClientError : (args) => {
+            let server_response = JSON.parse(args.response_text);
+            const h5 = document.createElement("h5");   
+            const msg_container = document.getElementById("delete-message");
+
+            h5.innerHTML = "Failed To Delete";
+            msg_container.appendChild(h5);
+            CreateErrorMessage(server_response, "delete-message");
         }
     }
 
+    ClearElementContentsById("delete-message");
     SendRequest(args);
 
 };

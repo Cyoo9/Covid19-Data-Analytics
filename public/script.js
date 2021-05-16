@@ -21,6 +21,10 @@ function SendRequest(args) {
         if(http.readyState == 4 && http.status == 200) {
             args.callback({ response_text: http.responseText} );
         }
+
+        if (http.readyState == 4 && http.status == 400) {
+            args.OnClientError( {response_text: http.responseText} );
+        }
         
     }   
     http.send(args.params);
@@ -89,4 +93,19 @@ function ClearElementContentsById(id) {
     }
 
     
+}
+
+function CreateErrorMessage(json_data, target_DOM_elem_id) {
+    const target = document.getElementById(target_DOM_elem_id);
+    const keys = Object.keys(json_data); //array of the json object's attributes
+    console.log(keys);
+
+    keys.forEach( (key) => {
+        if (json_data[key] != "") {
+            const p = document.createElement("p");
+            p.innerHTML = `* ${json_data[key]}`;
+            p.setAttribute("class" , "red");
+            target.appendChild(p);
+        }
+    });
 }
