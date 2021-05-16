@@ -40,6 +40,10 @@ document.getElementById("loadMore").onclick = () => {
     const numCases = document.getElementById("confirmed-cases").value;
     const numDeaths = document.getElementById("deaths").value;
     const numRecovered = document.getElementById("recoveries").value;
+    const cases_checkbox = document.getElementById("cases-checkbox").checked;
+    const deaths_checkbox = document.getElementById("deaths-checkbox").checked;
+    const recoveries_checkbox = document.getElementById("recoveries-checkbox").checked;
+
 
 
     var params = "";
@@ -49,29 +53,35 @@ document.getElementById("loadMore").onclick = () => {
     params += `&Confirmed=${numCases}`;
     params += `&Deaths=${numDeaths}`;
     params += `&Recovered=${numRecovered}`;
+    params += `&WantCases=${cases_checkbox}`;
+    params += `&WantDeaths=${deaths_checkbox}`;
+    params += `&WantRecoveries=${recoveries_checkbox}`;
 
     let args = {
         endpoint: '/search',
         method: 'POST',
         params: params,
         callback: (cb_args) => {
-            document.getElementById("showTable").innerHTML = "";
             let response_arr = JSON.parse(cb_args.response_text);
 
-            if (response_arr.length == 0) {
-                const result_div = document.getElementById("showTable");
-                const h5 = document.createElement("h5");
-                h5.innerText = "No results to display";
-        
-                result_div.appendChild(h5);
-                return;
-
-            }
-            ClearElementContentsById("showTable");
             CreateTable(response_arr, "showTable");
+        },
+
+        OnClientError: (args) => {
+
+            const div = document.getElementById("showTable");
+            const h5 = document.createElement("h5");
+
+            h5.innerHTML = "Failed To Search";
+            div.appendChild(h5);
+            
+
+            CreateErrorMessage({"msg" : args.response_text}, "showTable");
+
         },
     }
 
+    ClearElementContentsById("showTable");
     SendRequest(args);
 
 }

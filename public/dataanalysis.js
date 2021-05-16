@@ -367,26 +367,26 @@ document.getElementById("Q3-btn").onclick = () =>  {
                 },
 
             };
-            const config2 = {
-                type: 'line',
-                data : data2,
-                options: {
-                    plugins : {
-                        title: {
-                            display: true,
-                            text: country2,
-                        },
-                    },
-                    elements: {
-                        point:{
-                            radius: 0
-                        }
-                    },
-                    responsive: true,
-                    maintainAspectRatio: false,
-                },
+            // const config2 = {
+            //     type: 'line',
+            //     data : data2,
+            //     options: {
+            //         plugins : {
+            //             title: {
+            //                 display: true,
+            //                 text: country2,
+            //             },
+            //         },
+            //         elements: {
+            //             point:{
+            //                 radius: 0
+            //             }
+            //         },
+            //         responsive: true,
+            //         maintainAspectRatio: false,
+            //     },
 
-            };
+            // };
 
             DestroyCharts("Q3");
     

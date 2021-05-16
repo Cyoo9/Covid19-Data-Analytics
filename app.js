@@ -57,7 +57,16 @@ app.use(express.urlencoded({
 app.post('/search', search, (req, res) => {
   let json = JSON.stringify(searched_results); //stringify the search array
   fs.writeFileSync('./public/output.json', json); //store the string in a json file to be sent to front-end
-  res.sendFile(path.join(__dirname, "/public" , "output.json")); //send json
+  if (req.body.WantCases == "false" && req.body.WantDeaths == "false" && req.body.WantRecoveries == "false") {
+    res.status(400).send("You must select at least one statistic");
+  }
+  else if (searched_results.length == 0) {
+    res.status(400).send("No matching results were found");
+  }
+  else {
+    res.sendFile(path.join(__dirname, "/public" , "output.json")); //send json
+  }
+
 })
 
 //called when import button is selected
@@ -68,19 +77,41 @@ app.post('/import', (req, res) => {
 })
 
 //called in insert wrapper, uses middlewear to insert data into result array
-app.post('/insert', insertData, (req, res) => {
-  ConvertToCSV(result); //automatically backsup array for importing later
-  res.send("Successfully inserted data");
+app.post('/insert', InsertValidation, insertData, (req, res) => {
+
+  if (res.locals.input_is_valid) {
+    ConvertToCSV(result); //automatically backsup array for importing later
+    res.status(200).send();
+  }
+  else {
+    res.status(400).send(res.locals.validation_response);
+  }
+
 })
 
 //called in update wrapper, uses middlewear to update data in result array
-app.post('/update', updateData, (req, res) => {
-  ConvertToCSV(result); //automatically backsup array for importing later
+app.post('/update', UpdateValidation ,updateData, (req, res) => {
+
+
+  if (res.locals.input_is_valid) {
+    ConvertToCSV(result); //automatically backsup array for importing later
+    res.status(200).send();
+  }
+  else {
+    res.status(400).send(res.locals.validation_response);
+  }
 })
 
 //called in delete wrapper, uses middlewear to delete data in result array
 app.post('/delete', deleteData, (req, res) => {
-  ConvertToCSV(result); //automatically backsup array for importing later
+  if (res.locals.input_is_valid) {
+    ConvertToCSV(result); //automatically backsup array for importing later
+    res.status(200).send(res.locals.validation_response);
+  }
+  else {
+    res.status(400).send(res.locals.validation_response);
+  }
+  
 })
 
 app.post('/Q1', analytics1, (req, res) => {}) //calls analytic 1 middlewear
@@ -455,6 +486,8 @@ function csvParser(csv){
 function search(req, res, next) {
   searched_results = []; //reset array to empty
 
+  
+
   //loops through all the arrays objects
   for(var i = 0; i < result.length; i++) {
 
@@ -466,7 +499,22 @@ function search(req, res, next) {
           if(parseInt(result[i]['Confirmed']) >= parseInt(req.body.Confirmed)) {
             if(parseInt(result[i]['Deaths']) >= parseInt(req.body.Deaths)) {   
               if(parseInt(result[i]['Recovered']) >= parseInt(req.body.Recovered)) {
-                searched_results.push(result[i]);
+                let data = JSON.parse( JSON.stringify(result[i]) ); //deep copy
+                
+
+                if (req.body.WantCases == "false") {
+                  delete data.Confirmed;
+                }
+
+                if (req.body.WantDeaths == "false") {
+                  delete data.Deaths;
+                }
+
+                if (req.body.WantRecoveries == "false") {
+                  delete data.Recovered;
+                }
+
+                searched_results.push(data);
               }
             }
           }
@@ -506,6 +554,75 @@ function insertData(req, res, next) {
 
   //pushes new insert
   result.push(obj);
+
+  next();
+}
+
+function InsertValidation(req, res, next) {
+  console.log(req.body);
+
+  let response = {
+    country : "",
+    state : "",
+    cases : "",
+    deaths : "",
+    recoveries : "",
+  }
+
+  const country_is_valid = new RegExp("^[^0-9]+$").test(req.body.insertCountry);
+  const state_is_valid = new RegExp("^[^0-9]*$").test(req.body.insertState);
+  const cases_is_valid =  new RegExp("^[0-9]+$").test(req.body.newCases);
+  const deaths_is_valid =  new RegExp("^[0-9]+$").test(req.body.newDeaths);
+  const recoveries_is_valid =  new RegExp("^[0-9]+$").test(req.body.newRecoveries);
+
+
+
+
+  if (!country_is_valid) {
+    if (req.body.insertCountry == "") {
+      response.country = "Your country field cannot be empty";
+    }
+    else {
+      response.country = "Your inserted country must not contain numbers";
+    }
+  }
+
+  if (!state_is_valid) {
+      response.state = "Your Province/State must not contain numbers";
+  }
+
+  if (!cases_is_valid) {
+    if (req.body.newCases == "") {
+      response.cases = "Your number of cases cannot be empty"
+    }
+    else {
+      response.cases = "Your number of cases can only have numbers"
+    }
+  }
+
+  if (!deaths_is_valid) {
+    if (req.body.newDeaths == "") {
+      response.deaths = "Your number of deaths cannot be empty"
+    } 
+    else {
+      response.deaths = "Your number of deaths can only have numbers"
+    }
+  }
+
+  if (!recoveries_is_valid) {
+    if (req.body.newRecoveries == "") {
+      response.recoveries = "Your number of recoveries cannot be empty"
+    }
+    else {
+      response.recoveries = "Your number of recoveries can only have numbers"
+    }
+    
+  }
+
+  res.locals.input_is_valid = country_is_valid && state_is_valid && 
+                              cases_is_valid && deaths_is_valid && recoveries_is_valid;
+  
+  res.locals.validation_response = response;
 
   next();
 }
@@ -553,17 +670,95 @@ function updateData(req, res, next) {
     obj['Recovered'] = req.body.updateRecoveries;
     result.splice(index, 0, obj);
 
-    res.send("Successfully updated data");
   }
-  else {
-    res.send("Incorrect serial number. Try again.");
+  next();
+}
+
+function UpdateValidation(req, res, next) {
+  console.log(req.body);
+
+  let response = {
+    serial_number : "",
+    country : "",
+    state : "",
+    cases : "",
+    deaths : "",
+    recoveries : "",
   }
+
+  const serial_number_is_valid = new RegExp("^[0-9]+$").test(req.body.updateSno);
+  const country_is_valid = new RegExp("^[^0-9]+$").test(req.body.updateCountry);
+  const state_is_valid = new RegExp("^[^0-9]*$").test(req.body.updateState);
+  const cases_is_valid =  new RegExp("^[0-9]+$").test(req.body.updateCases);
+  const deaths_is_valid =  new RegExp("^[0-9]+$").test(req.body.updateDeaths);
+  const recoveries_is_valid =  new RegExp("^[0-9]+$").test(req.body.updateRecoveries);
+
+
+  if (!serial_number_is_valid) {
+    if (req.body.updateSno == "") {
+      response.serial_number = "Your serial number cannot be empty"
+    }
+    else {
+      response.serial_number = "Your serial number must only contain numbers"
+    }
+
+  }
+
+
+  if (!country_is_valid) {
+    if (req.body.updateCountry == "") {
+      response.country = "Your country field cannot be empty";
+    }
+    else {
+      response.country = "Your inserted country must not contain numbers";
+    }
+  }
+
+  if (!state_is_valid) {
+      response.updateState = "Your Province/State must not contain numbers";
+  }
+
+  if (!cases_is_valid) {
+    if (req.body.updateCases == "") {
+      response.cases = "Your number of cases cannot be empty"
+    }
+    else {
+      response.cases = "Your number of cases can only have numbers"
+    }
+  }
+
+  if (!deaths_is_valid) {
+    if (req.body.updateDeaths == "") {
+      response.deaths = "Your number of deaths cannot be empty"
+    } 
+    else {
+      response.deaths = "Your number of deaths can only have numbers"
+    }
+  }
+
+  if (!recoveries_is_valid) {
+    if (req.body.updateRecoveries == "") {
+      response.recoveries = "Your number of recoveries cannot be empty"
+    }
+    else {
+      response.recoveries = "Your number of recoveries can only have numbers"
+    }
+    
+  }
+
+  res.locals.input_is_valid = serial_number_is_valid && country_is_valid && state_is_valid && 
+                              cases_is_valid && deaths_is_valid && recoveries_is_valid;
+
+  res.locals.validation_response = response;
+
   next();
 }
 
 //deletes data in result array
 function deleteData(req, res, next) {
   //deletes data at given SNo if SNo exists
+
+  let to_be_deleted = {};
   let country, date, state, index, confirmed, deaths, recoveries; 
 
   if(result.findIndex(x => x.SNo === req.body.deleteSno) != -1) {
@@ -578,18 +773,31 @@ function deleteData(req, res, next) {
     deaths = result[index]['Deaths'];
     recoveries = result[index]['Recovered'];
 
+    to_be_deleted["Serial Number"] = req.body.deleteSno;
+    to_be_deleted["country"] = country;
+    to_be_deleted["date"] = date;
+    to_be_deleted["state"] = state;
+    to_be_deleted["confirmed"] = confirmed;
+    to_be_deleted["deaths"] = deaths;
+    to_be_deleted["recoveries"] = recoveries;
+
+    
+
     deleteAggregate(country, date, state, confirmed, deaths, recoveries);
     delete2D(country, date, state);
     deleteWorldData(date, confirmed, deaths, recoveries);
     result.splice(index, 1); //removes from array
-    res.send("Successfully deleted data");
+    res.locals.input_is_valid = true;
+    res.locals.validation_response = to_be_deleted;
   }
   else {
-    res.send("Incorrect serial number. Try again.");
+    res.locals.input_is_valid = false;
+    res.locals.validation_response = { serial_number : "Your serial number is invalid" };
   }
 
   next();
 }
+
 
 //converts an array to a csv file called covid_19_data_updated.csv
 function ConvertToCSV(objArray) {
