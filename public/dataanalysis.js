@@ -228,16 +228,31 @@ document.getElementById("Q2-btn").onclick = () =>  {
                 },
             };
 
-            DestroyCharts("Q2");
+            
 
             charts.Q2.push( new Chart(
                 document.getElementById('q2-chart'),
                 config
             ));  
 
+        },
+
+        OnClientError: (args) => {
+
+            let server_response = JSON.parse(args.response_text);
+            const h5 = document.createElement("h5");
+            const msg_container = document.getElementById("Q2-message");
+
+            h5.innerHTML = "Failed To Show Chart";
+            msg_container.appendChild(h5);
+
+            CreateErrorMessage(server_response, "Q2-message");
+
         }
     }
 
+    DestroyCharts("Q2");
+    ClearElementContentsById("Q2-message");
     SendRequest(args);
 
 };
@@ -367,28 +382,28 @@ document.getElementById("Q3-btn").onclick = () =>  {
                 },
 
             };
-            // const config2 = {
-            //     type: 'line',
-            //     data : data2,
-            //     options: {
-            //         plugins : {
-            //             title: {
-            //                 display: true,
-            //                 text: country2,
-            //             },
-            //         },
-            //         elements: {
-            //             point:{
-            //                 radius: 0
-            //             }
-            //         },
-            //         responsive: true,
-            //         maintainAspectRatio: false,
-            //     },
+            const config2 = {
+                type: 'line',
+                data : data2,
+                options: {
+                    plugins : {
+                        title: {
+                            display: true,
+                            text: country2,
+                        },
+                    },
+                    elements: {
+                        point:{
+                            radius: 0
+                        }
+                    },
+                    responsive: true,
+                    maintainAspectRatio: false,
+                },
 
-            // };
+            };
 
-            DestroyCharts("Q3");
+            
     
             var q3_chart1 = new Chart(
                 document.getElementById('q3-chart'),
@@ -404,9 +419,24 @@ document.getElementById("Q3-btn").onclick = () =>  {
             charts.Q3.push(q3_chart2);
 
 
+        },
+
+        OnClientError: (args) => {
+
+            let server_response = JSON.parse(args.response_text);
+            const h5 = document.createElement("h5");
+            const msg_container = document.getElementById("Q3-message");
+
+            h5.innerHTML = "Failed To Show Charts";
+            msg_container.appendChild(h5);
+
+            CreateErrorMessage(server_response, "Q3-message");
+
         }
     }
 
+    ClearElementContentsById("Q3-message");
+    DestroyCharts("Q3");
     SendRequest(args);
 
     
@@ -494,7 +524,7 @@ document.getElementById("Q4-btn").onclick = () =>  {
 
             };
 
-            DestroyCharts("Q4");
+            
 
             var myChart = new Chart(
                 document.getElementById('q4-chart'),
@@ -502,10 +532,25 @@ document.getElementById("Q4-btn").onclick = () =>  {
             );  
 
             charts.Q4.push(myChart);
+        },
+
+        OnClientError: (args) => {
+
+            let server_response = JSON.parse(args.response_text);
+            const h5 = document.createElement("h5");
+            const msg_container = document.getElementById("Q4-message");
+
+            h5.innerHTML = "Failed To Show Chart";
+            msg_container.appendChild(h5);
+
+            CreateErrorMessage(server_response, "Q4-message");
+
         }
 
     }
 
+    DestroyCharts("Q4");
+    ClearElementContentsById("Q4-message");
     SendRequest(args);
     
 };
@@ -523,10 +568,25 @@ document.getElementById("Q5-btn").onclick = () =>  {
             console.log(cb_args.response_text);
             let response_arr = JSON.parse(cb_args.response_text);
 
-            ClearElementContentsById("showTable5");
+            
             CreateTable(response_arr, "showTable5");
         },
+        OnClientError: (args) => {
+
+            let server_response = JSON.parse(args.response_text);
+            const h5 = document.createElement("h5");
+            const msg_container = document.getElementById("Q5-message");
+
+            h5.innerHTML = "Failed To Show Table";
+            msg_container.appendChild(h5);
+
+            CreateErrorMessage(server_response, "Q5-message");
+
+        }
     }
+
+    ClearElementContentsById("showTable5");
+    ClearElementContentsById("Q5-message");
     SendRequest(args);
     
 };
@@ -550,8 +610,22 @@ document.getElementById("Q6-btn").onclick = () =>  {
             ClearElementContentsById("showTable6");
             CreateTable(response_arr, "showTable6");
         },
+        OnClientError: (args) => {
+
+            let server_response = JSON.parse(args.response_text);
+            const h5 = document.createElement("h5");
+            const msg_container = document.getElementById("Q6-message");
+
+            h5.innerHTML = "Failed To Show Table";
+            msg_container.appendChild(h5);
+
+            CreateErrorMessage(server_response, "Q6-message");
+
+        }
     }
 
+    ClearElementContentsById("showTable6");
+    ClearElementContentsById("Q6-message");
     SendRequest(args);
 }
 
@@ -630,7 +704,7 @@ document.getElementById("Q7-btn").onclick = () =>  {
 
             };
 
-            DestroyCharts("Q7");
+           
             var myChart = new Chart(
                 document.getElementById('q7-chart'),
                 config
@@ -638,9 +712,24 @@ document.getElementById("Q7-btn").onclick = () =>  {
 
             charts.Q7.push(myChart);
         },
+        OnClientError: (args) => {
+
+            let server_response = JSON.parse(args.response_text);
+            const h5 = document.createElement("h5");
+            const msg_container = document.getElementById("Q7-message");
+
+            h5.innerHTML = "Failed To Show Chart";
+            msg_container.appendChild(h5);
+
+            CreateErrorMessage(server_response, "Q7-message");
+
+        },
     }
     
 
+    DestroyCharts("Q7");
+    ClearElementContentsById("Q7-message");
+    ClearElementContentsById("showTable7");
     SendRequest(args);
 }
 

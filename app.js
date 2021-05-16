@@ -7,7 +7,7 @@ let ejs = require('ejs');
 
 var bodyParser = require("body-parser");
 var multer  = require('multer');
-const { ap, all, of } = require('list');
+const { ap, all, of, sort } = require('list');
 const { parse } = require('path');
 const { PassThrough } = require('stream');
 var result = []; //holds all data
@@ -207,54 +207,62 @@ function analytics2(req, res, next) {
     }
   }
 
-  //vaccine info stored at the 2nd to last object of the non-cumulative data
-  let vaccineName = array[array.length-2]['vaxName'];
-  let vaccineDate = array[array.length-2]['vaxDate'];
-  
-  let casesBeforeSum = 0;
-  let casesAfterSum = 0;
-  let deathsBeforeSum = 0;
-  let deathsAfterSum = 0;
-  let recoveriesBeforeSum = 0;
-  let recoveriesAfterSum = 0;
-  let countBefore = 0;
-  let countAfter = 0;
-
-  //go through data (not last two objects), and sum up all the statistics for before and after the vaccine date
-  for(let i = 0; i < array.length-2; i++) {
-    if(ReformatDate("" + array[i]['ObservationDate']) <= vaccineDate) {
-      casesBeforeSum += Math.max(0, parseInt(array[i]['Confirmed']));
-      deathsBeforeSum += Math.max(0, parseInt(array[i]['Deaths']));
-      recoveriesBeforeSum += Math.max(0, parseInt(array[i]['Recovered']));
-      countBefore++;
-    }
-    else {
-      casesAfterSum += Math.max(0, parseInt(array[i]['Confirmed']));
-      deathsAfterSum += Math.max(0, parseInt(array[i]['Deaths']));
-      recoveriesAfterSum += Math.max(0, parseInt(array[i]['Recovered']));
-      countAfter++;
-    }
+  //skip if country not found
+  if (array.length == 0) {
+    res.status(400).send({ "msg" : `${country} was not found`});
+    next();
   }
+  else {
+    //vaccine info stored at the 2nd to last object of the non-cumulative data
+    let vaccineName = array[array.length-2]['vaxName'];
+    let vaccineDate = array[array.length-2]['vaxDate'];
+    
+    let casesBeforeSum = 0;
+    let casesAfterSum = 0;
+    let deathsBeforeSum = 0;
+    let deathsAfterSum = 0;
+    let recoveriesBeforeSum = 0;
+    let recoveriesAfterSum = 0;
+    let countBefore = 0;
+    let countAfter = 0;
 
-  //created object of averages
-  let vaxObj = {'avgCasesBeforeVax' : casesBeforeSum/countBefore,
-                'avgCasesAfterVax' : casesAfterSum/countAfter, 
-                'avgDeathsBeforeVax' : deathsBeforeSum/countBefore, 
-                'avgDeathsAfterVax' : deathsAfterSum/countAfter, 
-                'avgRecoveriesBeforeVax' : recoveriesBeforeSum/countBefore,
-                'avgRecoveriesAfterVax' : recoveriesAfterSum/countAfter,
-                'VaccineName' : vaccineName,
-                'VaccineDate' : vaccineDate
-                };
+    //go through data (not last two objects), and sum up all the statistics for before and after the vaccine date
+    for(let i = 0; i < array.length-2; i++) {
+      if(ReformatDate("" + array[i]['ObservationDate']) <= vaccineDate) {
+        casesBeforeSum += Math.max(0, parseInt(array[i]['Confirmed']));
+        deathsBeforeSum += Math.max(0, parseInt(array[i]['Deaths']));
+        recoveriesBeforeSum += Math.max(0, parseInt(array[i]['Recovered']));
+        countBefore++;
+      }
+      else {
+        casesAfterSum += Math.max(0, parseInt(array[i]['Confirmed']));
+        deathsAfterSum += Math.max(0, parseInt(array[i]['Deaths']));
+        recoveriesAfterSum += Math.max(0, parseInt(array[i]['Recovered']));
+        countAfter++;
+      }
+    }
 
-  //must put object into array for front end
-  let retArray = [];
-  retArray.push(vaxObj);
+    //created object of averages
+    let vaxObj = {'avgCasesBeforeVax' : casesBeforeSum/countBefore,
+                  'avgCasesAfterVax' : casesAfterSum/countAfter, 
+                  'avgDeathsBeforeVax' : deathsBeforeSum/countBefore, 
+                  'avgDeathsAfterVax' : deathsAfterSum/countAfter, 
+                  'avgRecoveriesBeforeVax' : recoveriesBeforeSum/countBefore,
+                  'avgRecoveriesAfterVax' : recoveriesAfterSum/countAfter,
+                  'VaccineName' : vaccineName,
+                  'VaccineDate' : vaccineDate
+                  };
 
-  fs.writeFileSync('./public/output.json', JSON.stringify(retArray)); //write array to json
-  res.sendFile(path.join(__dirname, "/public" , "output.json")); //send json
+    //must put object into array for front end
+    let retArray = [];
+    retArray.push(vaxObj);
 
-  next();
+    fs.writeFileSync('./public/output.json', JSON.stringify(retArray)); //write array to json
+    res.sendFile(path.join(__dirname, "/public" , "output.json")); //send json
+      }
+
+
+ 
 }
 
 //finds two countries and compares their graphs
@@ -276,15 +284,33 @@ function analytics3(req, res, next) {
     }
   }
 
-  //combine arrays, front end will seperate the data into graphs
-  for(let i = 0; i < array2.length; i++) {
-    array1.push(array2[i]);
+  if (array1.length == 0 || array2.length == 0) {
+
+    let response = {};
+
+    if (array1.length == 0) {
+      response["msg1"] = `${country1} was not found`;
+    }
+    if (array2.length == 0) {
+      response["msg2"] = `${country2} was not found`;
+    }
+
+    res.status(400).send(response);
+    next();
+  }
+  else {
+    //combine arrays, front end will seperate the data into graphs
+    for(let i = 0; i < array2.length; i++) {
+      array1.push(array2[i]);
+    }
+
+    fs.writeFileSync('./public/output.json', JSON.stringify(array1)); //write to json
+    res.sendFile(path.join(__dirname, "/public" , "output.json")); //send json
   }
 
-  fs.writeFileSync('./public/output.json', JSON.stringify(array1)); //write to json
-  res.sendFile(path.join(__dirname, "/public" , "output.json")); //send json
 
-  next();
+
+
 }
 
 //compares an input countries cases and deaths in a graph
@@ -300,11 +326,17 @@ function analytics4(req, res, next) {
     }
   }
 
-  //front end will handle how graph looks, send
-  fs.writeFileSync('./public/output.json', JSON.stringify(array)); //write to json
-  res.sendFile(path.join(__dirname, "/public" , "output.json")); //send json
+  if (array.length == 0) {
+    res.status(400).send({"msg" : `${country} was not found`});
+    next();
+  }
+  else {
+    //front end will handle how graph looks, send
+    fs.writeFileSync('./public/output.json', JSON.stringify(array)); //write to json
+    res.sendFile(path.join(__dirname, "/public" , "output.json")); //send json
+  }
 
-  next();
+
 }
 
 //finds recoveries rates of an input country, or gives sorted list of all countries recovery rates
@@ -337,6 +369,10 @@ function analytics5(req, res, next) {
       let array = [];
       array.push(obj);
       fs.writeFileSync('./public/output.json', JSON.stringify(array)); //write to json
+      res.sendFile(path.join(__dirname, "/public" , "output.json")); //send json
+    }
+    else {
+      res.status(400).send({"msg" : `${country} was not found`});
     }
   }
   //user did not enter a country, find rates for all countries
@@ -374,8 +410,9 @@ function analytics5(req, res, next) {
     }
 
     fs.writeFileSync('./public/output.json', JSON.stringify(retArray)); //write to json
+    res.sendFile(path.join(__dirname, "/public" , "output.json")); //send json
   }
-  res.sendFile(path.join(__dirname, "/public" , "output.json")); //send json
+  
   next();
 }
 
@@ -389,41 +426,51 @@ function analytics6(req, res, next) {
     //sort by deaths
     sortType = 'Deaths';
   } 
-  else {
+  else if (req.body.statType == "Recoveries") {
     //sort by recoveries
     sortType = 'Recovered';
   }  
+  else {
+    sortType = undefined;
+  }
 
-  //selection sort, only for the first 10 objects
-  for(let i = 0; i < 10; i++) {
-    let max = i;
-    for(let j = i+1; j < aggregatedCountryData.length; j++) {
-      if(parseInt(aggregatedCountryData[j][sortType]) > parseInt(aggregatedCountryData[max][sortType])) {
-        max = j;
+  if (sortType == undefined) {
+    res.status(400).send({"msg" : `${req.body.statType} is not a valid statistic`});
+  }
+  else {
+    //selection sort, only for the first 10 objects
+    for(let i = 0; i < 10; i++) {
+      let max = i;
+      for(let j = i+1; j < aggregatedCountryData.length; j++) {
+        if(parseInt(aggregatedCountryData[j][sortType]) > parseInt(aggregatedCountryData[max][sortType])) {
+          max = j;
+        }
+      }
+      if(max != i) {
+        let temp = aggregatedCountryData[i];
+        aggregatedCountryData[i] = aggregatedCountryData[max];
+        aggregatedCountryData[max] = temp;
       }
     }
-    if(max != i) {
-      let temp = aggregatedCountryData[i];
-      aggregatedCountryData[i] = aggregatedCountryData[max];
-      aggregatedCountryData[max] = temp;
+
+    let topTen = [];
+    let obj = {};
+    //gather first 10 from the list and put into another array
+    for(let i = 0; i < 10; i++) {
+      obj = {
+        'Country' : aggregatedCountryData[i]['Country'],
+        'Cases' : aggregatedCountryData[i]['Confirmed'],
+        'Deaths' : aggregatedCountryData[i]['Deaths'],
+        'Recoveries' : aggregatedCountryData[i]['Recovered']
+      };
+      topTen.push(obj);
     }
+
+    fs.writeFileSync('./public/output.json', JSON.stringify(topTen)); //write to json
+    res.sendFile(path.join(__dirname, "/public" , "output.json")); //send json
   }
 
-  let topTen = [];
-  let obj = {};
-  //gather first 10 from the list and put into another array
-  for(let i = 0; i < 10; i++) {
-    obj = {
-      'Country' : aggregatedCountryData[i]['Country'],
-      'Cases' : aggregatedCountryData[i]['Confirmed'],
-      'Deaths' : aggregatedCountryData[i]['Deaths'],
-      'Recoveries' : aggregatedCountryData[i]['Recovered']
-    };
-    topTen.push(obj);
-  }
 
-  fs.writeFileSync('./public/output.json', JSON.stringify(topTen)); //write to json
-  res.sendFile(path.join(__dirname, "/public" , "output.json")); //send json
   next();
 }
 
@@ -446,29 +493,52 @@ function analytics7(req, res, next) {
   let peak = "";
 
   //all peaks are stored in last object of non-cumulative data; retrieve
-  if(stat == "Confirmed") {
-    date = array[array.length-1]['casesDate'];
-    peak = array[array.length-1]['peakCases'];
+  if (array.length != 0) {
+    if(stat == "Confirmed") {
+      date = array[array.length-1]['casesDate'];
+      peak = array[array.length-1]['peakCases'];
+    }
+    else if(stat == "Deaths") {
+      date = array[array.length-1]['deathsDate'];
+      peak = array[array.length-1]['peakDeaths'];
+    }
+    else if(stat == "Recovered") {
+      date = array[array.length-1]['recoveredDate'];
+      peak = array[array.length-1]['peakRecovered'];
+    }
+    else {}
   }
-  else if(stat == "Deaths") {
-    date = array[array.length-1]['deathsDate'];
-    peak = array[array.length-1]['peakDeaths'];
-  }
-  else if(stat == "Recovered") {
-    date = array[array.length-1]['recoveredDate'];
-    peak = array[array.length-1]['peakRecovered'];
-  }
-  else {}
 
-  //create object
-  var obj = {'Country' : country,
-            'Peak Date' : date
-            };
-  obj[stat] = peak;
-  array.splice(array.length-2, 2);
-  array.push(obj); //push to end of array for front end, along with usable graph data (not last two objects)
-  fs.writeFileSync('./public/output.json', JSON.stringify(array)); //write to json
-  res.sendFile(path.join(__dirname, "/public" , "output.json")); //send json
+
+  const statistic_is_valid = (stat == "Confirmed" || stat == "Deaths" || stat == "Recovered");
+
+  if (array.length == 0 ||  !statistic_is_valid ) {
+
+    let response = {};
+    
+    if (array.length == 0) {
+      response["msg1"] = `${country} was not found`;
+    }
+
+    if (!statistic_is_valid) {
+      response["msg2"] = `${stat} is not a valid statistic`;
+    }
+
+    res.status(400).send(response);
+  }
+  else {
+    //create object
+    var obj = {'Country' : country,
+              'Peak Date' : date
+              };
+    obj[stat] = peak;
+    array.splice(array.length-2, 2);
+    array.push(obj); //push to end of array for front end, along with usable graph data (not last two objects)
+    fs.writeFileSync('./public/output.json', JSON.stringify(array)); //write to json
+    res.sendFile(path.join(__dirname, "/public" , "output.json")); //send json
+  }
+
+
   next();
 }
 
