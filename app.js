@@ -19,17 +19,17 @@ var countryData = []; //2D array holds non-cumulative data for each country
 
 console.log("Starting Server...");
 
-var csv = fs.readFileSync(path.resolve(__dirname, './CSV Files/covid_19_data.csv')); //reads in a cvs file
-result = csvParser(csv); //put into usable array
+var resultCSV = fs.readFileSync(path.resolve(__dirname, './CSV Files/covid_19_data.csv')); //reads in a cvs file
+result = csvParser(resultCSV); //put into usable array
 
-csv = fs.readFileSync(path.resolve(__dirname, './CSV Files/outside_metrics.csv')); //gathers outside metrics
-outside_data = csvParser(csv); //put into usable array
+var outsideCSV = fs.readFileSync(path.resolve(__dirname, './CSV Files/outside_metrics.csv')); //gathers outside metrics
+outside_data = csvParser(outsideCSV); //put into usable array
 
-csv = fs.readFileSync(path.resolve(__dirname, './CSV Files/aggregated_country_data.csv')); //aggregated data
-aggregatedCountryData = csvParser(csv); //put into usable array
+var aggregateCSV = fs.readFileSync(path.resolve(__dirname, './CSV Files/aggregated_country_data.csv')); //aggregated data
+aggregatedCountryData = csvParser(aggregateCSV); //put into usable array
 
-csv = fs.readFileSync(path.resolve(__dirname, './CSV Files/world_data.csv')); //world data
-worldData = csvParser(csv); //put into usable array
+var worldCSV = fs.readFileSync(path.resolve(__dirname, './CSV Files/world_data.csv')); //world data
+worldData = csvParser(worldCSV); //put into usable array
 
 countryData = createCountryData(); //create 2D array of non-cumulative data for each country
 
@@ -62,25 +62,56 @@ app.post('/search', search, (req, res) => {
 
 //called when import button is selected
 app.post('/import', (req, res) => { 
-  csv = fs.readFileSync(path.resolve(__dirname, './CSV Files/covid_19_data_updated.csv')); //change filepath to updated csv
-  result = csvParser(csv); //reparse with updated csv file
+  resultCSV = fs.readFileSync(path.resolve(__dirname, './CSV Files/covid_19_data_updated.csv')); //change filepath to updated csv
+  result = csvParser(resultCSV); //reparse with updated csv file
+
+  aggregateCSV = fs.readFileSync(path.resolve(__dirname, './CSV Files/aggregated_country_data_updated.csv')); //change filepath to updated csv
+  aggregatedCountryData = csvParser(aggregateCSV); //reparse with updated csv file
+
+  worldCSV = fs.readFileSync(path.resolve(__dirname, './CSV Files/world_data_updated.csv')); //change filepath to updated csv
+  worldData = csvParser(worldCSV); //reparse with updated csv file
+
+  countryData = createCountryData();
+
   res.send("Import complete. Search now on updated database");
 })
 
 //called in insert wrapper, uses middlewear to insert data into result array
 app.post('/insert', insertData, (req, res) => {
-  ConvertToCSV(result); //automatically backsup array for importing later
+  resultCSV = './CSV Files/covid_19_data_updated.csv';
+  ConvertToCSV(result, resultCSV); //automatically backsup array for importing later
+
+  aggregateCSV = './CSV Files/aggregated_country_data_updated.csv';
+  ConvertToCSV(aggregatedCountryData, aggregateCSV);
+
+  worldCSV = './CSV Files/world_data_updated.csv';
+  ConvertToCSV(worldData, worldCSV);
+
   res.send("Successfully inserted data");
 })
 
 //called in update wrapper, uses middlewear to update data in result array
 app.post('/update', updateData, (req, res) => {
-  ConvertToCSV(result); //automatically backsup array for importing later
+  resultCSV = './CSV Files/covid_19_data_updated.csv';
+  ConvertToCSV(result, resultCSV); //automatically backsup array for importing later
+
+  aggregateCSV = './CSV Files/aggregated_country_data_updated.csv';
+  ConvertToCSV(aggregatedCountryData, aggregateCSV);
+
+  worldCSV = './CSV Files/world_data_updated.csv';
+  ConvertToCSV(worldData, worldCSV);
 })
 
 //called in delete wrapper, uses middlewear to delete data in result array
 app.post('/delete', deleteData, (req, res) => {
-  ConvertToCSV(result); //automatically backsup array for importing later
+  resultCSV = './CSV Files/covid_19_data_updated.csv';
+  ConvertToCSV(result, resultCSV); //automatically backsup array for importing later
+
+  aggregateCSV = './CSV Files/aggregated_country_data_updated.csv';
+  ConvertToCSV(aggregatedCountryData, aggregateCSV);
+
+  worldCSV = './CSV Files/world_data_updated.csv';
+  ConvertToCSV(worldData, worldCSV);
 })
 
 app.post('/Q1', analytics1, (req, res) => {}) //calls analytic 1 middlewear
@@ -592,42 +623,40 @@ function deleteData(req, res, next) {
 }
 
 //converts an array to a csv file called covid_19_data_updated.csv
-function ConvertToCSV(objArray) {
+function ConvertToCSV(objArray, csvfile) {
   var array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray; //gets array
 
-  //var str = 'SNo,ObservationDate,Province/State,Country/Region,Last Update,Confirmed,Deaths,Recovered\r\n'; //harcode headers
+  var keyArray = Object.keys(array[0]);
   let str = "";
-  for(let i = 0; i < array[0].length; i++) {
-    if(i != array[0].length - 1)
-      str += array[0] + ',';
-    else 
-      str += array[0] + '\r\n';
+  for(var i = 0; i < keyArray.length; i++) {
+    if(i == keyArray.length-1) {
+      str += keyArray[i] + "\r\n";
+    }
+    else {
+      str += keyArray[i] + ",";
+    }
   }
 
   //adds each value from each array object, sperated by commas
+  var line = '';
   for (var i = 0; i < array.length; i++) {
-      var line = '';
-      for (var index in array[i]) {
-        if(index != array[0].length - 1) { 
-          if(array[i][index].includes(',')) { 
-            line += '\"' + array[i][index] + '\"' + ',';
-          }
-          else {
-            line += array[i][index] + ',';
-          }
+    line = '';
+    for (var index in array[i]) {
+      if(index == keyArray[keyArray.length-1]) {
+        line += array[i][index];
+      }
+      else {
+        if(array[i][index].toString().includes(',')) { 
+          line += '\"' + array[i][index] + '\"' + ',';
         }
         else {
-          line += array[i][index];
+          line += array[i][index] + ',';
         }
       }
-     str += line + '\r\n';
+    }
+    str += line + '\r\n';
   }
-  if(array[0] === 'Sno')
-    fs.writeFileSync('./CSV Files/covid_data_updated.csv', str); //writes to file
-  else if(array[0] === 'Country')
-    fs.writeFileSync('./CSV Files/aggregated_country_data_updated.csv', str); //writes to file
-  else if(array[0] === 'Date')
-    fs.writeFileSync('./CSV Files/world_date_updated.csv', str); //writes to file
+  fs.writeFileSync(csvfile, str); //writes to file
 }
 
 //Reformats dates from something like 12/19/2020 to 2020-12-19
@@ -980,24 +1009,12 @@ function InsertAggregate (country, state, date, cases, deaths, recoveries) {
   }
   if(index != -1) {
     if(state == "") {
-      if(parseInt(aggregatedCountryData[index]['Confirmed']) < parseInt(cases)) {
-        aggregatedCountryData[index]['Confirmed'] = cases;
-      }
-      if(parseInt(aggregatedCountryData[index]['Deaths']) < parseInt(deaths)) {
-        aggregatedCountryData[index]['Deaths'] = deaths;
-      }
-      if(parseInt(aggregatedCountryData[index]['Recovered']) < parseInt(recoveries)) {
-        aggregatedCountryData[index]['Recovered'] = recoveries;
-      }
-      aggregatedCountryData[index]['numDates'] = parseInt(aggregatedCountryData[index]['numDates']) + 1;
-    }
-    else {
       for(var i = result.length-1; i >= 0; i--) {
         if(result[i]['Country/Region'] == country) {
-          if(ReformatDate(result[i]['ObservationDate']) == date) {
-            aggregatedCountryData[index]['Confirmed'] = parseInt(aggregatedCountryData[index]['Confirmed']) + parseInt(cases);
-            aggregatedCountryData[index]['Deaths'] = parseInt(aggregatedCountryData[index]['Deaths']) + parseInt(deaths);
-            aggregatedCountryData[index]['Recovered'] = parseInt(aggregatedCountryData[index]['Recovered']) + parseInt(recoveries);
+          if(date > ReformatDate(result[i]['ObservationDate'])) {
+            aggregatedCountryData[index]["Confirmed"] = cases;
+            aggregatedCountryData[index]["Deaths"] = deaths;
+            aggregatedCountryData[index]["Recovered"] = recoveries;
             break;
           }
           else {
@@ -1005,7 +1022,37 @@ function InsertAggregate (country, state, date, cases, deaths, recoveries) {
           }
         }
       }
-      aggregatedCountryData[index]['numDates'] = parseInt(aggregatedCountryData[index]['numDates']) + 1;
+      aggregatedCountryData[index]["numDates"] = parseInt(aggregatedCountryData[index]["numDates"]) + 1;
+    }
+    else {
+      var addDate = true;
+      for(var i = 0; i < result.length; i++) {
+        if(country == result[i]['Country/Region'] && date == ReformatDate(result[i]['ObservationDate']) && state != result[i]['Province/State']) {
+          addDate = false;
+        }
+      }
+      for(var i = result.length-1; i >= 0; i--) {
+        if(result[i]['Country/Region'] == country) {
+          if(date > ReformatDate(result[i]['ObservationDate'])) {
+            aggregatedCountryData[index]["Confirmed"] = cases;
+            aggregatedCountryData[index]["Deaths"] = deaths;
+            aggregatedCountryData[index]["Recovered"] = recoveries;
+            break;
+          }
+          else if (date == ReformatDate(result[i]['ObservationDate'])){
+            aggregatedCountryData[index]["Confirmed"] = parseInt(aggregatedCountryData[index]["Confirmed"]) + parseInt(cases);
+            aggregatedCountryData[index]["Deaths"] = parseInt(aggregatedCountryData[index]["Deaths"]) + parseInt(deaths);
+            aggregatedCountryData[index]["Recovered"] = parseInt(aggregatedCountryData[index]["Recovered"]) + parseInt(recoveries);
+            break;
+          }
+          else {
+            break;
+          }
+        }
+      }
+      if(addDate) {
+        aggregatedCountryData[index]["numDates"] = parseInt(aggregatedCountryData[index]["numDates"]) + 1;
+      }
     }
   }
   else {
@@ -1020,39 +1067,83 @@ function InsertAggregate (country, state, date, cases, deaths, recoveries) {
   }
 }
 
-function deleteAggregate(country, date, state, confirmed, deaths, recoveries) {
-  var changeAggregate = false;
-  var index = aggregatedCountryData.findIndex(x => x.Country === country);
-  for(let i = result.length-1; i >= 0; i--) {
-    if(result[i]['Country/Region'] == country && result[i]['Province/State'] == state) {
-      if(changeAggregate) {
-        if(state == "") {
-          aggregatedCountryData[index]['Confirmed'] = result[i]['Confirmed'];
-          aggregatedCountryData[index]['Deaths'] = result[i]['Deaths'];
-          aggregatedCountryData[index]['Recovered'] = result[i]['Recovered'];
-          aggregatedCountryData[index]['numDates'] = parseInt(aggregatedCountryData[index]['numDates'])-1;
-        }
-        else {
-          aggregatedCountryData[index]['Confirmed'] = parseInt(aggregatedCountryData[index]['Confirmed']) - parseInt(confirmed);
-          aggregatedCountryData[index]['Deaths'] = parseInt(aggregatedCountryData[index]['Deaths']) - parseInt(deaths);
-          aggregatedCountryData[index]['Recovered'] = parseInt(aggregatedCountryData[index]['Recovered']) - parseInt(recoveries);
-          if(parseInt(aggregatedCountryData[index]['Confirmed']) == 0 || parseInt(aggregatedCountryData[index]['Deaths']) == 0 || parseInt(aggregatedCountryData[index]['Recovered']) == 0) {
-            aggregatedCountryData[index]['Confirmed'] = result[i]['Confirmed'];
-            aggregatedCountryData[index]['Deaths'] = result[i]['Deaths'];
-            aggregatedCountryData[index]['Recovered'] = result[i]['Recovered'];
-            aggregatedCountryData[index]['numDates'] = parseInt(aggregatedCountryData[index]['numDates'])-1;
+function deleteAggregate(country, date, state, cases, deaths, recoveries) {
+  let index = -1;
+  for(let i = 0; i < aggregatedCountryData.length; i++) {
+    if(aggregatedCountryData[i]['Country'] == country) {
+      index = i;
+      break;
+    }
+  }
+  if(index != -1) {
+    if(state == "") {
+      for(var i = result.length-1; i >= 0; i--) {
+        if(result[i]['Country/Region'] == country) {
+          if(date == ReformatDate(result[i]['ObservationDate'])) {
+            for(var j = i-1; j >= 0; j--) {
+              if(result[j]['Country/Region'] == country) {
+                aggregatedCountryData[index]["Confirmed"] = result[j]["Confirmed"];
+                aggregatedCountryData[index]["Deaths"] = result[j]["Deaths"];
+                aggregatedCountryData[index]["Recovered"] = result[j]["Recovered"];
+                aggregatedCountryData[index]["numDates"] = parseInt(aggregatedCountryData[index]["numDates"]) - 1;
+                break;
+              }
+            }
+            break;
+          }
+          else {
+            aggregatedCountryData[index]["numDates"] = parseInt(aggregatedCountryData[index]["numDates"]) - 1;
+            break;
           }
         }
-        break;
       }
-      if(result[i]['ObservationDate'] == date) {
-        changeAggregate = true;
-      }
-      else {
-        if(state == "") {
-          aggregatedCountryData[index]['numDates'] = parseInt(aggregatedCountryData[index]['numDates'])-1;
+    }
+    else {
+      var minusDate = true;
+      for(var i = 0; i < result.length; i++) {
+        if(country == result[i]['Country/Region'] && date == ReformatDate(result[i]['ObservationDate']) && state != result[i]['Province/State']) {
+          minusDate = false;
         }
-        break;
+      }
+      for(var i = result.length-1; i >= 0; i--) {
+        if(result[i]['Country/Region'] == country) {
+          if (date == ReformatDate(result[i]['ObservationDate'])){
+            aggregatedCountryData[index]["Confirmed"] = parseInt(aggregatedCountryData[index]["Confirmed"]) - parseInt(cases);
+            aggregatedCountryData[index]["Deaths"] = parseInt(aggregatedCountryData[index]["Deaths"]) - parseInt(deaths);
+            aggregatedCountryData[index]["Recovered"] = parseInt(aggregatedCountryData[index]["Recovered"]) - parseInt(recoveries);
+            if(parseInt(aggregatedCountryData[index]["Confirmed"]) == 0 && parseInt(aggregatedCountryData[index]["Deaths"]) == 0 && parseInt(aggregatedCountryData[index]["Recovered"]) == 0) {
+              var dateFound = false;
+              var dateToAggregate = '';
+              var totalCases = 0;
+              var totalDeaths = 0;
+              var totalRecovered = 0;
+              for(var j = i-1; j >= 0; j--) {
+                if(dateFound && result[j]['Country/Region'] == country) {
+                  totalCases += parseInt(result[j]['Confirmed']);
+                  totalDeaths += parseInt(result[j]['Deaths']);
+                  totalRecovered += parseInt(result[j]['Recovered']);
+                }
+                if(result[j]['Country/Region'] == country && !dateFound) {
+                  dateFound = true;
+                  dateToAggregate = result[j]['ObservationDate'];
+                  totalCases = parseInt(result[j]['Confirmed']);
+                  totalDeaths = parseInt(result[j]['Deaths']);
+                  totalRecovered = parseInt(result[j]['Recovered']);
+                }
+              }
+              aggregatedCountryData[index]["Confirmed"] = totalCases;
+              aggregatedCountryData[index]["Deaths"] = totalDeaths;
+              aggregatedCountryData[index]["Recovered"] = totalRecovered;
+            }
+            break;
+          }
+          else {
+            break;
+          }
+        }
+      }
+      if(minusDate) {
+        aggregatedCountryData[index]["numDates"] = parseInt(aggregatedCountryData[index]["numDates"]) - 1;
       }
     }
   }
@@ -1155,3 +1246,42 @@ function deleteWorldData(date, confirmed, deaths, recoveries) {
   worldData[index]['worldDeaths'] = parseInt(worldData[index]['worldDeaths']) - parseInt(deaths); 
   worldData[index]['worldRecovered'] = parseInt(worldData[index]['worldRecovered']) - parseInt(recoveries); 
 }
+
+/*var changeAggregate = false;
+  var index = aggregatedCountryData.findIndex(x => x.Country === country);
+  for(let i = result.length-1; i >= 0; i--) {
+    if(result[i]['Country/Region'] == country) {
+      if(changeAggregate) {
+        if(state == "") {
+          console.log("oops?");
+          aggregatedCountryData[index]['Confirmed'] = result[i]['Confirmed'];
+          aggregatedCountryData[index]['Deaths'] = result[i]['Deaths'];
+          aggregatedCountryData[index]['Recovered'] = result[i]['Recovered'];
+          aggregatedCountryData[index]['numDates'] = parseInt(aggregatedCountryData[index]['numDates'])-1;
+        }
+        else {
+          console.log("we made it");
+          aggregatedCountryData[index]['Confirmed'] = parseInt(aggregatedCountryData[index]['Confirmed']) - parseInt(confirmed);
+          aggregatedCountryData[index]['Deaths'] = parseInt(aggregatedCountryData[index]['Deaths']) - parseInt(deaths);
+          aggregatedCountryData[index]['Recovered'] = parseInt(aggregatedCountryData[index]['Recovered']) - parseInt(recoveries);
+          if(parseInt(aggregatedCountryData[index]['Confirmed']) == 0 || parseInt(aggregatedCountryData[index]['Deaths']) == 0 || parseInt(aggregatedCountryData[index]['Recovered']) == 0) {
+            aggregatedCountryData[index]['Confirmed'] = result[i]['Confirmed'];
+            aggregatedCountryData[index]['Deaths'] = result[i]['Deaths'];
+            aggregatedCountryData[index]['Recovered'] = result[i]['Recovered'];
+            aggregatedCountryData[index]['numDates'] = parseInt(aggregatedCountryData[index]['numDates'])-1;
+          }
+        }
+        break;
+      }
+      if(result[i]['ObservationDate'] == date) {
+        console.log("did we get here?");
+        changeAggregate = true;
+      }
+      else {
+        if(state == "") {
+          aggregatedCountryData[index]['numDates'] = parseInt(aggregatedCountryData[index]['numDates'])-1;
+        }
+        break;
+      }
+    }
+  }*/
