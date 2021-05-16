@@ -7,6 +7,8 @@ let ejs = require('ejs');
 
 var bodyParser = require("body-parser");
 var multer  = require('multer');
+const {performance} = require('perf_hooks');
+
 const { ap, all, of } = require('list');
 const { parse } = require('path');
 const { PassThrough } = require('stream');
@@ -16,6 +18,7 @@ var outside_data = []; //holds data collected outside original file
 var aggregatedCountryData = []; //holds data for each country aggregate totals
 var worldData = []; //holds data for aggregate world totals
 var countryData = []; //2D array holds non-cumulative data for each country
+
 
 console.log("Starting Server...");
 
@@ -114,21 +117,61 @@ app.post('/delete', deleteData, (req, res) => {
   ConvertToCSV(worldData, worldCSV);
 })
 
-app.post('/Q1', analytics1, (req, res) => {}) //calls analytic 1 middlewear
+app.post('/Q1', (req, res) => {
+  let t0 = performance.now();
+  analytics1(req, res);
+  let t1 = performance.now();
+  console.log("Analytics 1 took " + (t1 - t0) + " milliseconds.");
+}) //calls analytic 1 middlewear
 
-app.post('/Q2', analytics2, (req, res) => {}) //calls analytic 1 middlewear
+app.post('/Q2', (req, res) => {
+  let t0 = performance.now();
+  analytics2(req, res);
+  let t1 = performance.now();
+  console.log("Analytics 2 took " + (t1 - t0) + " milliseconds.");
+}) //calls analytic 1 middlewear
 
-app.post('/Q3', analytics3, (req, res) => {}) //calls analytic 1 middlewear
+app.post('/Q3', (req, res) => {
+  let t0 = performance.now();
+  analytics3(req, res);
+  let t1 = performance.now();
+  console.log("Analytics 3 took " + (t1 - t0) + " milliseconds.");
+}) //calls analytic 1 middlewear
 
-app.post('/Q4', analytics4, (req, res) => {}) //calls analytic 1 middlewear
+app.post('/Q4', (req, res) => {
+  let t0 = performance.now();
+  analytics4(req, res);
+  let t1 = performance.now();
+  console.log("Analytics 4 took " + (t1 - t0) + " milliseconds.");
+}) //calls analytic 1 middlewear
 
-app.post('/Q5', analytics5, (req, res) => {}) //calls analytic 1 middlewear
+app.post('/Q5', (req, res) => {
+  let t0 = performance.now();
+  analytics5(req, res);
+  let t1 = performance.now();
+  console.log("Analytics 5 took " + (t1 - t0) + " milliseconds.");
+}) //calls analytic 1 middlewear
 
-app.post('/Q6', analytics6, (req, res) => {}) //calls analytic 1 middlewear
+app.post('/Q6', (req, res) => {
+  let t0 = performance.now();
+  analytics6(req, res);
+  let t1 = performance.now();
+  console.log("Analytics 6 took " + (t1 - t0) + " milliseconds.");
+}) //calls analytic 1 middlewear
 
-app.post('/Q7', analytics7, (req, res) => {}) //calls analytic 1 middlewear
+app.post('/Q7', (req, res) => {
+  let t0 = performance.now();
+  analytics7(req, res);
+  let t1 = performance.now();
+  console.log("Analytics 7 took " + (t1 - t0) + " milliseconds.");
+}) //calls analytic 1 middlewear
 
-app.post('/Q8', analytics8, (req, res) => {}) //calls analytic 1 middlewear
+app.post('/Q8', (req, res) => {
+  let t0 = performance.now();
+  analytics8(req, res);
+  let t1 = performance.now();
+  console.log("Analytics 8 took " + (t1 - t0) + " milliseconds.");
+}) //calls analytic 1 middlewear
 
 app.listen(server, function() {
     console.log(`Server is running on port: ${server}`);
@@ -156,8 +199,6 @@ function analytics1(req, res, next) {
 
   fs.writeFileSync('./public/output.json', JSON.stringify(retArray)); //write array to json
   res.sendFile(path.join(__dirname, "/public" , "output.json")); //send json
-
-  next();
 }
 
 //sends average cases, deaths, and recoveries before and after some countries recorded first vaccination date
@@ -220,7 +261,7 @@ function analytics2(req, res, next) {
   fs.writeFileSync('./public/output.json', JSON.stringify(retArray)); //write array to json
   res.sendFile(path.join(__dirname, "/public" , "output.json")); //send json
 
-  next();
+
 }
 
 //finds two countries and compares their graphs
@@ -250,7 +291,7 @@ function analytics3(req, res, next) {
   fs.writeFileSync('./public/output.json', JSON.stringify(array1)); //write to json
   res.sendFile(path.join(__dirname, "/public" , "output.json")); //send json
 
-  next();
+
 }
 
 //compares an input countries cases and deaths in a graph
@@ -270,7 +311,7 @@ function analytics4(req, res, next) {
   fs.writeFileSync('./public/output.json', JSON.stringify(array)); //write to json
   res.sendFile(path.join(__dirname, "/public" , "output.json")); //send json
 
-  next();
+
 }
 
 //finds recoveries rates of an input country, or gives sorted list of all countries recovery rates
@@ -342,7 +383,7 @@ function analytics5(req, res, next) {
     fs.writeFileSync('./public/output.json', JSON.stringify(retArray)); //write to json
   }
   res.sendFile(path.join(__dirname, "/public" , "output.json")); //send json
-  next();
+
 }
 
 //find top ten countries for maximum of an input statistic
@@ -390,7 +431,6 @@ function analytics6(req, res, next) {
 
   fs.writeFileSync('./public/output.json', JSON.stringify(topTen)); //write to json
   res.sendFile(path.join(__dirname, "/public" , "output.json")); //send json
-  next();
 }
 
 //find the date which a country peaked in one day observation on a given statistic
@@ -435,7 +475,7 @@ function analytics7(req, res, next) {
   array.push(obj); //push to end of array for front end, along with usable graph data (not last two objects)
   fs.writeFileSync('./public/output.json', JSON.stringify(array)); //write to json
   res.sendFile(path.join(__dirname, "/public" , "output.json")); //send json
-  next();
+
 }
 
 //outputs cumulative totals for world data
@@ -443,7 +483,6 @@ function analytics8(req, res, next) {
   fs.writeFileSync('./public/output.json', JSON.stringify(worldData)); 
   res.sendFile(path.join(__dirname, "/public" , "output.json"));
 
-  next();
 }
 
 //parses a cvs file into an array
@@ -505,7 +544,7 @@ function search(req, res, next) {
       }
     }
   }
-  next();
+
 }
 
 //inserts data into result array
