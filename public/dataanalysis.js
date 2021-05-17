@@ -319,12 +319,26 @@ document.getElementById("Q3-btn").onclick = () =>  {
                     lineTension: 0.7,
                     },
                     {
+                        label: "Confirmed Cases 2",
+                        backgroundColor: 'rgb(255, 140, 0)',
+                        borderColor: 'rgb(255, 140, 0)',
+                        data: confirmed_cases2,
+                        lineTension: 0.7,
+                        },
+                    {
                     label: "Deaths",
-                    backgroundColor: 'rgb(255, 99, 132)',
-                    borderColor: 'rgb(255, 99, 132)',
+                    backgroundColor: 'rgb(46, 139, 87)',
+                    borderColor: 'rgb(46, 139, 87)',
                     data: deaths1,
                     lineTension: 0.7, 
                     },
+                    {
+                        label: "Deaths2",
+                        backgroundColor: 'rgb(215, 99, 132)',
+                        borderColor: 'rgb(215, 99, 132)',
+                        data: deaths2,
+                        lineTension: 0.7, 
+                        },
                     {
                     label: "Recoveries",
                     backgroundColor: 'rgb(66, 155, 245)',
@@ -332,35 +346,42 @@ document.getElementById("Q3-btn").onclick = () =>  {
                     data: recoveries1,
                     lineTension: 0.7, 
                     },
+                    {
+                        label: "Recoveries2",
+                        backgroundColor: 'rgb(128, 0, 128)',
+                        borderColor: 'rgb(128, 0, 128)',
+                        data: recoveries2,
+                        lineTension: 0.7, 
+                        },
                 ]
             };   
 
-            let data2 = {
-                labels: observation_dates2,
-                datasets: [
-                    {
-                    label: "Confirmed Cases",
-                    backgroundColor: 'rgb(235, 235, 52)',
-                    borderColor: 'rgb(235, 235, 52)',
-                    data: confirmed_cases2,
-                    lineTension: 0.7,
-                    },
-                    {
-                    label: "Deaths",
-                    backgroundColor: 'rgb(255, 99, 132)',
-                    borderColor: 'rgb(255, 99, 132)',
-                    data: deaths2,
-                    lineTension: 0.7, 
-                    },
-                    {
-                    label: "Recoveries",
-                    backgroundColor: 'rgb(66, 155, 245)',
-                    borderColor: 'rgb(66, 155, 245)',
-                    data: recoveries2,
-                    lineTension: 0.7, 
-                    },
-                ]
-            }; 
+            // let data2 = {
+            //     labels: observation_dates2,
+            //     datasets: [
+            //         {
+            //         label: "Confirmed Cases",
+            //         backgroundColor: 'rgb(235, 235, 52)',
+            //         borderColor: 'rgb(235, 235, 52)',
+            //         data: confirmed_cases2,
+            //         lineTension: 0.7,
+            //         },
+            //         {
+            //         label: "Deaths",
+            //         backgroundColor: 'rgb(255, 99, 132)',
+            //         borderColor: 'rgb(255, 99, 132)',
+            //         data: deaths2,
+            //         lineTension: 0.7, 
+            //         },
+            //         {
+            //         label: "Recoveries",
+            //         backgroundColor: 'rgb(66, 155, 245)',
+            //         borderColor: 'rgb(66, 155, 245)',
+            //         data: recoveries2,
+            //         lineTension: 0.7, 
+            //         },
+            //     ]
+            // }; 
 
             const config1 = {
                 type: 'line',
@@ -369,7 +390,7 @@ document.getElementById("Q3-btn").onclick = () =>  {
                     plugins : {
                         title: {
                             display: true,
-                            text: country1,
+                            text: [`Country 1: `, country1, `Country 2: ` , country2]
                         },
                     },
                     elements: {
@@ -382,26 +403,26 @@ document.getElementById("Q3-btn").onclick = () =>  {
                 },
 
             };
-            const config2 = {
-                type: 'line',
-                data : data2,
-                options: {
-                    plugins : {
-                        title: {
-                            display: true,
-                            text: country2,
-                        },
-                    },
-                    elements: {
-                        point:{
-                            radius: 0
-                        }
-                    },
-                    responsive: true,
-                    maintainAspectRatio: false,
-                },
+            // const config2 = {
+            //     type: 'line',
+            //     data : data2,
+            //     options: {
+            //         plugins : {
+            //             title: {
+            //                 display: true,
+            //                 text: country2,
+            //             },
+            //         },
+            //         elements: {
+            //             point:{
+            //                 radius: 0
+            //             }
+            //         },
+            //         responsive: true,
+            //         maintainAspectRatio: false,
+            //     },
 
-            };
+            // };
 
             
     
@@ -410,13 +431,13 @@ document.getElementById("Q3-btn").onclick = () =>  {
                 config1
             );     
 
-            var q3_chart2 = new Chart(
-                document.getElementById('q3-chart2'),
-                config2
-            );     
+            // var q3_chart2 = new Chart(
+            //     document.getElementById('q3-chart2'),
+            //     config2
+            // );     
 
             charts.Q3.push(q3_chart1);
-            charts.Q3.push(q3_chart2);
+            // charts.Q3.push(q3_chart2);
 
 
         },
